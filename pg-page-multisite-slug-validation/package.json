@@ -1,6 +1,6 @@
 {
   "name": "pg-page-multisite-slug-validation",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.17.5",
