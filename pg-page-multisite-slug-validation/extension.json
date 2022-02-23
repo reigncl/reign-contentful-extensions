@@ -1,0 +1,9 @@
+{
+  "id": "pg-page-multisite-slug-validation",
+  "name": "pg-page-multisite-slug-validation",
+  "src": "https://reigncl.github.io/reign-contentful-extensions/pg-page-multisite-slug-validation/build/index.html",
+  "fieldTypes": [
+    "Symbol",
+    "Text"
+  ]
+}
