@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Asset, PlainClientAPI } from 'contentful-management'
 import { Asset as FormaAsset, Heading, Table, TextInput, ValidationMessage } from '@contentful/f36-components'
 import { FieldExtensionSDK } from '@contentful/app-sdk'
@@ -71,6 +72,7 @@ const Field = (props: FieldProps) => {
   }, [])
 
   if (!firstTextParameter || !secondTextParameter) {
+    props.sdk.window.stopAutoResizer()
     return (
       <ValidationMessage style={{ marginTop: '0.5rem' }}>
         Please complete the app setup for field <strong>{props.sdk.field.id}</strong>{' '}
