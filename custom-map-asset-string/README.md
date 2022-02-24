@@ -28,7 +28,7 @@ Read [here](https://www.contentful.com/developers/docs/extensibility/app-framewo
 
 #### `npm run upload-ci`
 
-Similar to `npm run upload` it will upload your app to contentful and activate it. The only difference is  
+Similar to `npm run upload` it will upload your app to contentful and activate it. The only difference is
 that with this command all required arguments are read from the environment variables, for example when you add
 the upload command to your CI pipeline.
 
