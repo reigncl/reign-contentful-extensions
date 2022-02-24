@@ -43632,6 +43632,9 @@ var react_1 = require("react");
 var App = function (props) {
   var _a, _b, _c, _d;
 
+  var appEnvironmentUri = props.sdk.ids.environment !== 'master' ? "/environments/" + props.sdk.ids.environment : '';
+  var appUriContentType = "https://app.contentful.com/spaces/" + props.sdk.ids.space + appEnvironmentUri + "/content_types/" + props.sdk.ids.contentType + "/fields";
+
   var _e = react_1.useState(((_a = props.sdk.field) === null || _a === void 0 ? void 0 : _a.getValue()) ? props.sdk.field.getValue() : ''),
       value = _e[0],
       setValue = _e[1];
@@ -43651,11 +43654,11 @@ var App = function (props) {
   var detachExternalChangeHandler = null;
   var detachSiteChangeHandler = null;
   react_1.useEffect(function () {
-    var _a, _b;
+    var _a;
 
-    props.sdk.window.startAutoResizer();
-    detachSiteChangeHandler = (_a = props.sdk.entry) === null || _a === void 0 ? void 0 : _a.fields['site'].onValueChanged(siteChangeHandler);
-    detachExternalChangeHandler = (_b = props.sdk.field) === null || _b === void 0 ? void 0 : _b.onValueChanged(onExternalChange);
+    props.sdk.window.startAutoResizer(); // detachSiteChangeHandler = props.sdk.entry?.fields['site'].onValueChanged(siteChangeHandler);
+
+    detachExternalChangeHandler = (_a = props.sdk.field) === null || _a === void 0 ? void 0 : _a.onValueChanged(onExternalChange);
     return function () {
       if (detachSiteChangeHandler) detachSiteChangeHandler();
       if (detachExternalChangeHandler) detachExternalChangeHandler();
@@ -43723,7 +43726,7 @@ var App = function (props) {
             thisId = props.sdk.entry.getSys().id;
             searchQuery = (_a = {
               limit: 5
-            }, _a['content_type'] = props.sdk.ids.contentType, _a['fields.site[in]'] = site, _a['fields.slug[in]'] = value, _a['sys.id[nin]'] = thisId, _a);
+            }, _a['content_type'] = props.sdk.ids.contentType, _a['fields.site[in]'] = site, _a["fields." + props.sdk.field.id + "[in]"] = value, _a['sys.id[nin]'] = thisId, _a);
             return [4
             /*yield*/
             , props.sdk.space.getEntries(searchQuery)];
@@ -43762,6 +43765,17 @@ var App = function (props) {
     });
   };
 
+  if (!props.sdk.parameters.instance.siteFieldId || !props.sdk.parameters.instance.errorMessage) {
+    return React.createElement(React.Fragment, null, React.createElement(forma_36_react_components_1.ValidationMessage, {
+      style: {
+        marginTop: '0.5rem'
+      }
+    }, "Please complete the ui-extension setup for field ", React.createElement("strong", null, props.sdk.field.id), ' ', React.createElement("a", {
+      href: appUriContentType,
+      target: '_blank'
+    }, "here"), "."));
+  }
+
   return React.createElement(React.Fragment, null, React.createElement(forma_36_react_components_1.TextInput, {
     value: value,
     onChange: function (event) {
@@ -43771,7 +43785,7 @@ var App = function (props) {
     style: {
       marginTop: '0.5rem'
     }
-  }, "El slug ya se encuentra en uso para el sitio seleccionado"));
+  }, props.sdk.parameters.instance.errorMessage));
 };
 
 contentful_ui_extensions_sdk_1.init(function (sdk) {
@@ -43814,7 +43828,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51864" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58348" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

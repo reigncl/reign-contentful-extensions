@@ -10,7 +10,15 @@ interface AppProps {
   sdk: FieldExtensionSDK;
 }
 
+interface ExtensionParametersInstance {
+  siteFieldId?: string;
+  errorMessage?: string;
+}
+
 const App = (props: AppProps) => {
+  const appEnvironmentUri =
+    props.sdk.ids.environment !== 'master' ? `/environments/${props.sdk.ids.environment}` : '';
+  const appUriContentType = `https://app.contentful.com/spaces/${props.sdk.ids.space}${appEnvironmentUri}/content_types/${props.sdk.ids.contentType}/fields`;
   const [value, setValue] = useState<string>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
@@ -25,7 +33,7 @@ const App = (props: AppProps) => {
 
   useEffect(() => {
     props.sdk.window.startAutoResizer();
-    detachSiteChangeHandler = props.sdk.entry?.fields['site'].onValueChanged(siteChangeHandler);
+    // detachSiteChangeHandler = props.sdk.entry?.fields['site'].onValueChanged(siteChangeHandler);
     detachExternalChangeHandler = props.sdk.field?.onValueChanged(onExternalChange);
 
     return () => {
@@ -85,7 +93,7 @@ const App = (props: AppProps) => {
         limit: 5,
         ['content_type']: props.sdk.ids.contentType,
         ['fields.site[in]']: site,
-        ['fields.slug[in]']: value,
+        [`fields.${props.sdk.field.id}[in]`]: value,
         ['sys.id[nin]']: thisId,
       };
       const result = await props.sdk.space.getEntries(searchQuery);
@@ -102,6 +110,20 @@ const App = (props: AppProps) => {
     setValue(value);
   };
 
+  if (
+    !(props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ||
+    !(props.sdk.parameters.instance as ExtensionParametersInstance).errorMessage
+  ) {
+    return (
+      <>
+        <ValidationMessage style={{ marginTop: '0.5rem' }}>
+          Please complete the ui-extension setup for field <strong>{props.sdk.field.id}</strong>{' '}
+          <a href={appUriContentType} target='_blank'>here</a>.
+        </ValidationMessage>
+      </>
+    );
+  }
+
   return (
     <>
       <TextInput
@@ -110,7 +132,7 @@ const App = (props: AppProps) => {
       />
       {isSlugUsed && (
         <ValidationMessage style={{ marginTop: '0.5rem' }}>
-          El slug ya se encuentra en uso para el sitio seleccionado
+          {(props.sdk.parameters.instance as ExtensionParametersInstance).errorMessage}
         </ValidationMessage>
       )}
     </>
