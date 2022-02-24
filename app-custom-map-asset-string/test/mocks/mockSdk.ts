@@ -21,6 +21,15 @@ const mockSdk: any = {
       },
     },
   },
+  parameters: {
+    instance: {
+      firstText: 'Category',
+      secondText: 'Text',
+    },
+  },
+  ids: {
+    environment: 'master',
+  },
 }
 
 export { mockSdk }

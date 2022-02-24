@@ -1,5 +1,5 @@
 export interface BannerImage {
-  category: string
+  [instanceParameter: string]: string
   imageUrl: string
   imageId: string
 }

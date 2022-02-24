@@ -2,7 +2,10 @@
 
 This repo stores generic contentful extensions and apps.
 
-## Apps & Extensions
+## Apps
 
-* custom-map-asset-string: Allows to build string-asset pairs in a JSON object.
-* ui-pg-page-multisite-slug-validation: Defines slugs filtering through a `site` field.
+* **app-custom-map-asset-string**: Allows to build string-asset pairs in a JSON object.
+
+## UI Extensions
+
+* **ui-pg-page-multisite-slug-validation**: Defines slugs filtering through a `site` field.
