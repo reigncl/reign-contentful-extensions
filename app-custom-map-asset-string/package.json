@@ -1,6 +1,6 @@
 {
-  "name": "custom-map-string-asset",
-  "version": "1.0.0",
+  "name": "app-custom-map-asset-string",
+  "version": "1.0.3",
   "private": true,
   "dependencies": {
     "@contentful/app-sdk": "^4.3.4",
