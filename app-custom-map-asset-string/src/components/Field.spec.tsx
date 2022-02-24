@@ -1,6 +1,22 @@
 import Field from './Field'
 import { render, cleanup, fireEvent } from '@testing-library/react'
 import { assetMock, fieldMock, imagesMock, mockCma, mockSdk } from '../../test/mocks'
+import { toCamelCase } from '../utils'
+
+const testChangeEvent = (inputs: HTMLElement[], inputValues: string[], fieldKey: string) => {
+  inputs.forEach((input, idx) => {
+    const inputValue = inputValues[idx]
+
+    expect(input).toBeInTheDocument()
+    expect((input as HTMLInputElement).defaultValue).toBe(fieldMock[idx][fieldKey])
+
+    fireEvent.change(input, {
+      target: { value: inputValue },
+    })
+
+    expect((input as HTMLInputElement).value).toBe(inputValue)
+  })
+}
 
 describe('Field component', () => {
   beforeEach(() => {
@@ -40,23 +56,16 @@ describe('Field component', () => {
 
     const { findAllByTestId } = render(<Field cma={mockCma} sdk={mockSdk} />)
 
-    const inputs = await findAllByTestId(/textInput/)
+    const firstParameterInputs = await findAllByTestId(/firstTextInput/)
+    const secondParameterInputs = await findAllByTestId(/secondTextInput/)
 
-    const inputValues = ['/1', '/2', '/3']
-    inputs.forEach((input, idx) => {
-      const inputValue = inputValues[idx]
+    const firstInputValues = ['/1', '/2', '/3']
+    const secondInputValues = ['text1', 'text2', 'text3']
 
-      expect(input).toBeInTheDocument()
-      expect((input as HTMLInputElement).defaultValue).toBe(fieldMock[idx].category)
+    testChangeEvent(firstParameterInputs, firstInputValues, toCamelCase(mockSdk.parameters.instance.firstText))
+    testChangeEvent(secondParameterInputs, secondInputValues, toCamelCase(mockSdk.parameters.instance.secondText))
 
-      fireEvent.change(input, {
-        target: { value: inputValue },
-      })
-
-      expect((input as HTMLInputElement).value).toBe(inputValue)
-    })
-
-    expect(mockSdk.field.setValue).toHaveBeenCalledTimes(inputs.length + 1)
+    expect(mockSdk.field.setValue).toHaveBeenCalledTimes(firstParameterInputs.length + secondInputValues.length + 1)
   })
 
   it('should call detachSiteChangeHandler', () => {
