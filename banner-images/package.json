@@ -16,6 +16,7 @@
     "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:cov": "react-scripts test -- --coverage",
     "lint": "eslint --fix **/*.{js,jsx,ts,tsx}",
     "prettier": "prettier --write .",
     "eject": "react-scripts eject",

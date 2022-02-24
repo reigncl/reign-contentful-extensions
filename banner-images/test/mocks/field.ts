@@ -6,4 +6,8 @@ export const bannerImageMock: BannerImage = {
   imageId: 'dummy-id',
 }
 
-export const fieldMock: BannerImage[] = [{ ...bannerImageMock }, { ...bannerImageMock }, { ...bannerImageMock }]
+export const fieldMock: BannerImage[] = [
+  { ...bannerImageMock },
+  { ...bannerImageMock, imageId: 'dummy-id2', category: '/Women-2' },
+  { ...bannerImageMock, imageId: 'dummy-id3', category: '/Women-3' },
+]

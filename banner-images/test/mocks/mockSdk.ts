@@ -11,6 +11,7 @@ const mockSdk: any = {
   field: {
     getValue: jest.fn(),
     setValue: jest.fn(),
+    locale: 'en-US',
   },
   entry: {
     fields: {

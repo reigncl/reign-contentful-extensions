@@ -57,9 +57,6 @@ const Field = (props: FieldProps) => {
   }, [])
 
   if (field.length === 0) {
-    console.log('no field')
-    console.log(field)
-
     return (
       <Heading style={{ textAlign: 'center' }} testId="noImagesHeading">
         No images
@@ -83,6 +80,7 @@ const Field = (props: FieldProps) => {
           <Table.Row key={`${idx}-${imageId}`}>
             <Table.Cell>
               <TextInput
+                testId={`textInput-${idx}`}
                 onChange={(e) => {
                   const newField: BannerImage[] = JSON.parse(JSON.stringify(field))
                   newField[idx].category = e.target.value
