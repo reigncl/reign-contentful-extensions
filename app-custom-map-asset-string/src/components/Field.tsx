@@ -25,6 +25,7 @@ const Field = (props: FieldProps) => {
 
   const imagesChangeHandler = async () => {
     if (!firstTextParameter || !firstParameterKey || !secondTextParameter || !secondParameterKey) {
+      updateField([])
       return
     }
 
