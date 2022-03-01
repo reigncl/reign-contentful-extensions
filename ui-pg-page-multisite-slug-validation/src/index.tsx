@@ -22,14 +22,35 @@ const App = (props: AppProps) => {
   const [value, setValue] = useState<string>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
-  const [site, setSite] = useState<string>(props.sdk.entry?.fields['site']?.getValue() || '');
   const [fieldValue, setFieldValue] = useState<string>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
   const [isSlugUsed, setIsSlugUsed] = useState<boolean>(false);
-
   let detachExternalChangeHandler: Function | null = null;
   let detachSiteChangeHandler: Function | null = null;
+
+  if (
+    !(props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ||
+    !(props.sdk.parameters.instance as ExtensionParametersInstance).errorMessage
+  ) {
+    return (
+      <>
+        <ValidationMessage style={{ marginTop: '0.5rem' }}>
+          Please complete the ui-extension setup for field <strong>{props.sdk.field.id}</strong>{' '}
+          <a href={appUriContentType} target="_blank">
+            here
+          </a>
+          .
+        </ValidationMessage>
+      </>
+    );
+  }
+
+  const [site, setSite] = useState<string>(
+    props.sdk.entry?.fields[
+      (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ?? ''
+    ]?.getValue() || ''
+  );
 
   useEffect(() => {
     props.sdk.window.startAutoResizer();
@@ -109,20 +130,6 @@ const App = (props: AppProps) => {
     const value = e.currentTarget.value;
     setValue(value);
   };
-
-  if (
-    !(props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ||
-    !(props.sdk.parameters.instance as ExtensionParametersInstance).errorMessage
-  ) {
-    return (
-      <>
-        <ValidationMessage style={{ marginTop: '0.5rem' }}>
-          Please complete the ui-extension setup for field <strong>{props.sdk.field.id}</strong>{' '}
-          <a href={appUriContentType} target='_blank'>here</a>.
-        </ValidationMessage>
-      </>
-    );
-  }
 
   return (
     <>
