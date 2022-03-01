@@ -28,6 +28,7 @@ const App = (props: AppProps) => {
   const [isSlugUsed, setIsSlugUsed] = useState<boolean>(false);
   let detachExternalChangeHandler: Function | null = null;
   let detachSiteChangeHandler: Function | null = null;
+  const siteFielIdDefault = 'site';
 
   if (
     !(props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ||
@@ -48,13 +49,18 @@ const App = (props: AppProps) => {
 
   const [site, setSite] = useState<string>(
     props.sdk.entry?.fields[
-      (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ?? ''
+      (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ??
+        siteFielIdDefault
     ]?.getValue() || ''
   );
 
   useEffect(() => {
     props.sdk.window.startAutoResizer();
-    // detachSiteChangeHandler = props.sdk.entry?.fields['site'].onValueChanged(siteChangeHandler);
+    detachSiteChangeHandler =
+      props.sdk.entry?.fields[
+        (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ??
+          siteFielIdDefault
+      ].onValueChanged(siteChangeHandler);
     detachExternalChangeHandler = props.sdk.field?.onValueChanged(onExternalChange);
 
     return () => {
@@ -113,7 +119,10 @@ const App = (props: AppProps) => {
       const searchQuery: SearchQuery = {
         limit: 5,
         ['content_type']: props.sdk.ids.contentType,
-        ['fields.site[in]']: site,
+        [`fields.${
+          (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ??
+          siteFielIdDefault
+        }[in]`]: site,
         [`fields.${props.sdk.field.id}[in]`]: value,
         ['sys.id[nin]']: thisId,
       };
