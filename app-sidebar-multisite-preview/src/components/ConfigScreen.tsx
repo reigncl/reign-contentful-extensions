@@ -27,6 +27,7 @@ import { DialogTypes } from "./Dialog";
 export interface AppInstallationParameters {
   contentTypePage?: string;
   fieldSite?: string;
+  fieldSlug?: string;
   items?: Array<ConfigPreviewItem>;
 }
 
@@ -38,7 +39,8 @@ interface ConfigScreenProps {
 export interface ConfigPreviewItem {
   site: string;
   url: string;
-  stage: string;
+  label: string;
+  index?: number;
 }
 
 const ConfigScreen = (props: ConfigScreenProps) => {
@@ -49,44 +51,26 @@ const ConfigScreen = (props: ConfigScreenProps) => {
   const [fields, setFields] = useState<Array<string>>();
 
   const onConfigure = useCallback(async () => {
-    // This method will be called when a user clicks on "Install"
-    // or "Save" in the configuration screen.
-    // for more details see https://www.contentful.com/developers/docs/extensibility/ui-extensions/sdk-reference/#register-an-app-configuration-hook
-
-    // Get current the state of EditorInterface and other entities
-    // related to this app installation
     const currentState = await props.sdk.app.getCurrentState();
 
     return {
-      // Parameters to be persisted as the app configuration.
       parameters,
-      // In case you don't want to submit any update to app
-      // locations, you can just pass the currentState as is
       targetState: currentState,
     };
   }, [parameters, props.sdk]);
 
   useEffect(() => {
-    // `onConfigure` allows to configure a callback to be
-    // invoked when a user attempts to install the app or update
-    // its configuration.
     props.sdk.app.onConfigure(() => onConfigure());
   }, [props.sdk, onConfigure]);
 
   useEffect(() => {
     (async () => {
-      // Get current parameters of the app.
-      // If the app is not installed yet, `parameters` will be `null`.
       const currentParameters: AppInstallationParameters | null =
         await props.sdk.app.getParameters();
 
       if (currentParameters) {
-        console.log("currentParameters", currentParameters);
         setParameters(currentParameters);
       }
-
-      // Once preparation has finished, call `setReady` to hide
-      // the loading screen and present the app to a user.
       props.sdk.app.setReady();
     })();
   }, [props.sdk]);
@@ -166,12 +150,19 @@ const ConfigScreen = (props: ConfigScreenProps) => {
     setSites(undefined);
   };
 
-  const onFieldChange = async (fieldId: string) => {
+  const onFieldSiteChange = async (fieldId: string) => {
     setParameters({
       ...parameters,
       fieldSite: fieldId,
     });
     setSites(undefined);
+  };
+
+  const onFieldSlugChange = async (fieldId: string) => {
+    setParameters({
+      ...parameters,
+      fieldSlug: fieldId,
+    });
   };
 
   const SelectContentType = () => {
@@ -211,7 +202,30 @@ const ConfigScreen = (props: ConfigScreenProps) => {
         name="optionSelect-SelectSiteField"
         value={parameters?.fieldSite}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-          onFieldChange(e.currentTarget.value)
+          onFieldSiteChange(e.currentTarget.value)
+        }
+      >
+        <Select.Option value="">Select field</Select.Option>
+        {fields?.map((field: string, index: number) => {
+          return (
+            <Select.Option key={index} value={field}>
+              {field}
+            </Select.Option>
+          );
+        })}
+      </Select>
+    </FormControl>
+  );
+
+  const SelectSlugField = () => (
+    <FormControl>
+      <FormControl.Label>Select the "slug/permalink" field.</FormControl.Label>
+      <Select
+        id="optionSelect-SelectSiteField"
+        name="optionSelect-SelectSiteField"
+        value={parameters?.fieldSlug}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          onFieldSlugChange(e.currentTarget.value)
         }
       >
         <Select.Option value="">Select field</Select.Option>
@@ -256,24 +270,17 @@ const ConfigScreen = (props: ConfigScreenProps) => {
                   URL
                 </TextWithNote>
               </Table.Cell>
-              <Table.Cell>
-                <TextWithNote
-                  note="The stage of the link. E.g. dev, staging, production"
-                  id="stage"
-                >
-                  Stage
-                </TextWithNote>
-              </Table.Cell>
+              <Table.Cell>Button label</Table.Cell>
               <Table.Cell>Actions</Table.Cell>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {parameters.items.map((itm: ConfigPreviewItem, index: number) => {
+            {parameters.items.map((itm: ConfigPreviewItem, itmIndex: number) => {
               return (
-                <Table.Row key={index}>
-                  <Table.Cell>{itm.site}</Table.Cell>
-                  <Table.Cell>{itm.url}</Table.Cell>
-                  <Table.Cell>{itm.stage}</Table.Cell>
+                <Table.Row key={itmIndex}>
+                  <Table.Cell>{itm?.site}</Table.Cell>
+                  <Table.Cell>{itm?.url}</Table.Cell>
+                  <Table.Cell>{itm?.label}</Table.Cell>
                   <Table.Cell>
                     <TextLink
                       as="button"
@@ -281,7 +288,7 @@ const ConfigScreen = (props: ConfigScreenProps) => {
                       icon={<EditIcon />}
                       alignIcon="end"
                       onClick={() => {
-                        openDialog(DialogTypes.UPDATE, itm, index);
+                        openDialog(DialogTypes.UPDATE, itm, itmIndex);
                       }}
                     />
                     <TextLink
@@ -290,7 +297,7 @@ const ConfigScreen = (props: ConfigScreenProps) => {
                       icon={<DeleteIcon />}
                       alignIcon="end"
                       onClick={() => {
-                        openDeleteDialog(itm, index);
+                        openDeleteDialog(itm, itmIndex);
                       }}
                     />
                   </Table.Cell>
@@ -309,6 +316,7 @@ const ConfigScreen = (props: ConfigScreenProps) => {
     index?: number
   ) => {
     try {
+      console.log('openDialog index', index)
       const result: ConfigPreviewItem = await props.sdk.dialogs.openCurrentApp({
         title: type === DialogTypes.ADD ? "Add new preview" : "Edit preview",
         minHeight: 450,
@@ -316,20 +324,25 @@ const ConfigScreen = (props: ConfigScreenProps) => {
           sites,
           type,
           item,
+          index,
         },
       });
       const currentItems = parameters.items ?? [];
-      if (type === DialogTypes.ADD) {
+      if (type === DialogTypes.ADD && result) {
         currentItems.push(result);
       }
-      if (type === DialogTypes.UPDATE && typeof index !== "undefined") {
-        currentItems[index] = result;
+      if (type === DialogTypes.UPDATE && typeof result?.index !== "undefined") {
+        currentItems[result?.index] = result;
       }
-      setParameters({
-        ...parameters,
-        items: currentItems,
-      });
-    } catch (error) {}
+      if (result) {
+        setParameters({
+          ...parameters,
+          items: currentItems,
+        });
+      }
+    } catch (error) {
+      console.log("openDialog error", error);
+    }
   };
 
   const openDeleteDialog = async (item: ConfigPreviewItem, index: number) => {
@@ -346,7 +359,9 @@ const ConfigScreen = (props: ConfigScreenProps) => {
           items: currentItems,
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("openDeleteDialog error", error);
+    }
   };
 
   return (
@@ -356,6 +371,7 @@ const ConfigScreen = (props: ConfigScreenProps) => {
           <Heading>Config</Heading>
           <SelectContentType />
           <SelectSiteField />
+          <SelectSlugField />
           <SitesDetected />
         </Form>
       </Box>

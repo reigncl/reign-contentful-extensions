@@ -13,7 +13,8 @@ import { ConfigPreviewItem } from "./ConfigScreen";
 import { css } from "@emotion/css";
 
 export enum DialogTypes {
-  ADD, UPDATE
+  ADD,
+  UPDATE,
 }
 
 interface DialogProps {
@@ -29,24 +30,24 @@ interface DialogParameters {
 
 const Dialog = (props: DialogProps) => {
   const [submitted, setSubmitted] = useState(false);
-  const sites = (props.sdk.parameters.invocation as DialogParameters).sites;
+  const { item, sites } = props.sdk.parameters.invocation as DialogParameters;
   const [site, setSite] = useState<string | undefined>(
     (props.sdk.parameters.invocation as DialogParameters).item?.site
   );
   const [url, setUrl] = useState<string | undefined>(
     (props.sdk.parameters.invocation as DialogParameters).item?.url
   );
-  const [stage, setStage] = useState<string | undefined>(
-    (props.sdk.parameters.invocation as DialogParameters).item?.stage
+  const [label, setLabel] = useState<string | undefined>(
+    (props.sdk.parameters.invocation as DialogParameters).item?.label
   );
 
   const submitForm = () => {
     setSubmitted(true);
-    console.log("dialogprops", props);
     props.sdk.close({
       site,
       url,
-      stage,
+      label,
+      index: item?.index,
     } as ConfigPreviewItem);
   };
 
@@ -58,7 +59,7 @@ const Dialog = (props: DialogProps) => {
           <Select
             id="dialog-selectSite"
             name="dialog-selectSite"
-            value={site}
+            value={item?.site}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               setSite(e.currentTarget.value);
             }}
@@ -76,7 +77,7 @@ const Dialog = (props: DialogProps) => {
         <FormControl isRequired>
           <FormControl.Label>Add URL</FormControl.Label>
           <TextInput
-            value={url}
+            value={item?.url}
             type="url"
             name="dialog-url"
             placeholder="https://www.yourwebsite.com/{slug}"
@@ -90,22 +91,26 @@ const Dialog = (props: DialogProps) => {
           </FormControl.HelpText>
         </FormControl>
         <FormControl isRequired>
-          <FormControl.Label>Write the stage</FormControl.Label>
+          <FormControl.Label>Button label</FormControl.Label>
           <TextInput
-            value={stage}
+            value={item?.label}
             type="text"
-            name="dialog-stage"
-            placeholder="staging"
+            name="dialog-label"
+            placeholder="Open staging"
             onChange={(e) => {
-              setStage(e.currentTarget.value);
+              setLabel(e.currentTarget.value);
             }}
           />
           <FormControl.HelpText>
-            The stage of the link. E.g. dev, staging, production
+            Write the button label. E.g. Open staging
           </FormControl.HelpText>
         </FormControl>
-        <Button variant="primary" type="submit" isDisabled={submitted}>
-          Create preview
+        <Button
+          variant={item ? "positive" : "primary"}
+          type="submit"
+          isDisabled={submitted}
+        >
+          {item ? "Edit preview" : "Add preview"}
         </Button>
       </Form>
     </Flex>
