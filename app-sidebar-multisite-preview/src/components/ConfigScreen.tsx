@@ -114,7 +114,6 @@ const ConfigScreen = (props: ConfigScreenProps) => {
           parameters?.fieldSite
         );
         setSites(arrayOfSites);
-        console.log("arrayOfSites", arrayOfSites);
       }
     })();
   }, [
@@ -316,7 +315,6 @@ const ConfigScreen = (props: ConfigScreenProps) => {
     index?: number
   ) => {
     try {
-      console.log('openDialog index', index)
       const result: ConfigPreviewItem = await props.sdk.dialogs.openCurrentApp({
         title: type === DialogTypes.ADD ? "Add new preview" : "Edit preview",
         minHeight: 450,

@@ -1,6 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { PlainClientAPI } from "contentful-management";
-import { Button, Stack, ValidationMessage } from "@contentful/f36-components";
+import {
+  Button,
+  Note,
+  Stack,
+  ValidationMessage,
+} from "@contentful/f36-components";
 import { SidebarExtensionSDK } from "@contentful/app-sdk";
 import { ExternalLinkIcon } from "@contentful/f36-icons";
 import { AppInstallationParameters, ConfigPreviewItem } from "./ConfigScreen";
@@ -14,10 +19,8 @@ interface SidebarProps {
 }
 
 const Sidebar = (props: SidebarProps) => {
-  useEffect(() => {
-    props.sdk.window.startAutoResizer();
-  }, [props.sdk.window]);
-
+  const siteFielIdDefault: string = "site";
+  const slugFielIdDefault: string = "slug";
   const appEnvironmentUri =
     props.sdk.ids.environment !== "master"
       ? `/environments/${props.sdk.ids.environment}`
@@ -25,6 +28,47 @@ const Sidebar = (props: SidebarProps) => {
   const appSetupUri = `https://app.contentful.com/spaces/${props.sdk.ids.space}${appEnvironmentUri}/apps/${props.sdk.ids.app}`;
   const { contentTypePage, fieldSite, items, fieldSlug } = props?.sdk
     ?.parameters?.installation as AppInstallationParameters;
+
+  const [siteSelected, setSiteSelected] = useState<string | undefined>(
+    props?.sdk?.entry?.fields[fieldSite ?? siteFielIdDefault]?.getValue()
+  );
+  const [slugPgPage, setSlugPgPage] = useState<string | undefined>(
+    props?.sdk?.entry?.fields[fieldSlug ?? slugFielIdDefault]?.getValue()
+  );
+  let detachSiteChangeHandler: Function | null = null;
+  let detachSlugChangeHandler: Function | null = null;
+
+  useEffect(() => {
+
+    const siteChangeHandler = (value: string) => {
+      props.sdk.window.startAutoResizer();
+      setSiteSelected(value);
+    };
+
+    const slugChangeHandler = (value: string) => {
+      props.sdk.window.startAutoResizer();
+      setSlugPgPage(value);
+    };
+
+    detachSiteChangeHandler =
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      props.sdk.entry?.fields[
+        (props.sdk.parameters.installation as AppInstallationParameters)
+          ?.fieldSite ?? siteFielIdDefault
+      ].onValueChanged(siteChangeHandler);
+    detachSlugChangeHandler =
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      props.sdk.entry?.fields[
+        (props.sdk.parameters.installation as AppInstallationParameters)
+          ?.fieldSlug ?? slugFielIdDefault
+      ].onValueChanged(slugChangeHandler);
+
+    return () => {
+      if (detachSiteChangeHandler) detachSiteChangeHandler();
+      if (detachSlugChangeHandler) detachSlugChangeHandler();
+    };
+  }, []);
+
   if (
     !contentTypePage ||
     !fieldSite ||
@@ -44,9 +88,6 @@ const Sidebar = (props: SidebarProps) => {
       </>
     );
   }
-
-  const siteSelected: string = props?.sdk?.entry?.fields[fieldSite]?.getValue();
-  const slugPgPage: string = props?.sdk?.entry?.fields[fieldSlug]?.getValue();
   if (!siteSelected || !slugPgPage) {
     return (
       <>
@@ -57,12 +98,26 @@ const Sidebar = (props: SidebarProps) => {
     );
   }
 
+  const itemsFiltered: Array<ConfigPreviewItem> = items
+    ?.filter((item: ConfigPreviewItem) => item.site === siteSelected)
+    ?.sort(SortByLabel);
+
   return (
     <Stack flexDirection="column">
-      {items
-        ?.filter((item: ConfigPreviewItem) => item.site === siteSelected)
-        ?.sort(SortByLabel)
-        ?.map((item: ConfigPreviewItem, index: number) => {
+      {itemsFiltered && itemsFiltered.length === 0 && (
+        <>
+          <Note variant="warning">
+            Please add previews to this site{" "}
+            <a href={appSetupUri} target="_blank" rel="noreferrer">
+              <strong>here</strong>
+            </a>
+            .
+          </Note>
+        </>
+      )}
+      {itemsFiltered &&
+        itemsFiltered.length > 0 &&
+        itemsFiltered?.map((item: ConfigPreviewItem, index: number) => {
           const urlFieldId: string = GetBracesVar(item?.url) as string;
           const previewLink = BuildPreviewUrl(
             item?.url,
@@ -73,7 +128,7 @@ const Sidebar = (props: SidebarProps) => {
             <Button
               key={index}
               as="a"
-              endIcon={<ExternalLinkIcon />}
+              startIcon={<ExternalLinkIcon />}
               target="_blank"
               isFullWidth
               href={previewLink}
