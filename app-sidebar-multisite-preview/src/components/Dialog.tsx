@@ -26,11 +26,12 @@ interface DialogParameters {
   sites: Array<string>;
   item?: ConfigPreviewItem;
   type: DialogTypes;
+  index?: number;
 }
 
 const Dialog = (props: DialogProps) => {
   const [submitted, setSubmitted] = useState(false);
-  const { item, sites } = props.sdk.parameters.invocation as DialogParameters;
+  const { index, item, sites } = props.sdk.parameters.invocation as DialogParameters;
   const [site, setSite] = useState<string | undefined>(
     (props.sdk.parameters.invocation as DialogParameters).item?.site
   );
@@ -47,7 +48,7 @@ const Dialog = (props: DialogProps) => {
       site,
       url,
       label,
-      index: item?.index,
+      index
     } as ConfigPreviewItem);
   };
 
@@ -59,7 +60,7 @@ const Dialog = (props: DialogProps) => {
           <Select
             id="dialog-selectSite"
             name="dialog-selectSite"
-            value={item?.site}
+            value={site}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
               setSite(e.currentTarget.value);
             }}
@@ -77,7 +78,7 @@ const Dialog = (props: DialogProps) => {
         <FormControl isRequired>
           <FormControl.Label>Add URL</FormControl.Label>
           <TextInput
-            value={item?.url}
+            value={url}
             type="url"
             name="dialog-url"
             placeholder="https://www.yourwebsite.com/{slug}"
@@ -93,7 +94,7 @@ const Dialog = (props: DialogProps) => {
         <FormControl isRequired>
           <FormControl.Label>Button label</FormControl.Label>
           <TextInput
-            value={item?.label}
+            value={label}
             type="text"
             name="dialog-label"
             placeholder="Open staging"
