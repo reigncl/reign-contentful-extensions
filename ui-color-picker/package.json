@@ -1,13 +1,12 @@
 {
   "name": "ui-color-picker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "devDependencies": {
     "@babel/core": "7.12.3",
     "@babel/plugin-transform-runtime": "7.12.1",
     "@babel/preset-env": "7.12.1",
     "@babel/preset-react": "7.12.1",
-    "@contentful/browserslist-config": "^2.0.0",
     "@contentful/contentful-extension-scripts": "0.21.0",
     "@contentful/eslint-config-extension": "0.4.3",
     "@testing-library/react": "11.1.1",
@@ -34,6 +33,7 @@
     "help": "contentful-extension-scripts help"
   },
   "dependencies": {
+    "@contentful/browserslist-config": "^2.0.0",
     "@contentful/f36-components": "^4.8.0",
     "@contentful/f36-tokens": "^4.0.1",
     "contentful-ui-extensions-sdk": "3.24.0",
