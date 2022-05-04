@@ -1,6 +1,6 @@
 {
   "name": "ui-color-picker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "devDependencies": {
     "@babel/core": "7.12.3",
