@@ -1,12 +1,25 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
-import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.css';
 import { useEffect, useState, useRef } from 'react';
+import { CirclePicker, ChromePicker, CompactPicker, ColorResult } from 'react-color';
+import { FormControl } from '@contentful/f36-components';
 
 interface AppProps {
   sdk: FieldExtensionSDK;
+}
+
+enum TypeColorPicker {
+  CirclePicker = 'CirclePicker',
+  ChromePicker = 'ChromePicker',
+  CompactPicker = 'CompactPicker',
+  HTMLNative = 'HTMLNative',
+}
+
+interface ExtensionParametersInstance {
+  colors?: string;
+  type?: TypeColorPicker;
 }
 
 interface AppProps {
@@ -19,10 +32,25 @@ const App = (props: AppProps) => {
   );
   // eslint-disable-next-line @typescript-eslint/ban-types
   const detachExternalChangeHandler = useRef<Function>();
+  const [parameters, setParameters] = useState<ExtensionParametersInstance>(
+    props.sdk.parameters.instance as ExtensionParametersInstance
+  );
+  const availableColors =
+    parameters?.colors?.split(',')?.map((color: string) => color?.toLowerCase()?.trim()) || [];
 
-  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
+  const onChangeColor = async (color: ColorResult) => {
+    setValue(color.hex);
+  };
+
+  const onChangeColorComplete = async (color: ColorResult) => {
+    setValue(color.hex);
+    await props.sdk.field.setValue(color.hex);
+  };
+
+  const onChangeNative = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event?.target?.value;
     setValue(value);
+    await props.sdk.field.setValue(value);
   };
 
   const onExternalChange = (externalValue: string) => {
@@ -41,13 +69,42 @@ const App = (props: AppProps) => {
   }, [props.sdk]);
 
   return (
-    <input
-      value={value}
-      onChange={(event) => onChange(event as React.ChangeEvent<HTMLInputElement>)}
-      type="color"
-      title={value}
-      name={props.sdk.field.id}
-    />
+    <FormControl margin="spacingS">
+      {parameters?.type === TypeColorPicker.HTMLNative && (
+        <input
+          value={value}
+          type="color"
+          title={value}
+          onChange={onChangeNative}
+          name={props.sdk.field.id}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.CirclePicker && (
+        <CirclePicker
+          color={value}
+          colors={availableColors}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.ChromePicker && (
+        <ChromePicker
+          color={value}
+          disableAlpha={true}
+          onChange={onChangeColor}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.CompactPicker && (
+        <CompactPicker
+          color={value}
+          colors={availableColors}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+    </FormControl>
   );
 };
 

@@ -1,23 +1,25 @@
 {
   "name": "ui-color-picker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "devDependencies": {
-    "@contentful/contentful-extension-scripts": "0.21.0",
-    "@contentful/eslint-config-extension": "0.4.3",
     "@babel/core": "7.12.3",
     "@babel/plugin-transform-runtime": "7.12.1",
     "@babel/preset-env": "7.12.1",
     "@babel/preset-react": "7.12.1",
+    "@contentful/browserslist-config": "^2.0.0",
+    "@contentful/contentful-extension-scripts": "0.21.0",
+    "@contentful/eslint-config-extension": "0.4.3",
     "@testing-library/react": "11.1.1",
-    "cssnano": "4.1.10",
-    "contentful-cli": "1.4.48",
-    "eslint": "7.12.1",
-    "typescript": "4.0.5",
     "@types/jest": "26.0.15",
     "@types/react": "16.9.56",
+    "@types/react-color": "^3.0.6",
     "@types/react-dom": "16.9.9",
-    "@types/webpack-env": "1.15.3"
+    "@types/webpack-env": "1.15.3",
+    "contentful-cli": "1.4.48",
+    "cssnano": "4.1.10",
+    "eslint": "7.12.1",
+    "typescript": "4.0.5"
   },
   "scripts": {
     "start": "contentful-extension-scripts start",
@@ -32,12 +34,12 @@
     "help": "contentful-extension-scripts help"
   },
   "dependencies": {
-    "@contentful/forma-36-fcss": "^0.0.35",
-    "@contentful/forma-36-react-components": "3.11.3",
-    "@contentful/forma-36-tokens": "^0.5.2",
+    "@contentful/f36-components": "^4.8.0",
+    "@contentful/f36-tokens": "^4.0.1",
     "contentful-ui-extensions-sdk": "3.24.0",
     "prop-types": "15.7.2",
     "react": "16.14.0",
+    "react-color": "^2.19.3",
     "react-dom": "16.14.0"
   },
   "browserslist": [

@@ -1,8 +1,29 @@
 {
   "id": "ui-color-picker",
   "name": "ui-color-picker",
-  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=1.0.0",
-  "fieldTypes": [
-    "Symbol"
-  ]
+  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=1.0.1",
+  "fieldTypes": ["Symbol"],
+  "parameters": {
+    "instance": [
+      {
+        "id": "type",
+        "type": "Enum",
+        "name": "Type",
+        "options": [
+          { "CirclePicker": "CirclePicker" },
+          { "ChromePicker": "ChromePicker" },
+          { "CompactPicker": "CompactPicker" },
+          { "HTMLNative": "HTML Native" }
+        ],
+        "default": "HTMLNative",
+        "required": true
+      },
+      {
+        "id": "colors",
+        "type": "Symbol",
+        "name": "Available colors",
+        "description": "Complete only if you wish to have a list of available colors. Add them separated by comma and hex value. Eg.: #D9E3F0, #009688, #555555"
+      }
+    ]
+  }
 }
