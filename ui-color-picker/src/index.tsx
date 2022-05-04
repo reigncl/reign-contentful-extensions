@@ -68,7 +68,7 @@ const App = (props: AppProps) => {
   }, [props.sdk]);
 
   return (
-    <div style={{'padding': '10px'}}>
+    <div style={{'padding': '15px'}}>
       {parameters?.type === TypeColorPicker.HTMLNative && (
         <input
           value={value}
