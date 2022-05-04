@@ -1,7 +1,7 @@
 {
   "id": "ui-color-picker",
   "name": "ui-color-picker",
-  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=1.0.3",
+  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=2.0.0",
   "fieldTypes": ["Symbol"],
   "parameters": {
     "instance": [

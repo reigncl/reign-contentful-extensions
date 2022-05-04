@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
+import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.css';
-import { useEffect, useState, useRef } from 'react';
 import { CirclePicker, ChromePicker, CompactPicker, ColorResult } from 'react-color';
-import { FormControl } from '@contentful/f36-components';
 
 interface AppProps {
   sdk: FieldExtensionSDK;
@@ -27,12 +26,12 @@ interface AppProps {
 }
 
 const App = (props: AppProps) => {
-  const [value, setValue] = useState<string>(
+  const [value, setValue] = React.useState<string>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
   // eslint-disable-next-line @typescript-eslint/ban-types
-  const detachExternalChangeHandler = useRef<Function>();
-  const [parameters, setParameters] = useState<ExtensionParametersInstance>(
+  const detachExternalChangeHandler = React.useRef<Function>();
+  const [parameters, setParameters] = React.useState<ExtensionParametersInstance>(
     props.sdk.parameters.instance as ExtensionParametersInstance
   );
   const availableColors =
@@ -59,7 +58,7 @@ const App = (props: AppProps) => {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     props.sdk.window.startAutoResizer();
     detachExternalChangeHandler.current = props.sdk.field?.onValueChanged(onExternalChange);
 
@@ -69,7 +68,7 @@ const App = (props: AppProps) => {
   }, [props.sdk]);
 
   return (
-    <FormControl margin="spacingS">
+    <div style={{'padding': '10px'}}>
       {parameters?.type === TypeColorPicker.HTMLNative && (
         <input
           value={value}
@@ -104,11 +103,11 @@ const App = (props: AppProps) => {
           onChangeComplete={onChangeColorComplete}
         />
       )}
-    </FormControl>
+    </div>
   );
 };
 
-init((sdk) => {
+init(sdk => {
   render(<App sdk={sdk as FieldExtensionSDK} />, document.getElementById('root'));
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "ui-color-picker",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "private": true,
   "devDependencies": {
     "@babel/core": "7.12.3",
@@ -22,8 +22,8 @@
   },
   "scripts": {
     "start": "contentful-extension-scripts start",
-    "build": "contentful-extension-scripts build",
-    "lint": "eslint ./ --ext .tsx && tsc -p ./ --noEmit",
+    "build": "contentful-extension-scripts build --no-inline",
+    "lint": "eslint ./ --ext .js,.jsx,.ts,.tsx && tsc -p ./ --noEmit",
     "test": "contentful-extension-scripts test --env=jsdom --watch",
     "test:coverage": "contentful-extension-scripts test --env=jsdom --coverage",
     "deploy": "npm run build && contentful extension update --force",
@@ -33,9 +33,9 @@
     "help": "contentful-extension-scripts help"
   },
   "dependencies": {
-    "@contentful/browserslist-config": "^2.0.0",
-    "@contentful/f36-components": "^4.8.0",
-    "@contentful/f36-tokens": "^4.0.1",
+    "@contentful/forma-36-fcss": "^0.0.35",
+    "@contentful/forma-36-react-components": "3.11.3",
+    "@contentful/forma-36-tokens": "^0.5.2",
     "contentful-ui-extensions-sdk": "3.24.0",
     "prop-types": "15.7.2",
     "react": "16.14.0",
