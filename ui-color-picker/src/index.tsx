@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
-import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.css';
 import { useEffect, useState, useRef } from 'react';
-import { CirclePicker, ChromePicker, SwatchesPicker, ColorResult } from 'react-color';
+import { CirclePicker, ChromePicker, CompactPicker, ColorResult } from 'react-color';
+import { FormControl } from '@contentful/f36-components';
 
 interface AppProps {
   sdk: FieldExtensionSDK;
@@ -13,7 +13,7 @@ interface AppProps {
 enum TypeColorPicker {
   CirclePicker = 'CirclePicker',
   ChromePicker = 'ChromePicker',
-  SwatchesPicker = 'SwatchesPicker',
+  CompactPicker = 'CompactPicker',
   HTMLNative = 'HTMLNative',
 }
 
@@ -32,11 +32,25 @@ const App = (props: AppProps) => {
   );
   // eslint-disable-next-line @typescript-eslint/ban-types
   const detachExternalChangeHandler = useRef<Function>();
-  const parameters = props.sdk.parameters.instance as ExtensionParametersInstance;
-  const availableColors = parameters?.colors?.split(',') || [];
+  const [parameters, setParameters] = useState<ExtensionParametersInstance>(
+    props.sdk.parameters.instance as ExtensionParametersInstance
+  );
+  const availableColors =
+    parameters?.colors?.split(',')?.map((color: string) => color?.toLowerCase()?.trim()) || [];
 
-  const onChange = (color: ColorResult) => {
+  const onChangeColor = async (color: ColorResult) => {
     setValue(color.hex);
+  };
+
+  const onChangeColorComplete = async (color: ColorResult) => {
+    setValue(color.hex);
+    await props.sdk.field.setValue(color.hex);
+  };
+
+  const onChangeNative = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event?.target?.value;
+    setValue(value);
+    await props.sdk.field.setValue(value);
   };
 
   const onExternalChange = (externalValue: string) => {
@@ -54,42 +68,43 @@ const App = (props: AppProps) => {
     };
   }, [props.sdk]);
 
-  const MainPicker = () => {
-    switch (parameters?.type) {
-      case TypeColorPicker.CirclePicker:
-        return (
-          <CirclePicker
-            color={value}
-            colors={availableColors}
-            onChangeComplete={onChange}
-          />
-        );
-      case TypeColorPicker.ChromePicker:
-        return (
-          <ChromePicker
-            color={value}
-            onChangeComplete={onChange}
-          />
-        );
-      case TypeColorPicker.SwatchesPicker:
-        return (
-          <SwatchesPicker
-            color={value}
-            colors={[availableColors]}
-            onChange={onChange}
-            onChangeComplete={onChange}
-          />
-        );
-      case TypeColorPicker.HTMLNative:
-      default:
-        return <input value={value} type="color" title={value} name={props.sdk.field.id} />;
-    }
-  };
-
   return (
-    <div style={{'padding': '0 20px'}}>
-      <MainPicker />
-    </div>
+    <FormControl margin="spacingS">
+      {parameters?.type === TypeColorPicker.HTMLNative && (
+        <input
+          value={value}
+          type="color"
+          title={value}
+          onChange={onChangeNative}
+          name={props.sdk.field.id}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.CirclePicker && (
+        <CirclePicker
+          color={value}
+          colors={availableColors}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.ChromePicker && (
+        <ChromePicker
+          color={value}
+          disableAlpha={true}
+          onChange={onChangeColor}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+
+      {parameters?.type === TypeColorPicker.CompactPicker && (
+        <CompactPicker
+          color={value}
+          colors={availableColors}
+          onChangeComplete={onChangeColorComplete}
+        />
+      )}
+    </FormControl>
   );
 };
 

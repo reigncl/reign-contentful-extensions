@@ -1,7 +1,7 @@
 {
   "id": "ui-color-picker",
   "name": "ui-color-picker",
-  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=1.0.0",
+  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-color-picker/build/index.html?v=1.0.1",
   "fieldTypes": ["Symbol"],
   "parameters": {
     "instance": [
@@ -12,7 +12,7 @@
         "options": [
           { "CirclePicker": "CirclePicker" },
           { "ChromePicker": "ChromePicker" },
-          { "SwatchesPicker": "SwatchesPicker" },
+          { "CompactPicker": "CompactPicker" },
           { "HTMLNative": "HTML Native" }
         ],
         "default": "HTMLNative",
