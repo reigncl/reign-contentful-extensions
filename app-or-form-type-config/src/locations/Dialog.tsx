@@ -86,17 +86,18 @@ const Dialog = () => {
     sdk.close(configData);
   };
 
-  const handleKeyChange = (event: any, id: string) => {
-    const value = valueList.find((value) => value.id === id);
-    if (value) {
-      value.key = event.target.value;
-    }
-  };
+  const handleInputChange = (event: any, id: string, key: string) => {
+    const valueIndex = valueList.findIndex((value) => value.id === id);
 
-  const handleValueChange = (event: any, id: string) => {
-    const value = valueList.find((value) => value.id === id);
-    if (value) {
-      value.value = event.target.value;
+    if (valueIndex !== -1) {
+      const newValueList = [...valueList];
+      newValueList[valueIndex] = {
+        ...valueList[valueIndex],
+        [key]: event.target.value,
+      };
+      console.log(newValueList);
+
+      setValueList(newValueList);
     }
   };
 
@@ -127,7 +128,9 @@ const Dialog = () => {
                   <FormControl.Label>Key</FormControl.Label>
                   <TextInput
                     value={value.key}
-                    onChange={(event) => handleKeyChange(event, value.id)}
+                    onChange={(event) =>
+                      handleInputChange(event, value.id, "key")
+                    }
                     name={"variable"}
                     id={"variable"}
                   />
@@ -138,7 +141,9 @@ const Dialog = () => {
                   <FormControl.Label>Value</FormControl.Label>
                   <TextInput
                     value={stringValue}
-                    onChange={(event) => handleValueChange(event, value.id)}
+                    onChange={(event) =>
+                      handleInputChange(event, value.id, "value")
+                    }
                     name={"variable"}
                     id={"variable"}
                   />
