@@ -1,1 +1,1 @@
-export * from './use-entry'
+export * from './use-asset'

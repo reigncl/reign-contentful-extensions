@@ -1,3 +1,5 @@
+import { ContentfulLinkAsset } from './contentful-link-asset'
+
 export enum MlFormFieldSize {
   SMALL = 'small',
   MEDIUM = 'medium',
@@ -81,4 +83,6 @@ export interface MlFormField {
   multipleFiles?: boolean
   allowedFileExtensions: MlFormFieldAllowedExtensions[]
   servicesFieldIds: Record<MlFormFieldServices, string>
+  leftIcon?: ContentfulLinkAsset
+  rightIcon?: ContentfulLinkAsset
 }

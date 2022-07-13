@@ -1,6 +1,7 @@
-import { FormControl, Select, Switch, TextInput } from '@contentful/f36-components'
+import { Box, FormControl, Select, Switch, TextInput } from '@contentful/f36-components'
 import { MlFormFieldSize, MlFormFieldValueType, CommonProps, MlFormFieldType } from '../../interfaces'
-import { ServicesFieldIdsDropdown } from './ServicesFieldIdsDropdown'
+import { AssetSelector, ServicesFieldIdsDropdown } from '.'
+import { ValidationsDropdown } from './ValidationsDropdown'
 
 export const CommonFields = ({ entry, updateField }: CommonProps) => (
   <>
@@ -125,8 +126,17 @@ export const CommonFields = ({ entry, updateField }: CommonProps) => (
     </FormControl>
 
     <FormControl>
-      <FormControl.Label>Icons</FormControl.Label>
-      Coming soon
+      <FormControl.Label>Left Icon</FormControl.Label>
+      <Box>
+        <AssetSelector entry={entry} updateField={updateField} fieldId="leftIcon" />
+      </Box>
+    </FormControl>
+
+    <FormControl>
+      <FormControl.Label>Right Icon</FormControl.Label>
+      <Box>
+        <AssetSelector entry={entry} updateField={updateField} fieldId="rightIcon" />
+      </Box>
     </FormControl>
 
     <FormControl>
@@ -187,6 +197,11 @@ export const CommonFields = ({ entry, updateField }: CommonProps) => (
     </FormControl>
 
     <FormControl>
+      <FormControl.Label>Validations</FormControl.Label>
+      <ValidationsDropdown entry={entry} updateField={updateField} />
+    </FormControl>
+
+    <FormControl>
       <FormControl.Label>Services Field Ids</FormControl.Label>
       <ServicesFieldIdsDropdown entry={entry} updateField={updateField} />
     </FormControl>
@@ -209,5 +224,3 @@ export const CommonFields = ({ entry, updateField }: CommonProps) => (
     </FormControl>
   </>
 )
-
-/* options: Record<'label' | 'value', string>[] */

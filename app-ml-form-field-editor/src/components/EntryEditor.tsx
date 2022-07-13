@@ -35,10 +35,14 @@ const Entry = () => {
     multipleFiles: sdk.entry.fields.multipleFiles.getValue() || false,
     allowedFileExtensions: sdk.entry.fields.allowedFileExtensions.getValue() || [],
     servicesFieldIds: sdk.entry.fields.servicesFieldIds.getValue() || {},
+    leftIcon: sdk.entry.fields.leftIcon.getValue() || undefined,
+    rightIcon: sdk.entry.fields.rightIcon.getValue() || undefined,
   })
 
   const updateField = (newField: unknown, fieldKey: keyof MlFormField) => {
     sdk.entry.fields[fieldKey].setValue(newField)
+    console.log(newField)
+
     setEntry({
       ...entry,
       [fieldKey]: newField,

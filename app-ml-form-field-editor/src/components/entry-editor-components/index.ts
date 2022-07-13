@@ -1,3 +1,4 @@
+export * from './AssetSelector'
 export * from './CommonFields'
 export * from './FileFields'
 export * from './NumberFields'
