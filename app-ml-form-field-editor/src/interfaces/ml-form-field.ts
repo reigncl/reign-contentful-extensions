@@ -38,23 +38,6 @@ export enum MlFormFieldAllowedExtensions {
   PNG = 'png',
 }
 
-export enum MlFormFieldServices {
-  AWS = 'aws',
-  EMTELCO = 'emtelco',
-  EVENTBROKER = 'eventbroker',
-  FIVE9 = 'five9',
-  HORUS = 'horus',
-  HUBSPOT = 'hubspot',
-  LINK = 'link',
-  MAILCHIMP = 'mailchimp',
-  MASIV = 'masiv',
-  MYTOOLS = 'mytools',
-  PARDOT = 'pardot',
-  QFLOW = 'qflow',
-  SENDINBLUE = 'sendinblue',
-  ZENDESK = 'zendesk',
-}
-
 export enum MlFormFieldValidations {
   NUMERIC = 'Numeric',
   ALPHANUMERIC = 'Alphanumeric',
@@ -95,8 +78,8 @@ export interface MlFormField {
   maxUploadFileSize?: number
   multipleFiles?: boolean
   allowedFileExtensions: MlFormFieldAllowedExtensions[]
-  servicesFieldIds: Record<MlFormFieldServices, string>
+  servicesFieldIds: Record<string, string>
   leftIcon?: ContentfulLinkAsset
   rightIcon?: ContentfulLinkAsset
-  validations: Record<MlFormFieldValidations, Record<'pattern' | 'errorMessage', string>>
+  validations: Record<MlFormFieldValidations | string, Record<'pattern' | 'errorMessage', string>>
 }

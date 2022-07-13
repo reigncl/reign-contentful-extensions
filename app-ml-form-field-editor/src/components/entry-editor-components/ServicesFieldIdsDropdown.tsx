@@ -1,3 +1,4 @@
+import { AppExtensionSDK } from '@contentful/app-sdk'
 import {
   Button,
   Table,
@@ -11,13 +12,19 @@ import {
   Menu,
 } from '@contentful/f36-components'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
-import { CommonProps, MlFormFieldServices } from '../../interfaces'
+import { useSDK } from '@contentful/react-apps-toolkit'
+import { CommonProps } from '../../interfaces'
+import { AppInstallationParameters } from '../ConfigScreen'
 
 export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) => {
+  const sdk = useSDK<AppExtensionSDK>()
+
   const servicesQty = Object.values(entry.servicesFieldIds).length
-  const availableServices = Object.values(MlFormFieldServices).filter((service) => {
-    return !Object.keys(entry.servicesFieldIds).find((serviceName) => serviceName === service)
-  })
+  const availableServices = (sdk.parameters.installation as AppInstallationParameters).services
+    .split(',')
+    .filter((service) => {
+      return !Object.keys(entry.servicesFieldIds).find((serviceName) => serviceName === service)
+    })
 
   return (
     <div>
@@ -68,7 +75,7 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
                     <TableCell style={{ verticalAlign: 'middle' }}>
                       <TextInput
                         onChange={(event) => {
-                          entry.servicesFieldIds[serviceKey as MlFormFieldServices] = event.target.value
+                          entry.servicesFieldIds[serviceKey] = event.target.value
                           updateField(entry.servicesFieldIds, 'servicesFieldIds')
                         }}
                         value={fieldId}
@@ -81,7 +88,7 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
                         aria-label={`Delete ${serviceKey} config`}
                         icon={<CloseIcon />}
                         onClick={() => {
-                          delete entry.servicesFieldIds[serviceKey as MlFormFieldServices]
+                          delete entry.servicesFieldIds[serviceKey]
                           updateField(entry.servicesFieldIds, 'servicesFieldIds')
                         }}
                       />

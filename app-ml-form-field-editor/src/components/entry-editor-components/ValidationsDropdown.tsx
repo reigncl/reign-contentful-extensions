@@ -1,3 +1,4 @@
+import { AppExtensionSDK } from '@contentful/app-sdk'
 import {
   Button,
   Table,
@@ -11,14 +12,20 @@ import {
   Menu,
 } from '@contentful/f36-components'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
+import { useSDK } from '@contentful/react-apps-toolkit'
 import { CommonProps, MlFormFieldValidations } from '../../interfaces'
 import { isRegex } from '../../utils'
+import { AppInstallationParameters } from '../ConfigScreen'
 
 export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
+  const sdk = useSDK<AppExtensionSDK>()
+
   const validationsQty = Object.values(entry.validations).length
-  const availableValidations = Object.values(MlFormFieldValidations).filter((val) => {
-    return !Object.keys(entry.validations).find((valName) => valName === val)
-  })
+  const availableValidations = Object.values<string>(MlFormFieldValidations)
+    .concat((sdk.parameters.installation as AppInstallationParameters).validations.split(','))
+    .filter((val) => {
+      return !Object.keys(entry.validations).find((valName) => valName === val)
+    })
 
   return (
     <div>

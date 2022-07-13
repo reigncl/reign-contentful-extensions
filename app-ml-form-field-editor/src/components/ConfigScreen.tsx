@@ -1,42 +1,31 @@
 import { useCallback, useState, useEffect } from 'react'
 import { AppExtensionSDK } from '@contentful/app-sdk'
-import { Heading, Form, Paragraph, Flex } from '@contentful/f36-components'
+import { Heading, Form, Paragraph, Flex, Box, FormControl, TextInput } from '@contentful/f36-components'
 import { css } from 'emotion'
-import { /* useCMA, */ useSDK } from '@contentful/react-apps-toolkit'
+import { useSDK } from '@contentful/react-apps-toolkit'
 
-export interface AppInstallationParameters {}
+export interface AppInstallationParameters {
+  services: string
+  validations: string
+}
 
 const ConfigScreen = () => {
-  const [parameters, setParameters] = useState<AppInstallationParameters>({})
+  const [parameters, setParameters] = useState<AppInstallationParameters>({
+    services: '',
+    validations: '',
+  })
+
   const sdk = useSDK<AppExtensionSDK>()
-  /*
-     To use the cma, inject it as follows.
-     If it is not needed, you can remove the next line.
-  */
-  // const cma = useCMA();
 
   const onConfigure = useCallback(async () => {
-    // This method will be called when a user clicks on "Install"
-    // or "Save" in the configuration screen.
-    // for more details see https://www.contentful.com/developers/docs/extensibility/ui-extensions/sdk-reference/#register-an-app-configuration-hook
-
-    // Get current the state of EditorInterface and other entities
-    // related to this app installation
     const currentState = await sdk.app.getCurrentState()
-
     return {
-      // Parameters to be persisted as the app configuration.
       parameters,
-      // In case you don't want to submit any update to app
-      // locations, you can just pass the currentState as is
       targetState: currentState,
     }
   }, [parameters, sdk])
 
   useEffect(() => {
-    // `onConfigure` allows to configure a callback to be
-    // invoked when a user attempts to install the app or update
-    // its configuration.
     sdk.app.onConfigure(() => onConfigure())
   }, [sdk, onConfigure])
 
@@ -60,7 +49,36 @@ const ConfigScreen = () => {
     <Flex flexDirection="column" className={css({ margin: '80px', maxWidth: '800px' })}>
       <Form>
         <Heading>App Config</Heading>
-        <Paragraph>Welcome to your contentful app. This is your config page.</Paragraph>
+        <Box>
+          <FormControl>
+            <FormControl.Label>Services</FormControl.Label>
+            <Paragraph>Here you can add services to map specific field ids in your inputs.</Paragraph>
+            <TextInput
+              testId="services"
+              onChange={(e) => {
+                setParameters({ ...parameters, services: e.target.value })
+              }}
+              defaultValue={parameters.services}
+              value={parameters.services}
+              placeholder="aws,hubspot,mailchimp"
+              css={{ width: 150 }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Validations</FormControl.Label>
+            <Paragraph>Here you can add validation types that your inputs need to consider.</Paragraph>
+            <TextInput
+              testId="validations"
+              onChange={(e) => {
+                setParameters({ ...parameters, validations: e.target.value })
+              }}
+              defaultValue={parameters.validations}
+              value={parameters.validations}
+              placeholder="Dni,Special Identifier,Rut"
+              css={{ width: 150 }}
+            />
+          </FormControl>
+        </Box>
       </Form>
     </Flex>
   )
