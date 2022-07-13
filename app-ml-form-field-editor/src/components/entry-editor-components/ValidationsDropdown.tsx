@@ -63,7 +63,7 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
       <div style={{ paddingTop: '10px' }}>
         {validationsQty === 0 && <Note variant="warning">There are no configured validations.</Note>}
         {validationsQty > 0 && (
-          <Table style={{ maxWidth: '600px' }}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>

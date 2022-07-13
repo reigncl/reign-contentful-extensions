@@ -59,7 +59,7 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
       <div style={{ paddingTop: '10px' }}>
         {servicesQty === 0 && <Note variant="warning">There are no configured services.</Note>}
         {servicesQty > 0 && (
-          <Table style={{ maxWidth: '600px' }}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Service</TableCell>
