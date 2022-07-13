@@ -140,19 +140,6 @@ export const CommonFields = ({ entry, updateField }: CommonProps) => (
     </FormControl>
 
     <FormControl>
-      <FormControl.Label>Error Message</FormControl.Label>
-      <TextInput
-        testId="errorMessage"
-        onChange={(e) => {
-          updateField(e.target.value, 'errorMessage')
-        }}
-        defaultValue={entry.errorMessage}
-        css={{ width: 150 }}
-      />
-      <FormControl.HelpText>{entry.errorMessage?.length} characters</FormControl.HelpText>
-    </FormControl>
-
-    <FormControl>
       <FormControl.Label>Helper Message</FormControl.Label>
       <TextInput
         testId="helperMessage"
@@ -200,6 +187,21 @@ export const CommonFields = ({ entry, updateField }: CommonProps) => (
       <FormControl.Label>Validations</FormControl.Label>
       <ValidationsDropdown entry={entry} updateField={updateField} />
     </FormControl>
+
+    {!Object.keys(entry.validations).length && (
+      <FormControl>
+        <FormControl.Label>Error Message (used when there are no validations)</FormControl.Label>
+        <TextInput
+          testId="errorMessage"
+          onChange={(e) => {
+            updateField(e.target.value, 'errorMessage')
+          }}
+          defaultValue={entry.errorMessage}
+          css={{ width: 150 }}
+        />
+        <FormControl.HelpText>{entry.errorMessage?.length} characters</FormControl.HelpText>
+      </FormControl>
+    )}
 
     <FormControl>
       <FormControl.Label>Services Field Ids</FormControl.Label>

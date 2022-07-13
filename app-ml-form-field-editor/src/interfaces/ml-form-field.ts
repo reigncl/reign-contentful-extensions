@@ -55,6 +55,13 @@ export enum MlFormFieldServices {
   ZENDESK = 'zendesk',
 }
 
+export enum MlFormFieldValidations {
+  NUMERIC = 'Numeric',
+  ALPHANUMERIC = 'Alphanumeric',
+  CUSTOM = 'Custom',
+  PHONE = 'Phone',
+}
+
 export interface MlFormField {
   name: string
   id: string
@@ -85,4 +92,5 @@ export interface MlFormField {
   servicesFieldIds: Record<MlFormFieldServices, string>
   leftIcon?: ContentfulLinkAsset
   rightIcon?: ContentfulLinkAsset
+  validations: Record<MlFormFieldValidations, Record<'pattern' | 'errorMessage', string>>
 }

@@ -37,6 +37,7 @@ const Entry = () => {
     servicesFieldIds: sdk.entry.fields.servicesFieldIds.getValue() || {},
     leftIcon: sdk.entry.fields.leftIcon.getValue() || undefined,
     rightIcon: sdk.entry.fields.rightIcon.getValue() || undefined,
+    validations: sdk.entry.fields.validations.getValue() || {},
   })
 
   const updateField = (newField: unknown, fieldKey: keyof MlFormField) => {

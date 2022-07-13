@@ -55,9 +55,9 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
           <Table style={{ maxWidth: '600px' }}>
             <TableHead>
               <TableRow>
-                <TableCell>Servicio</TableCell>
+                <TableCell>Service</TableCell>
                 <TableCell>Field Id</TableCell>
-                <TableCell> </TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

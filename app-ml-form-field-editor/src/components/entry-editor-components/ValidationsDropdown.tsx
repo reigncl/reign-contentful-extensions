@@ -11,12 +11,13 @@ import {
   Menu,
 } from '@contentful/f36-components'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
-import { CommonProps, MlFormFieldServices } from '../../interfaces'
+import { CommonProps, MlFormFieldValidations } from '../../interfaces'
+import { isRegex } from '../../utils'
 
 export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
-  const servicesQty = Object.values(entry.servicesFieldIds).length
-  const availableServices = Object.values(MlFormFieldServices).filter((service) => {
-    return !Object.keys(entry.servicesFieldIds).find((serviceName) => serviceName === service)
+  const validationsQty = Object.values(entry.validations).length
+  const availableValidations = Object.values(MlFormFieldValidations).filter((val) => {
+    return !Object.keys(entry.validations).find((valName) => valName === val)
   })
 
   return (
@@ -24,25 +25,28 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
       <Menu>
         <Menu.Trigger>
           <Button
-            isDisabled={availableServices.length === 0}
+            isDisabled={availableValidations.length === 0}
             size="small"
             variant="secondary"
             endIcon={<ChevronDownIcon />}
           >
-            Select service
+            Select validation
           </Button>
         </Menu.Trigger>
-        {availableServices.length > 0 && (
+        {availableValidations.length > 0 && (
           <Menu.List>
-            {availableServices.map((service, index) => {
+            {availableValidations.map((validation, index) => {
               return (
                 <Menu.Item
-                  key={`${service}-item-${index}`}
+                  key={`${validation}-item-${index}`}
                   onClick={() => {
-                    updateField({ ...entry.servicesFieldIds, [service]: '' }, 'servicesFieldIds')
+                    updateField(
+                      { ...entry.validations, [validation]: { pattern: '', errorMessage: '' } },
+                      'validations',
+                    )
                   }}
                 >
-                  {service}
+                  {validation}
                 </Menu.Item>
               )
             })}
@@ -50,39 +54,61 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
         )}
       </Menu>
       <div style={{ paddingTop: '10px' }}>
-        {servicesQty === 0 && <Note variant="warning">There are no configured services.</Note>}
-        {servicesQty > 0 && (
+        {validationsQty === 0 && <Note variant="warning">There are no configured validations.</Note>}
+        {validationsQty > 0 && (
           <Table style={{ maxWidth: '600px' }}>
             <TableHead>
               <TableRow>
-                <TableCell>Servicio</TableCell>
-                <TableCell>Field Id</TableCell>
-                <TableCell> </TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Pattern</TableCell>
+                <TableCell>Custom Error Message</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(entry.servicesFieldIds).map(([serviceKey, fieldId], index) => {
+              {Object.entries(entry.validations).map(([validationKey, validationValues], index) => {
                 return (
                   <TableRow key={index}>
-                    <TableCell style={{ verticalAlign: 'middle' }}>{serviceKey}</TableCell>
+                    <TableCell style={{ verticalAlign: 'middle' }}>{validationKey}</TableCell>
+                    <TableCell style={{ verticalAlign: 'middle' }}>
+                      {validationKey === MlFormFieldValidations.CUSTOM && (
+                        <TextInput
+                          onChange={(event) => {
+                            entry.validations[validationKey as MlFormFieldValidations].pattern = event.target.value
+                            updateField(entry.validations, 'validations')
+                          }}
+                          isInvalid={
+                            validationKey === MlFormFieldValidations.CUSTOM
+                              ? !isRegex(entry.validations[validationKey as MlFormFieldValidations].pattern)
+                              : false
+                          }
+                          value={validationValues.pattern}
+                        />
+                      )}
+                      {!isRegex(entry.validations[validationKey as MlFormFieldValidations].pattern) && (
+                        <span style={{ color: 'rgb(189, 0, 42)', display: 'inline' }}>
+                          You have to enter a valid regex
+                        </span>
+                      )}
+                    </TableCell>
                     <TableCell style={{ verticalAlign: 'middle' }}>
                       <TextInput
                         onChange={(event) => {
-                          entry.servicesFieldIds[serviceKey as MlFormFieldServices] = event.target.value
-                          updateField(entry.servicesFieldIds, 'servicesFieldIds')
+                          entry.validations[validationKey as MlFormFieldValidations].errorMessage = event.target.value
+                          updateField(entry.validations, 'validations')
                         }}
-                        value={fieldId}
+                        value={validationValues.errorMessage}
                       />
                     </TableCell>
                     <TableCell style={{ verticalAlign: 'middle' }}>
                       <IconButton
                         variant="negative"
                         size="small"
-                        aria-label={`Delete ${serviceKey} config`}
+                        aria-label={`Delete ${validationKey} config`}
                         icon={<CloseIcon />}
                         onClick={() => {
-                          delete entry.servicesFieldIds[serviceKey as MlFormFieldServices]
-                          updateField(entry.servicesFieldIds, 'servicesFieldIds')
+                          delete entry.validations[validationKey as MlFormFieldValidations]
+                          updateField(entry.validations, 'validations')
                         }}
                       />
                     </TableCell>
