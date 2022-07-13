@@ -104,7 +104,7 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
                       <IconButton
                         variant="negative"
                         size="small"
-                        aria-label={`Delete ${validationKey} config`}
+                        aria-label={`Delete ${validationKey} validation`}
                         icon={<CloseIcon />}
                         onClick={() => {
                           delete entry.validations[validationKey as MlFormFieldValidations]

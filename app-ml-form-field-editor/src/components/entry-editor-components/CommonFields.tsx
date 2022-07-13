@@ -1,7 +1,6 @@
 import { Box, FormControl, Select, Switch, TextInput } from '@contentful/f36-components'
 import { MlFormFieldSize, MlFormFieldValueType, CommonProps, MlFormFieldType } from '../../interfaces'
-import { AssetSelector, ServicesFieldIdsDropdown } from '.'
-import { ValidationsDropdown } from './ValidationsDropdown'
+import { AssetSelector, ServicesFieldIdsDropdown, ValidationsDropdown } from '.'
 
 export const CommonFields = ({ entry, updateField }: CommonProps) => (
   <>

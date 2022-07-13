@@ -62,6 +62,12 @@ export enum MlFormFieldValidations {
   PHONE = 'Phone',
 }
 
+export type MlFormFieldOptions = {
+  label: string
+  value: string
+  children: any
+}
+
 export interface MlFormField {
   name: string
   id: string
@@ -71,7 +77,7 @@ export interface MlFormField {
   errorMessage?: string
   helperMessage?: string
   type: MlFormFieldType
-  options: Record<'label' | 'value', string>[]
+  options: MlFormFieldOptions[]
   pattern?: string
   min?: number
   max?: number

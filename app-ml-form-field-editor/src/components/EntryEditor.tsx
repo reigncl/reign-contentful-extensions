@@ -2,7 +2,14 @@ import { EditorExtensionSDK } from '@contentful/app-sdk'
 import { useSDK } from '@contentful/react-apps-toolkit'
 import { useState } from 'react'
 import { MlFormField, MlFormFieldSize, MlFormFieldType } from '../interfaces'
-import { CommonFields, FileFields, NumberFields, TextAreaFields, TextFields } from './entry-editor-components'
+import {
+  CommonFields,
+  FileFields,
+  NumberFields,
+  SelectFields,
+  TextAreaFields,
+  TextFields,
+} from './entry-editor-components'
 
 const Entry = () => {
   const sdk = useSDK<EditorExtensionSDK>()
@@ -16,7 +23,7 @@ const Entry = () => {
     errorMessage: sdk.entry.fields.errorMessage.getValue() || '',
     helperMessage: sdk.entry.fields.helperMessage.getValue() || '',
     type: sdk.entry.fields.type.getValue() || MlFormFieldType.TEXT,
-    options: sdk.entry.fields.options.getValue() || {},
+    options: sdk.entry.fields.options.getValue() || [],
     pattern: sdk.entry.fields.pattern.getValue() || '',
     min: sdk.entry.fields.min.getValue() || 0,
     max: sdk.entry.fields.max.getValue() || 0,
@@ -54,6 +61,7 @@ const Entry = () => {
     <>
       <div className="entry-container">
         <CommonFields entry={entry} updateField={updateField} />
+
         {entry.type === 'textarea' && <TextAreaFields entry={entry} updateField={updateField} />}
 
         {['text', 'password'].includes(entry.type) && <TextFields entry={entry} updateField={updateField} />}
@@ -61,6 +69,10 @@ const Entry = () => {
         {['number', 'range'].includes(entry.type) && <NumberFields entry={entry} updateField={updateField} />}
 
         {entry.type === 'file' && <FileFields entry={entry} updateField={updateField} />}
+
+        {entry.type === 'select' && (
+          <SelectFields level={0} options={entry.options} entry={entry} updateField={updateField} />
+        )}
       </div>
     </>
   )
