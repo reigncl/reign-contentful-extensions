@@ -22,7 +22,7 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
 
   const validationsQty = Object.values(entry.validations).length
   const availableValidations = Object.values<string>(MlFormFieldValidations)
-    .concat((sdk.parameters.installation as AppInstallationParameters).validations.split(','))
+    .concat((sdk.parameters.installation as AppInstallationParameters).validations?.split(',') ?? [])
     .filter((val) => {
       return !Object.keys(entry.validations).find((valName) => valName === val)
     })
@@ -61,7 +61,7 @@ export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
         )}
       </Menu>
       <div style={{ paddingTop: '10px' }}>
-        {validationsQty === 0 && <Note variant="warning">There are no configured validations.</Note>}
+        {validationsQty === 0 && <Note variant="warning">There are no validations selected.</Note>}
         {validationsQty > 0 && (
           <Table>
             <TableHead>

@@ -1,11 +1,5 @@
 import { ContentfulLinkAsset } from './contentful-link-asset'
 
-export enum MlFormFieldSize {
-  SMALL = 'small',
-  MEDIUM = 'medium',
-  LARGE = 'large',
-}
-
 export enum MlFormFieldValueType {
   VALUE = 'value',
   PARAM = 'param',
@@ -24,18 +18,6 @@ export enum MlFormFieldType {
   URL_FULL = 'origin URL (full)',
   DATEPICKER = 'datepicker',
   FILE = 'file',
-}
-
-export enum MlFormFieldAllowedExtensions {
-  ZIP = 'zip',
-  XLS = 'xls',
-  XLSX = 'xlsx',
-  DOC = 'doc',
-  DOCX = 'docx',
-  PDF = 'pdf',
-  JPG = 'jpg',
-  JPEG = 'jpeg',
-  PNG = 'png',
 }
 
 export enum MlFormFieldValidations {
@@ -70,14 +52,14 @@ export interface MlFormField {
   readonly?: boolean
   disabled?: boolean
   submitOnEnter?: boolean
-  size: MlFormFieldSize
+  size: string
   hidden?: boolean
   columns?: number
   rows?: number
   valueType?: MlFormFieldValueType
   maxUploadFileSize?: number
   multipleFiles?: boolean
-  allowedFileExtensions: MlFormFieldAllowedExtensions[]
+  allowedFileExtensions: string[]
   servicesFieldIds: Record<string, string>
   leftIcon?: ContentfulLinkAsset
   rightIcon?: ContentfulLinkAsset

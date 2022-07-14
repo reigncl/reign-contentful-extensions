@@ -7,12 +7,16 @@ import { useSDK } from '@contentful/react-apps-toolkit'
 export interface AppInstallationParameters {
   services: string
   validations: string
+  sizes: string
+  fileExtensions: string
 }
 
 const ConfigScreen = () => {
   const [parameters, setParameters] = useState<AppInstallationParameters>({
     services: '',
     validations: '',
+    sizes: '',
+    fileExtensions: '',
   })
 
   const sdk = useSDK<AppExtensionSDK>()
@@ -75,6 +79,34 @@ const ConfigScreen = () => {
               defaultValue={parameters.validations}
               value={parameters.validations}
               placeholder="Dni,Special Identifier,Rut"
+              css={{ width: 150 }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Sizes</FormControl.Label>
+            <Paragraph>Here you can add the sizes your input has to support.</Paragraph>
+            <TextInput
+              testId="sizes"
+              onChange={(e) => {
+                setParameters({ ...parameters, sizes: e.target.value })
+              }}
+              defaultValue={parameters.sizes}
+              value={parameters.sizes}
+              placeholder="small,medium,large"
+              css={{ width: 150 }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>File Extensions</FormControl.Label>
+            <Paragraph>Here you can add the file extensions that you want to give support.</Paragraph>
+            <TextInput
+              testId="fileExtensions"
+              onChange={(e) => {
+                setParameters({ ...parameters, fileExtensions: e.target.value })
+              }}
+              defaultValue={parameters.fileExtensions}
+              value={parameters.fileExtensions}
+              placeholder="zip,xls,doc,docx,pdf,jpg,jpeg"
               css={{ width: 150 }}
             />
           </FormControl>

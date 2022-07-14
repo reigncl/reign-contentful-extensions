@@ -20,11 +20,10 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
   const sdk = useSDK<AppExtensionSDK>()
 
   const servicesQty = Object.values(entry.servicesFieldIds).length
-  const availableServices = (sdk.parameters.installation as AppInstallationParameters).services
-    .split(',')
-    .filter((service) => {
+  const availableServices =
+    (sdk.parameters.installation as AppInstallationParameters).services?.split(',').filter((service) => {
       return !Object.keys(entry.servicesFieldIds).find((serviceName) => serviceName === service)
-    })
+    }) ?? []
 
   return (
     <div>
@@ -57,7 +56,7 @@ export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) =>
         )}
       </Menu>
       <div style={{ paddingTop: '10px' }}>
-        {servicesQty === 0 && <Note variant="warning">There are no configured services.</Note>}
+        {servicesQty === 0 && <Note variant="warning">There are no services selected.</Note>}
         {servicesQty > 0 && (
           <Table>
             <TableHead>

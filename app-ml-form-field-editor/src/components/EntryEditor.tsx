@@ -1,7 +1,7 @@
 import { EditorExtensionSDK } from '@contentful/app-sdk'
 import { useSDK } from '@contentful/react-apps-toolkit'
 import { useState } from 'react'
-import { MlFormField, MlFormFieldSize, MlFormFieldType } from '../interfaces'
+import { MlFormField, MlFormFieldType } from '../interfaces'
 import {
   CommonFields,
   FileFields,
@@ -33,7 +33,7 @@ const Entry = () => {
     readonly: sdk.entry.fields.readonly.getValue() || false,
     disabled: sdk.entry.fields.disabled.getValue() || false,
     submitOnEnter: sdk.entry.fields.submitOnEnter.getValue() || false,
-    size: sdk.entry.fields.size.getValue() || MlFormFieldSize.MEDIUM,
+    size: sdk.entry.fields.size.getValue() || '',
     valueType: sdk.entry.fields.valueType.getValue() || '',
     hidden: sdk.entry.fields.hidden.getValue() || false,
     columns: sdk.entry.fields.columns.getValue() || 0,
