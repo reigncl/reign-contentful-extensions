@@ -1,7 +1,7 @@
 import { FormControl, TextInput } from '@contentful/f36-components'
-import { CommonProps } from '../../interfaces'
+import { CommonEntryEditorProps } from '../../interfaces'
 
-export const NumberFields = ({ entry, updateField }: CommonProps) => (
+export const NumberFields = ({ entry, updateField }: CommonEntryEditorProps) => (
   <>
     <FormControl>
       <FormControl.Label>Minimum Value</FormControl.Label>

@@ -14,9 +14,9 @@ import {
 } from '@contentful/f36-components'
 import { PlusIcon, CloseIcon, EditIcon } from '@contentful/f36-icons'
 import { useState } from 'react'
-import { CommonProps, MlFormField } from '../../interfaces'
+import { CommonEntryEditorProps, MlFormField } from '../../interfaces'
 
-export type SelectFieldsProps = CommonProps & {
+export type SelectFieldsProps = CommonEntryEditorProps & {
   options: MlFormField['options']
   level: number
 }

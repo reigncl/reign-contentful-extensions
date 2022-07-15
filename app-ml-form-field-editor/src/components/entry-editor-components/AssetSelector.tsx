@@ -1,9 +1,9 @@
 import { Box, Flex, Button, Menu, AssetCard, MenuItem, Paragraph } from '@contentful/f36-components'
 import { PlusIcon, ChevronDownIcon } from '@contentful/f36-icons'
 import { useAsset } from '../../hooks'
-import { CommonProps, MlFormField } from '../../interfaces'
+import { CommonEntryEditorProps, MlFormField } from '../../interfaces'
 
-export type AssetSelectorProps = CommonProps & {
+export type AssetSelectorProps = CommonEntryEditorProps & {
   fieldId: keyof MlFormField
 }
 

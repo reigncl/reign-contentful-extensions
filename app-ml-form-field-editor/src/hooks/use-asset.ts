@@ -2,9 +2,9 @@ import { Asset, EditorExtensionSDK, NavigatorOpenResponse } from '@contentful/ap
 import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { AssetProps } from 'contentful-management'
 import { useState, useEffect, useMemo } from 'react'
-import { CommonProps, ContentfulLinkAsset, MlFormField } from '../interfaces'
+import { CommonEntryEditorProps, ContentfulLinkAsset, MlFormField } from '../interfaces'
 
-export const useAsset = ({ entry, updateField, fieldId }: CommonProps & { fieldId: keyof MlFormField }) => {
+export const useAsset = ({ entry, updateField, fieldId }: CommonEntryEditorProps & { fieldId: keyof MlFormField }) => {
   const cma = useCMA()
   const sdk = useSDK<EditorExtensionSDK>()
 

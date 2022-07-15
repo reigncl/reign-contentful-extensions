@@ -1,11 +1,11 @@
 import { AppExtensionSDK } from '@contentful/app-sdk'
 import { Checkbox, FormControl, Stack, Switch, TextInput } from '@contentful/f36-components'
 import { useSDK } from '@contentful/react-apps-toolkit'
-import { CommonProps } from '../../interfaces'
+import { CommonEntryEditorProps } from '../../interfaces'
 import { NotConfiguredAppNote } from '../../utils'
 import { AppInstallationParameters } from '../ConfigScreen'
 
-export const FileFields = ({ entry, updateField }: CommonProps) => {
+export const FileFields = ({ entry, updateField }: CommonEntryEditorProps) => {
   const sdk = useSDK<AppExtensionSDK>()
 
   const handleAllowedExtensionsChange = (extension: string) => {

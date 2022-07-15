@@ -1,7 +1,8 @@
 import { EditorExtensionSDK } from '@contentful/app-sdk'
 import { useSDK } from '@contentful/react-apps-toolkit'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MlFormField, MlFormFieldType } from '../interfaces'
+import { AppInstallationParameters } from './ConfigScreen'
 import {
   CommonFields,
   FileFields,
@@ -13,38 +14,39 @@ import {
 
 const Entry = () => {
   const sdk = useSDK<EditorExtensionSDK>()
+  const fieldIds = useMemo(() => (sdk.parameters.installation as AppInstallationParameters).fieldIds, [sdk])
 
   const [entry, setEntry] = useState<MlFormField>({
-    name: sdk.entry.fields.name.getValue() || '',
-    id: sdk.entry.fields.id.getValue() || '',
-    fieldName: sdk.entry.fields.fieldName.getValue() || '',
-    placeholder: sdk.entry.fields.placeholder.getValue() || '',
-    required: sdk.entry.fields.required.getValue() || true,
-    errorMessage: sdk.entry.fields.errorMessage.getValue() || '',
-    helperMessage: sdk.entry.fields.helperMessage.getValue() || '',
-    type: sdk.entry.fields.type.getValue() || MlFormFieldType.TEXT,
-    options: sdk.entry.fields.options.getValue() || [],
-    pattern: sdk.entry.fields.pattern.getValue() || '',
-    min: sdk.entry.fields.min.getValue() || 0,
-    max: sdk.entry.fields.max.getValue() || 0,
-    minLength: sdk.entry.fields.minLength.getValue() || 0,
-    maxLength: sdk.entry.fields.maxLength.getValue() || 0,
-    defaultValue: sdk.entry.fields.defaultValue.getValue() || '',
-    readonly: sdk.entry.fields.readonly.getValue() || false,
-    disabled: sdk.entry.fields.disabled.getValue() || false,
-    submitOnEnter: sdk.entry.fields.submitOnEnter.getValue() || false,
-    size: sdk.entry.fields.size.getValue() || '',
-    valueType: sdk.entry.fields.valueType.getValue() || '',
-    hidden: sdk.entry.fields.hidden.getValue() || false,
-    columns: sdk.entry.fields.columns.getValue() || 0,
-    rows: sdk.entry.fields.rows.getValue() || 0,
-    maxUploadFileSize: sdk.entry.fields.maxUploadFileSize.getValue() || 0,
-    multipleFiles: sdk.entry.fields.multipleFiles.getValue() || false,
-    allowedFileExtensions: sdk.entry.fields.allowedFileExtensions.getValue() || [],
-    servicesFieldIds: sdk.entry.fields.servicesFieldIds.getValue() || {},
-    leftIcon: sdk.entry.fields.leftIcon.getValue() || undefined,
-    rightIcon: sdk.entry.fields.rightIcon.getValue() || undefined,
-    validations: sdk.entry.fields.validations.getValue() || {},
+    name: sdk.entry.fields[fieldIds.name ?? 'name'].getValue() || '',
+    id: sdk.entry.fields[fieldIds.id ?? 'id'].getValue() || '',
+    fieldName: sdk.entry.fields[fieldIds.fieldName ?? 'fieldName'].getValue() || '',
+    placeholder: sdk.entry.fields[fieldIds.placeholder ?? 'placeholder'].getValue() || '',
+    required: sdk.entry.fields[fieldIds.required ?? 'required'].getValue() || true,
+    errorMessage: sdk.entry.fields[fieldIds.errorMessage ?? 'errorMessage'].getValue() || '',
+    helperMessage: sdk.entry.fields[fieldIds.helperMessage ?? 'helperMessage'].getValue() || '',
+    type: sdk.entry.fields[fieldIds.type ?? 'type'].getValue() || MlFormFieldType.TEXT,
+    options: sdk.entry.fields[fieldIds.options ?? 'options'].getValue() || [],
+    pattern: sdk.entry.fields[fieldIds.pattern ?? 'pattern'].getValue() || '',
+    min: sdk.entry.fields[fieldIds.min ?? 'min'].getValue() || 0,
+    max: sdk.entry.fields[fieldIds.max ?? 'max'].getValue() || 0,
+    minLength: sdk.entry.fields[fieldIds.minLength ?? 'minLength'].getValue() || 0,
+    maxLength: sdk.entry.fields[fieldIds.maxLength ?? 'maxLength'].getValue() || 0,
+    defaultValue: sdk.entry.fields[fieldIds.defaultValue ?? 'defaultValue'].getValue() || '',
+    readonly: sdk.entry.fields[fieldIds.readonly ?? 'readonly'].getValue() || false,
+    disabled: sdk.entry.fields[fieldIds.disabled ?? 'disabled'].getValue() || false,
+    submitOnEnter: sdk.entry.fields[fieldIds.submitOnEnter ?? 'submitOnEnter'].getValue() || false,
+    size: sdk.entry.fields[fieldIds.size ?? 'size'].getValue() || '',
+    valueType: sdk.entry.fields[fieldIds.valueType ?? 'valueType'].getValue() || '',
+    hidden: sdk.entry.fields[fieldIds.hidden ?? 'hidden'].getValue() || false,
+    columns: sdk.entry.fields[fieldIds.columns ?? 'columns'].getValue() || 0,
+    rows: sdk.entry.fields[fieldIds.rows ?? 'rows'].getValue() || 0,
+    maxUploadFileSize: sdk.entry.fields[fieldIds.maxUploadFileSize ?? 'maxUploadFileSize'].getValue() || 0,
+    multipleFiles: sdk.entry.fields[fieldIds.multipleFiles ?? 'multipleFiles'].getValue() || false,
+    allowedFileExtensions: sdk.entry.fields[fieldIds.allowedFileExtensions ?? 'allowedFileExtensions'].getValue() || [],
+    servicesFieldIds: sdk.entry.fields[fieldIds.servicesFieldIds ?? 'servicesFieldIds'].getValue() || {},
+    leftIcon: sdk.entry.fields[fieldIds.leftIcon ?? 'leftIcon'].getValue() || undefined,
+    rightIcon: sdk.entry.fields[fieldIds.rightIcon ?? 'rightIcon'].getValue() || undefined,
+    validations: sdk.entry.fields[fieldIds.validations ?? 'validations'].getValue() || {},
   })
 
   const updateField = (newField: unknown, fieldKey: keyof MlFormField) => {

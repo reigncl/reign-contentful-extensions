@@ -13,10 +13,10 @@ import {
 } from '@contentful/f36-components'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
 import { useSDK } from '@contentful/react-apps-toolkit'
-import { CommonProps } from '../../interfaces'
+import { CommonEntryEditorProps } from '../../interfaces'
 import { AppInstallationParameters } from '../ConfigScreen'
 
-export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonProps) => {
+export const ServicesFieldIdsDropdown = ({ entry, updateField }: CommonEntryEditorProps) => {
   const sdk = useSDK<AppExtensionSDK>()
 
   const servicesQty = Object.values(entry.servicesFieldIds).length

@@ -1,12 +1,12 @@
 import { Box, FormControl, Select, Switch, TextInput } from '@contentful/f36-components'
-import { MlFormFieldValueType, CommonProps, MlFormFieldType } from '../../interfaces'
+import { MlFormFieldValueType, CommonEntryEditorProps, MlFormFieldType } from '../../interfaces'
 import { AssetSelector, ServicesFieldIdsDropdown, ValidationsDropdown } from '.'
 import { AppInstallationParameters } from '../ConfigScreen'
 import { AppExtensionSDK } from '@contentful/app-sdk'
 import { useSDK } from '@contentful/react-apps-toolkit'
 import { NotConfiguredAppNote } from '../../utils'
 
-export const CommonFields = ({ entry, updateField }: CommonProps) => {
+export const CommonFields = ({ entry, updateField }: CommonEntryEditorProps) => {
   const sdk = useSDK<AppExtensionSDK>()
 
   return (

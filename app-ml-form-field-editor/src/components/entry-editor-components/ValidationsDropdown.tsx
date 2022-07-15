@@ -13,11 +13,11 @@ import {
 } from '@contentful/f36-components'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
 import { useSDK } from '@contentful/react-apps-toolkit'
-import { CommonProps, MlFormFieldValidations } from '../../interfaces'
+import { CommonEntryEditorProps, MlFormFieldValidations } from '../../interfaces'
 import { isRegex } from '../../utils'
 import { AppInstallationParameters } from '../ConfigScreen'
 
-export const ValidationsDropdown = ({ entry, updateField }: CommonProps) => {
+export const ValidationsDropdown = ({ entry, updateField }: CommonEntryEditorProps) => {
   const sdk = useSDK<AppExtensionSDK>()
 
   const validationsQty = Object.values(entry.validations).length

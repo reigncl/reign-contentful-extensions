@@ -1,7 +1,7 @@
 import { FormControl, TextInput } from '@contentful/f36-components'
-import { CommonProps } from '../../interfaces'
+import { CommonEntryEditorProps } from '../../interfaces'
 
-export const TextFields = ({ entry, updateField }: CommonProps) => (
+export const TextFields = ({ entry, updateField }: CommonEntryEditorProps) => (
   <>
     <FormControl>
       <FormControl.Label>Min Length</FormControl.Label>
