@@ -113,7 +113,7 @@ const Entry = () => {
     <>
       <div className="entry-container">
         {!isAppConfigured && (
-          <NotConfiguredAppNote label="Some of your field IDs are not the same as the default ones." />
+          <NotConfiguredAppNote label="You have not selected the Content Type or some of your field IDs are not the same as the default ones." />
         )}
 
         {isAppConfigured && (

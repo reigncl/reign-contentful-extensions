@@ -200,7 +200,7 @@ export const CommonFields = ({ entry, updateField }: CommonEntryEditorProps) => 
 
       <FormControl>
         <FormControl.Label>Validations</FormControl.Label>
-        {(sdk.parameters.installation as AppInstallationParameters).validations ? (
+        {typeof (sdk.parameters.installation as AppInstallationParameters).validations !== 'undefined' ? (
           <ValidationsDropdown entry={entry} updateField={updateField} />
         ) : (
           <NotConfiguredAppNote label="You have not configured validations." />

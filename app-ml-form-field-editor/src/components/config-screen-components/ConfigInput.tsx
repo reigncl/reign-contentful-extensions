@@ -22,7 +22,7 @@ export const ConfigInput = ({
       <TextInput
         testId={id}
         onChange={(e) => {
-          setParameters({ ...parameters, fileExtensions: e.target.value })
+          setParameters({ ...parameters, [id]: e.target.value })
         }}
         defaultValue={parameters[id]}
         value={parameters[id]}
