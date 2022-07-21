@@ -118,7 +118,10 @@ export const FieldIdsMapping = ({
               </Note>
             )}
             {!parameters.contentType && (
-              <Note variant="warning">If you want to customize field IDs please select a Content Type.</Note>
+              <Note variant="warning">
+                <strong>You have to select a Content Type for the Contentful App to work.</strong> Then you can define
+                custom field IDs.
+              </Note>
             )}
           </Flex>
         )}
