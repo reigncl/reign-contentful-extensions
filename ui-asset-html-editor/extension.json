@@ -1,0 +1,8 @@
+{
+  "id": "ui-asset-html-editor",
+  "name": "ui-asset-html-editor",
+  "srcdoc": "./build/index.html",
+  "fieldTypes": [
+    "Asset"
+  ]
+}
