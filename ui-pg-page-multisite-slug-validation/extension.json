@@ -1,7 +1,7 @@
 {
   "id": "ui-pg-page-multisite-slug-validation",
   "name": "ui-pg-page-multisite-slug-validation",
-  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-pg-page-multisite-slug-validation/build/index.html?v=1.0.4",
+  "src": "https://reigncl.github.io/reign-contentful-extensions/ui-pg-page-multisite-slug-validation/build/index.html?v=1.1.0",
   "fieldTypes": [
     "Symbol",
     "Text"
@@ -13,6 +13,12 @@
         "type": "Symbol",
         "name": "Site Field ID",
         "description": "Field id from field that contains the list of Multisites"
+      },
+      {
+        "id": "helpMessage",
+        "type": "Symbol",
+        "name": "Help text",
+        "description": "This help text will show up below the field"
       },
       {
         "id": "errorMessage",

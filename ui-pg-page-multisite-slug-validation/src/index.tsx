@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { TextInput, ValidationMessage } from '@contentful/forma-36-react-components';
+import { HelpText, TextInput, ValidationMessage } from '@contentful/forma-36-react-components';
 import { init, FieldExtensionSDK, SearchQuery } from 'contentful-ui-extensions-sdk';
 import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.css';
@@ -13,6 +13,7 @@ interface AppProps {
 interface ExtensionParametersInstance {
   siteFieldId?: string;
   errorMessage?: string;
+  helpMessage?: string;
 }
 
 const App = (props: AppProps) => {
@@ -146,6 +147,11 @@ const App = (props: AppProps) => {
         value={value}
         onChange={(event) => onChange(event as React.ChangeEvent<HTMLInputElement>)}
       />
+      {(props.sdk.parameters.instance as ExtensionParametersInstance)?.helpMessage && (
+        <HelpText>
+          {(props.sdk.parameters.instance as ExtensionParametersInstance)?.helpMessage}
+        </HelpText>
+      )}
       {isSlugUsed && (
         <ValidationMessage style={{ marginTop: '0.5rem' }}>
           {(props.sdk.parameters.instance as ExtensionParametersInstance).errorMessage}
