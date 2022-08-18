@@ -1,8 +1,0 @@
-{
-  "id": "ui-reference-field-multisite",
-  "name": "ui-reference-field-multisite",
-  "srcdoc": "./build/index.html",
-  "fieldTypes": [
-    "Object"
-  ]
-}
