@@ -1,23 +1,17 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { TextInput } from '@contentful/forma-36-react-components';
 import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
-import '@contentful/forma-36-react-components/dist/styles.css';
 import './index.css';
+import { Asset as FormaAsset, Heading, Table, TextInput, ValidationMessage } from '@contentful/f36-components'
 
 interface AppProps {
   sdk: FieldExtensionSDK;
 }
 
 const App = (props: AppProps) => {
-  return (
-    <TextInput
-      width="large"
-      type="text"
-      id="my-field"
-      testId="my-field"
-    />
-  );
+  return <>
+  <FormaAsset type="image" src={undefined} style={{ width: '100%', height: 100 }} />
+  </>;
 }
 
 init(sdk => {
