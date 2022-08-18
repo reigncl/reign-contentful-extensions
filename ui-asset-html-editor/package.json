@@ -7,6 +7,7 @@
     "@babel/plugin-transform-runtime": "7.12.1",
     "@babel/preset-env": "7.12.1",
     "@babel/preset-react": "7.12.1",
+    "@contentful/browserslist-config": "^2.0.0",
     "@contentful/contentful-extension-scripts": "0.21.0",
     "@contentful/eslint-config-extension": "0.4.3",
     "@testing-library/react": "11.1.1",

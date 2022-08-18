@@ -2,7 +2,7 @@ import * as React from 'react';
 import { render } from 'react-dom';
 import { init, FieldExtensionSDK } from 'contentful-ui-extensions-sdk';
 import './index.css';
-import { Asset as FormaAsset, Heading, Table, TextInput, ValidationMessage } from '@contentful/f36-components'
+import { Asset as FormaAsset } from '@contentful/f36-components'
 
 interface AppProps {
   sdk: FieldExtensionSDK;
