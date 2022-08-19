@@ -51,14 +51,9 @@ const Field = () => {
 
   const populateContentType = () => {
     cma.contentType
-      .getMany({})
-      .then((data: CollectionProp<ContentTypeProps>) => {
-        console.log('data', data)
-        data?.items?.map((value: ContentTypeProps) => {
-          if (value?.sys?.id === contentTypeId) {
-            setContentType(value)
-          }
-        })
+      .get({contentTypeId})
+      .then((data: ContentTypeProps) => {
+        setContentType(data)
       })
       .catch((error) => console.log('error', error))
   }
@@ -68,7 +63,7 @@ const Field = () => {
     return () => {
       sdk.window.stopAutoResizer()
     }
-  }, [])
+  }, [siteFieldId, contentTypeId, contentType, sdk.window])
 
   useEffect(() => {
     if (siteFieldId) {
