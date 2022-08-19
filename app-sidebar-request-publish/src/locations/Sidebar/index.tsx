@@ -3,7 +3,6 @@ import {
   Box,
   SectionHeading,
   Paragraph,
-  ButtonGroup,
   Button,
 } from "@contentful/f36-components";
 import { PreviewIcon } from "@contentful/f36-icons";
