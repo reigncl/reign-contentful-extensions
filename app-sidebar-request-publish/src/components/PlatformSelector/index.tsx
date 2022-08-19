@@ -39,8 +39,8 @@ export const PlatformSelector = ({
         integration.
       </Paragraph>
       <Select
-        id="optionSelect-controlled"
-        name="optionSelect-controlled"
+        id="selected-platform"
+        name="selected-platform"
         value={platform}
         onChange={handlePlatformChange}
       >

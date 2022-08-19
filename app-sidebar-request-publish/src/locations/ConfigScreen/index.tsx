@@ -10,6 +10,7 @@ import {
 import { css } from "emotion";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import PlatformSelector from "../../components/PlatformSelector";
+import { PlatformConfigComponentSwitch } from "./utils";
 
 export interface AppInstallationParameters {
   selectedPlatform?: string;
@@ -62,6 +63,11 @@ const ConfigScreen = () => {
     [parameters?.selectedPlatform]
   );
 
+  const ConfigComponent = useMemo(
+    () => PlatformConfigComponentSwitch(selectedPlatform),
+    [selectedPlatform]
+  );
+
   return (
     <Flex
       flexDirection="column"
@@ -82,6 +88,7 @@ const ConfigScreen = () => {
             onPlatformChange={onPlatformChange}
             initialPlatform={selectedPlatform}
           />
+          <ConfigComponent />
         </React.Fragment>
       )}
     </Flex>
