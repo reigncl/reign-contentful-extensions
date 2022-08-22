@@ -6,14 +6,24 @@ import {
   Flex,
   SkeletonContainer,
   SkeletonBodyText,
+  Subheading,
 } from "@contentful/f36-components";
 import { css } from "emotion";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import PlatformSelector from "../../components/PlatformSelector";
-import { PlatformConfigComponentSwitch } from "./utils";
+import {
+  PlatformConfigComponentSwitch,
+  PlatformConfigDisplayComponentSwitch,
+} from "./utils";
+import {
+  AvailablePlatformsType,
+  AVAILABLE_PLATFORMS,
+} from "../../constants/platforms";
 
 export interface AppInstallationParameters {
-  selectedPlatform?: string;
+  selectedPlatform?: AvailablePlatformsType;
+  slackOauthToken?: string;
+  slackMessagesChannelId?: string;
 }
 
 const ConfigScreen = () => {
@@ -48,11 +58,21 @@ const ConfigScreen = () => {
     })();
   }, [sdk]);
 
+  const onParamsChange = useCallback(
+    (params: Record<string, string>) => {
+      setParameters((oldParams) => ({
+        ...oldParams,
+        ...params,
+      }));
+    },
+    [setParameters]
+  );
+
   const onPlatformChange = useCallback(
     (platform: string) => {
       setParameters((oldParams) => ({
         ...oldParams,
-        selectedPlatform: platform,
+        selectedPlatform: platform as AvailablePlatformsType,
       }));
     },
     [setParameters]
@@ -68,11 +88,26 @@ const ConfigScreen = () => {
     [selectedPlatform]
   );
 
+  const ConfigDisplayComponent = useMemo(
+    () => PlatformConfigDisplayComponentSwitch(selectedPlatform),
+    [selectedPlatform]
+  );
+
   return (
     <Flex
       flexDirection="column"
       className={css({ margin: "40px 80px", maxWidth: "800px" })}
     >
+      <Heading>Current config</Heading>
+      <Paragraph>Values currently configured:</Paragraph>
+      <Subheading>Selected Platform:</Subheading>
+      <Paragraph>
+        {parameters?.selectedPlatform
+          ? AVAILABLE_PLATFORMS[parameters.selectedPlatform]
+          : "None"}
+      </Paragraph>
+      <ConfigDisplayComponent initialParams={parameters} />
+
       <Heading>Configuration Details</Heading>
       <Paragraph>
         To start posting publishing notifications we must first configure some
@@ -88,7 +123,10 @@ const ConfigScreen = () => {
             onPlatformChange={onPlatformChange}
             initialPlatform={selectedPlatform}
           />
-          <ConfigComponent />
+          <ConfigComponent
+            onParamsChange={onParamsChange}
+            initialParams={parameters}
+          />
         </React.Fragment>
       )}
     </Flex>

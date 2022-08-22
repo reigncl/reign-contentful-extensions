@@ -1,5 +1,5 @@
 import React from "react";
-import SlackConfig from "../../components/SlackConfig";
+import SlackConfig, { SlackDisplayConfig } from "../../components/SlackConfig";
 import { AvailablePlatformsType } from "../../constants/platforms";
 
 export const PlatformConfigComponentSwitch = (
@@ -8,6 +8,18 @@ export const PlatformConfigComponentSwitch = (
   switch (selectedPlatform) {
     case "slack-app":
       return SlackConfig;
+
+    default:
+      return React.Fragment;
+  }
+};
+
+export const PlatformConfigDisplayComponentSwitch = (
+  selectedPlatform?: AvailablePlatformsType | string
+) => {
+  switch (selectedPlatform) {
+    case "slack-app":
+      return SlackDisplayConfig;
 
     default:
       return React.Fragment;
