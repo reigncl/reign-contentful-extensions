@@ -2,7 +2,7 @@ import { Entry, NavigatorOpenResponse } from '@contentful/app-sdk'
 import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { ContentTypeProps } from 'contentful-management'
 import { useState, useEffect, useMemo } from 'react'
-import { LogoLink } from '../interfaces'
+import { ReferenceEntry } from '../interfaces'
 
 export const useEntry = ({
   entryReference,
@@ -10,8 +10,8 @@ export const useEntry = ({
   fieldId,
   contentType,
 }: {
-  entryReference: LogoLink | null
-  updateField: (newEntryValue: LogoLink | null, fieldKey: string) => void
+  entryReference: ReferenceEntry | null
+  updateField: (newEntryValue: ReferenceEntry | null, fieldKey: string) => void
   fieldId: string
   contentType: ContentTypeProps
 }) => {
@@ -20,7 +20,7 @@ export const useEntry = ({
 
   const defaultLocale = useMemo(() => sdk.locales.default, [sdk])
 
-  const [entry, setEntry] = useState<LogoLink>()
+  const [entry, setEntry] = useState<ReferenceEntry>()
 
   const loadEntry = async (entryId?: string) => {
     if (entryId) {
@@ -30,7 +30,7 @@ export const useEntry = ({
         // reading en-US when creating new entry
         console.log(contentfulEntry)
 
-        const formattedEntry: LogoLink = {
+        const formattedEntry: ReferenceEntry = {
           sys: {
             id: contentfulEntry.sys.id,
             publishedAt: contentfulEntry.sys.publishedAt,

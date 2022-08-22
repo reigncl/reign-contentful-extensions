@@ -2,12 +2,12 @@ import { Box, Flex, Button, Menu, EntryCard, MenuItem } from '@contentful/f36-co
 import { PlusIcon, ChevronDownIcon } from '@contentful/f36-icons'
 import { ContentTypeProps } from 'contentful-management'
 import { useEntry } from '../../hooks'
-import { LogoLink } from '../../interfaces'
+import { ReferenceEntry } from '../../interfaces'
 
 export type AssetSelectorProps = {
   fieldId: string
-  entryReference: LogoLink | null
-  updateField: (newEntryValue: LogoLink | null, fieldKey: string) => void
+  entryReference: ReferenceEntry | null
+  updateField: (newEntryValue: ReferenceEntry | null, fieldKey: string) => void
   contentType: ContentTypeProps
 }
 

@@ -1,4 +1,4 @@
-export interface LogoLink {
+export interface ReferenceEntry {
   sys: {
     id: string
     createdAt?: string
@@ -8,6 +8,6 @@ export interface LogoLink {
   fields: Record<string, Record<string, string | unknown>>
 }
 
-export interface LogoLinks {
-  [site: string]: LogoLink | null // at-link entry associated to some site
+export interface ReferenceMultiSite {
+  [site: string]: ReferenceEntry | null // at-link entry associated to some site
 }

@@ -1,11 +1,11 @@
 import { Box, Button, IconButton, Menu, Note, Table, ValidationMessage } from '@contentful/f36-components'
 import { useEffect, useState } from 'react'
-import { LogoLinks, InstanceParameters } from '../interfaces'
+import { ReferenceMultiSite, InstanceParameters } from '../interfaces'
 import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
 import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { EntrySelector } from '../components/field-editor-components'
 import { EntryFieldAPI, FieldExtensionSDK } from '@contentful/app-sdk'
-import { CollectionProp, ContentTypeFieldValidation, ContentTypeProps } from 'contentful-management'
+import { ContentTypeProps } from 'contentful-management'
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>()
@@ -15,69 +15,66 @@ const Field = () => {
   const appUriContentType = `https://app.contentful.com/spaces/${sdk.ids.space}${appEnvironmentUri}/content_types/${sdk.ids.contentType}/fields`
   const { siteFieldId, contentTypeId } = sdk.parameters.instance as InstanceParameters
   const [sites, setSites] = useState<Array<string>>([])
-  const [availableSites, setAvailableSites] = useState<Array<string>>([])
   const [contentType, setContentType] = useState<ContentTypeProps>()
+  let detachExternalChangeHandler: Function | null = null
+  let detachSiteChangeHandler: Function | null = null
 
-  const [field, setField] = useState<LogoLinks>(sdk.field.getValue() ?? {})
+  const [field, setField] = useState<ReferenceMultiSite>(sdk.field.getValue() ?? {})
 
-  const updateField = (newField: LogoLinks) => {
+  const updateField = (newField: ReferenceMultiSite) => {
     sdk.field.setValue(newField)
     setField(newField)
   }
 
-  const updateAvailableSites = (field: LogoLinks) => {
-    setAvailableSites(
-      sites.filter((site) => {
-        return !Object.keys(field).find((siteKey) => siteKey === site)
-      }) ?? []
-    )
-  }
-
-  const populateSites = () => {
-    const validation: ContentTypeFieldValidation | undefined = (
-      sdk.entry.fields[siteFieldId] as EntryFieldAPI
-    )?.validations?.find((validation: ContentTypeFieldValidation) => {
-      for (let validationKey in validation) {
-        if (validationKey === 'in') {
-          return true
-        }
-      }
-      return false
-    })
-    if (validation?.in && validation?.in?.length) {
-      setSites(validation?.in as Array<string>)
-    }
-  }
-
   const populateContentType = () => {
     cma.contentType
-      .get({contentTypeId})
+      .get({ contentTypeId })
       .then((data: ContentTypeProps) => {
         setContentType(data)
       })
       .catch((error) => console.log('error', error))
   }
 
-  useEffect(() => {
-    sdk.window.startAutoResizer()
-    return () => {
-      sdk.window.stopAutoResizer()
-    }
-  }, [siteFieldId, contentTypeId, contentType, sdk.window])
+  const onExternalChange = (externalValue: ReferenceMultiSite) => {
+    setField(externalValue)
+  }
+
+  const siteChangeHandler = (newSites: Array<string> | undefined) => {
+    setSites(newSites ?? [])
+  }
 
   useEffect(() => {
-    if (siteFieldId) {
-      populateSites()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    detachSiteChangeHandler = (sdk.entry.fields[siteFieldId] as EntryFieldAPI)?.onValueChanged(siteChangeHandler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    detachExternalChangeHandler = sdk.field?.onValueChanged(onExternalChange)
+    return () => {
+      if (detachSiteChangeHandler) detachSiteChangeHandler()
+      if (detachExternalChangeHandler) detachExternalChangeHandler()
     }
+  }, [])
+
+  useEffect(() => {
+    sdk.window.startAutoResizer()
     if (contentTypeId) {
       populateContentType()
     }
-  }, [siteFieldId, contentTypeId])
+    return () => {
+      sdk.window.stopAutoResizer()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [siteFieldId, contentTypeId, contentType, sdk.window])
 
   useEffect(() => {
-    if (sites && sites?.length) {
-      updateAvailableSites(field)
+    // field
+    const filteredField: ReferenceMultiSite = {}
+    for (let item in field) {
+      if (sites && sites.includes(item)) {
+        filteredField[item as string] = field[item]
+      }
     }
+    updateField(filteredField)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sites])
 
   if (!siteFieldId || !contentTypeId) {
@@ -112,7 +109,7 @@ const Field = () => {
       <Menu>
         <Menu.Trigger>
           <Button
-            isDisabled={availableSites.length === 0}
+            isDisabled={sites.length === 0}
             size="small"
             variant="secondary"
             endIcon={<ChevronDownIcon />}
@@ -120,16 +117,15 @@ const Field = () => {
             Select site
           </Button>
         </Menu.Trigger>
-        {availableSites.length > 0 && (
+        {sites.length > 0 && (
           <Menu.List>
-            {availableSites.map((site, index) => {
+            {sites.map((site, index) => {
               return (
                 <Menu.Item
                   key={`${site}-item-${index}`}
                   onClick={() => {
                     const newField = { ...field, [site]: null }
                     updateField(newField)
-                    updateAvailableSites(newField)
                   }}
                 >
                   {site}
@@ -142,7 +138,7 @@ const Field = () => {
       <div style={{ paddingTop: '10px' }}>
         {sites.length === 0 && (
           <Note variant="warning">
-            There are no sites configured in the <strong>{siteFieldId}</strong> field.
+            Activate a site in <strong>{siteFieldId}</strong> field.
           </Note>
         )}
         {!!sites.length && !!Object.entries(field).length && (
@@ -157,14 +153,14 @@ const Field = () => {
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {Object.entries(field).map(([siteKey, logoLink], index) => {
+              {Object.entries(field).map(([siteKey, ReferenceEntry], index) => {
                 return (
                   <Table.Row key={index}>
                     <Table.Cell style={{ verticalAlign: 'middle' }}>{siteKey}</Table.Cell>
                     <Table.Cell style={{ verticalAlign: 'middle' }}>
                       <Box>
                         <EntrySelector
-                          entryReference={logoLink}
+                          entryReference={ReferenceEntry}
                           updateField={(newEntryValue, fieldKey: string) => {
                             updateField({
                               ...field,
@@ -186,7 +182,6 @@ const Field = () => {
                           const newField = JSON.parse(JSON.stringify(field))
                           delete newField[siteKey]
                           updateField(newField)
-                          updateAvailableSites(newField)
                         }}
                       />
                     </Table.Cell>

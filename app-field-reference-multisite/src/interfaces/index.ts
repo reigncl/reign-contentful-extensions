@@ -1,2 +1,2 @@
-export * from './logo-link'
+export * from './reference-entry'
 export * from './instance-parameters'
