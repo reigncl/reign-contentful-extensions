@@ -19,6 +19,8 @@ const Sidebar = () => {
   const sdk = useSDK<SidebarExtensionSDK>();
   const cma = useCMA();
 
+  console.log(sdk);
+
   const installationParameters: AppInstallationParameters = useMemo(
     () => sdk.parameters?.installation,
     [sdk.parameters?.installation]
@@ -42,13 +44,19 @@ const Sidebar = () => {
             installationParameters.slackMessagesChannelId as string,
             `*There is a new publication request at ${space.name} / ${
               environment.name
-            }*\n>*Requested by:* ${sdk.user.firstName} ${
-              sdk.user.lastName
-            }\n>*Content Type:* ${
-              sdk.contentType.name
+            }*\n>*Entry ID:* ${
+              sdk.ids.entry
             }\n>*Display name:* ${sdk.entry.fields[
               sdk.contentType.displayField
-            ].getValue()}`
+            ].getValue()}\n>*Content Type:* ${
+              sdk.contentType.name
+            }\n>*Entry URL:* https://app.contentful.com/spaces/${
+              sdk.ids.space
+            }/environments/${
+              sdk.ids?.environmentAlias ?? sdk.ids.environment
+            }/entries/${sdk.ids.entry}\n>*Requested by:* ${
+              sdk.user.firstName
+            } ${sdk.user.lastName}`
           );
           if (!response) {
             throw new Error("Call not okay!");
