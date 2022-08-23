@@ -26,9 +26,6 @@ export const useEntry = ({
     if (entryId) {
       try {
         const contentfulEntry = await cma.entry.get({ entryId })
-        // PRINT CONTENTFUL ENTRY HERE AND SEE WHY cannot read properties of Undefined
-        // reading en-US when creating new entry
-        console.log(contentfulEntry)
 
         const formattedEntry: ReferenceEntry = {
           sys: {
@@ -84,6 +81,7 @@ export const useEntry = ({
 
   useEffect(() => {
     loadEntry(entryReference?.sys.id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return { onNewEntry, onEditEntry, onRemoveEntry, onSelectExistingEntry, defaultLocale }
