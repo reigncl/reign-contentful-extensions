@@ -3,4 +3,5 @@ export interface InstanceParameters {
   contentTypeId: string
   helpText?: string
   errorText?: string
+  errorMessage?: string
 }
