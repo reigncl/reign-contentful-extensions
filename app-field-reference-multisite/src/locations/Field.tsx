@@ -6,6 +6,7 @@ import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { EntrySelector } from '../components/field-editor-components'
 import { EntryFieldAPI, FieldExtensionSDK } from '@contentful/app-sdk'
 import { ContentTypeProps } from 'contentful-management'
+import { shallowEqual } from '../utils'
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>()
@@ -15,6 +16,7 @@ const Field = () => {
   const appUriContentType = `https://app.contentful.com/spaces/${sdk.ids.space}${appEnvironmentUri}/content_types/${sdk.ids.contentType}/fields`
   const { siteFieldId, contentTypeId } = sdk.parameters.instance as InstanceParameters
   const [sites, setSites] = useState<Array<string>>([])
+  const [fieldValid, setFieldValid] = useState<boolean>(false)
   const [contentType, setContentType] = useState<ContentTypeProps>()
   let detachExternalChangeHandler: Function | null = null
   let detachSiteChangeHandler: Function | null = null
@@ -43,6 +45,20 @@ const Field = () => {
     setSites(newSites ?? [])
   }
 
+  const validateField = () => {
+    let flagInvalid = false
+    for (let site of sites) {
+      if (site && !field[site]) {
+        flagInvalid = true
+      }
+    }
+    if (Object.keys(field)?.length !== sites?.length) {
+      flagInvalid = true
+    }
+    setFieldValid(flagInvalid)
+    sdk.field.setInvalid(flagInvalid)
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     detachSiteChangeHandler = (sdk.entry.fields[siteFieldId] as EntryFieldAPI)?.onValueChanged(siteChangeHandler)
@@ -62,19 +78,17 @@ const Field = () => {
     return () => {
       sdk.window.stopAutoResizer()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteFieldId, contentTypeId, contentType, sdk.window])
 
   useEffect(() => {
-    // field
-    const filteredField: ReferenceMultiSite = {}
-    for (let item in field) {
-      if (sites && sites.includes(item)) {
-        filteredField[item as string] = field[item]
-      }
-    }
-    updateField(filteredField)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    validateField()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [field])
+
+  useEffect(() => {
+    validateField()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sites])
 
   if (!siteFieldId || !contentTypeId) {
@@ -108,12 +122,7 @@ const Field = () => {
     <div style={{ minHeight: 200 }}>
       <Menu>
         <Menu.Trigger>
-          <Button
-            isDisabled={sites.length === 0}
-            size="small"
-            variant="secondary"
-            endIcon={<ChevronDownIcon />}
-          >
+          <Button isDisabled={sites.length === 0} size="small" variant="secondary" endIcon={<ChevronDownIcon />}>
             Select site
           </Button>
         </Menu.Trigger>
@@ -192,6 +201,11 @@ const Field = () => {
           </Table>
         )}
       </div>
+      {fieldValid && (
+        <ValidationMessage style={{ marginTop: '0.5rem' }}>
+          {(sdk.parameters.instance as InstanceParameters)?.errorMessage}
+        </ValidationMessage>
+      )}
     </div>
   )
 }
