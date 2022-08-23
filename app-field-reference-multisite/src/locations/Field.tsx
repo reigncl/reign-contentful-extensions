@@ -6,7 +6,7 @@ import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { EntrySelector } from '../components/field-editor-components'
 import { EntryFieldAPI, FieldExtensionSDK } from '@contentful/app-sdk'
 import { ContentTypeProps } from 'contentful-management'
-import { shallowEqual } from '../utils'
+import { useIsMounted } from '../hooks'
 
 const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>()
@@ -18,6 +18,7 @@ const Field = () => {
   const [sites, setSites] = useState<Array<string>>([])
   const [fieldValid, setFieldValid] = useState<boolean>(false)
   const [contentType, setContentType] = useState<ContentTypeProps>()
+  const [hasCheckedContentType, setHasCheckedContentType] = useState(false)
   let detachExternalChangeHandler: Function | null = null
   let detachSiteChangeHandler: Function | null = null
 
@@ -35,6 +36,7 @@ const Field = () => {
         setContentType(data)
       })
       .catch((error) => console.log('error', error))
+      .finally(() => setHasCheckedContentType(true))
   }
 
   const onExternalChange = (externalValue: ReferenceMultiSite) => {
@@ -45,19 +47,20 @@ const Field = () => {
     setSites(newSites ?? [])
   }
 
-  const validateField = () => {
-    let flagInvalid = false
-    for (let site of sites) {
-      if (site && !field[site]) {
-        flagInvalid = true
+  const isMounted = useIsMounted()
+
+  useEffect(() => {
+    if (sites && isMounted && field) {
+      const filteredField: ReferenceMultiSite = {}
+      for (let item in field) {
+        if (sites && sites.includes(item)) {
+          filteredField[item as string] = field[item]
+        }
       }
+      updateField(filteredField)
     }
-    if (Object.keys(field)?.length !== sites?.length) {
-      flagInvalid = true
-    }
-    setFieldValid(flagInvalid)
-    sdk.field.setInvalid(flagInvalid)
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sites])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,17 +82,26 @@ const Field = () => {
       sdk.window.stopAutoResizer()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteFieldId, contentTypeId, contentType, sdk.window])
+  }, [])
+
+  const validateField = () => {
+    let flagInvalid = false
+    for (let site of sites) {
+      if (site && !field[site]) {
+        flagInvalid = true
+      }
+    }
+    if (Object.keys(field)?.length !== sites?.length) {
+      flagInvalid = true
+    }
+    setFieldValid(flagInvalid)
+    sdk.field.setInvalid(flagInvalid)
+  }
 
   useEffect(() => {
     validateField()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field])
-
-  useEffect(() => {
-    validateField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sites])
+  }, [field, sites])
 
   if (!siteFieldId || !contentTypeId) {
     sdk.window.stopAutoResizer()
@@ -103,8 +115,10 @@ const Field = () => {
       </ValidationMessage>
     )
   }
-  if (!contentType) {
-    sdk.window.stopAutoResizer()
+
+  if (!hasCheckedContentType) return <span>Loading...</span>
+
+  if (!contentType && hasCheckedContentType) {
     return (
       <ValidationMessage style={{ marginTop: '0.5rem' }}>
         The content type (<strong>{contentTypeId}</strong>) does not exist.
@@ -177,7 +191,7 @@ const Field = () => {
                             })
                           }}
                           fieldId={siteKey}
-                          contentType={contentType}
+                          contentType={contentType!}
                         />
                       </Box>
                     </Table.Cell>
@@ -188,6 +202,8 @@ const Field = () => {
                         aria-label={`Delete ${siteKey} config`}
                         icon={<CloseIcon />}
                         onClick={() => {
+                          console.log(siteKey)
+
                           const newField = JSON.parse(JSON.stringify(field))
                           delete newField[siteKey]
                           updateField(newField)
@@ -203,7 +219,7 @@ const Field = () => {
       </div>
       {fieldValid && (
         <ValidationMessage style={{ marginTop: '0.5rem' }}>
-          {(sdk.parameters.instance as InstanceParameters)?.errorMessage}
+          {(sdk.parameters.instance as InstanceParameters)?.errorMessage ?? `You have to select an entry per site`}
         </ValidationMessage>
       )}
     </div>
