@@ -1,7 +1,6 @@
-import { Box, Button, IconButton, Menu, Note, Table, ValidationMessage } from '@contentful/f36-components'
+import { Box, Note, Table, ValidationMessage } from '@contentful/f36-components'
 import { useEffect, useState } from 'react'
 import { ReferenceMultiSite, InstanceParameters } from '../interfaces'
-import { ChevronDownIcon, CloseIcon } from '@contentful/f36-icons'
 import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
 import { EntrySelector } from '../components/field-editor-components'
 import { EntryFieldAPI, FieldExtensionSDK } from '@contentful/app-sdk'
@@ -52,11 +51,14 @@ const Field = () => {
   useEffect(() => {
     if (sites && isMounted && field) {
       const filteredField: ReferenceMultiSite = {}
-      for (let item in field) {
-        if (sites && sites.includes(item)) {
-          filteredField[item as string] = field[item]
+      sites.forEach((site) => {
+        if (site in field) {
+          filteredField[site as string] = field[site]
+        } else {
+          filteredField[site as string] = null
         }
-      }
+      })
+
       updateField(filteredField)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,30 +136,6 @@ const Field = () => {
 
   return (
     <div style={{ minHeight: 200 }}>
-      <Menu>
-        <Menu.Trigger>
-          <Button isDisabled={sites.length === 0} size="small" variant="secondary" endIcon={<ChevronDownIcon />}>
-            Select site
-          </Button>
-        </Menu.Trigger>
-        {sites.length > 0 && (
-          <Menu.List>
-            {sites.map((site, index) => {
-              return (
-                <Menu.Item
-                  key={`${site}-item-${index}`}
-                  onClick={() => {
-                    const newField = { ...field, [site]: null }
-                    updateField(newField)
-                  }}
-                >
-                  {site}
-                </Menu.Item>
-              )
-            })}
-          </Menu.List>
-        )}
-      </Menu>
       <div style={{ paddingTop: '10px' }}>
         {sites.length === 0 && (
           <Note variant="warning">
@@ -171,8 +149,7 @@ const Field = () => {
                 <Table.Cell width="25%" testId="siteCellHead">
                   Site
                 </Table.Cell>
-                <Table.Cell testId="logoCellHead">Logo</Table.Cell>
-                <Table.Cell testId="actionsCellHead">Actions</Table.Cell>
+                <Table.Cell testId="logoCellHead">Entry</Table.Cell>
               </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -194,21 +171,6 @@ const Field = () => {
                           contentType={contentType!}
                         />
                       </Box>
-                    </Table.Cell>
-                    <Table.Cell style={{ verticalAlign: 'middle' }}>
-                      <IconButton
-                        variant="negative"
-                        size="small"
-                        aria-label={`Delete ${siteKey} config`}
-                        icon={<CloseIcon />}
-                        onClick={() => {
-                          console.log(siteKey)
-
-                          const newField = JSON.parse(JSON.stringify(field))
-                          delete newField[siteKey]
-                          updateField(newField)
-                        }}
-                      />
                     </Table.Cell>
                   </Table.Row>
                 )
