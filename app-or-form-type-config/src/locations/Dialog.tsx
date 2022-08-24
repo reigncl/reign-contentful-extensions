@@ -44,8 +44,6 @@ const Dialog = () => {
       }
       setValueList(valueListArray);
       setKeyValueCounter(keyValueCont);
-
-      console.log({ valueListArray });
     }
     //eslint-disable-next-line
   }, []);
@@ -82,7 +80,6 @@ const Dialog = () => {
       return valueListObject;
     }, {});
 
-    console.log({ configData });
     sdk.close(configData);
   };
 
@@ -95,7 +92,6 @@ const Dialog = () => {
         ...valueList[valueIndex],
         [key]: event.target.value,
       };
-      console.log(newValueList);
 
       setValueList(newValueList);
     }

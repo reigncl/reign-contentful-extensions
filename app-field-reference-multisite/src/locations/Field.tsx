@@ -22,9 +22,6 @@ const Field = () => {
   let detachSiteChangeHandler: Function | null = null
 
   const [field, setField] = useState<ReferenceMultiSite>(sdk.field.getValue() ?? {})
-  console.log(sdk.field.getValue())
-  console.log('actual field', field)
-  console.log('sites', sites)
 
   const updateField = (newField: ReferenceMultiSite) => {
     sdk.field.setValue(newField)
