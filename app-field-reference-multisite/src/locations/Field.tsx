@@ -11,15 +11,17 @@ const Field = () => {
   const sdk = useSDK<FieldExtensionSDK>()
   const cma = useCMA()
 
-  const appEnvironmentUri = sdk.ids.environment !== 'master' ? `/environments/${sdk.ids.environment}` : ''
+  const appEnvironmentUri =
+    sdk.ids.environment !== 'master' ? `/environments/${sdk.ids.environment}` : ''
   const appUriContentType = `https://app.contentful.com/spaces/${sdk.ids.space}${appEnvironmentUri}/content_types/${sdk.ids.contentType}/fields`
-  const { siteFieldId, contentTypeId } = sdk.parameters.instance as InstanceParameters
+  const { siteFieldId, contentTypeId, validFieldId } = sdk.parameters.instance as InstanceParameters
   const [sites, setSites] = useState<Array<string>>([])
-  const [fieldValid, setFieldValid] = useState<boolean>(false)
+  const [isFieldValid, setIsFieldValid] = useState<boolean>(true)
   const [contentType, setContentType] = useState<ContentTypeProps>()
   const [hasCheckedContentType, setHasCheckedContentType] = useState(false)
+
   let detachExternalChangeHandler: Function | null = null
-  let detachSiteChangeHandler: Function | null = null
+  let detachSitesFieldChangeHandler: Function | null = null
 
   const [field, setField] = useState<ReferenceMultiSite>(sdk.field.getValue() ?? {})
 
@@ -42,11 +44,61 @@ const Field = () => {
     setField(externalValue ?? {})
   }
 
-  const siteChangeHandler = (newSites: Array<string> | undefined) => {
+  const sitesFieldChangeHandler = (newSites: Array<string> | undefined) => {
     setSites(newSites ?? [])
   }
 
   const isMounted = useIsMounted()
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    detachSitesFieldChangeHandler = (
+      sdk.entry.fields[siteFieldId] as EntryFieldAPI
+    )?.onValueChanged(sitesFieldChangeHandler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    detachExternalChangeHandler = sdk.field?.onValueChanged(onExternalChange)
+    return () => {
+      if (detachSitesFieldChangeHandler) detachSitesFieldChangeHandler()
+      if (detachExternalChangeHandler) detachExternalChangeHandler()
+    }
+  }, [])
+
+  useEffect(() => {
+    sdk.window.startAutoResizer()
+    if (contentTypeId) {
+      populateContentType()
+    }
+
+    return () => {
+      sdk.window.stopAutoResizer()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const validateEntry = () => {
+    const appFields = sdk.editor.editorInterface.controls?.filter(
+      (control) => control.widgetId === sdk.ids.app
+    )
+    const validFields = appFields?.every((field) => {
+      const entryField = sdk.entry.fields[field.fieldId].getValue()
+      return (
+        Object.keys(entryField).length === sites.length &&
+        Object.values(entryField).every((value) => !!value)
+      )
+    })
+
+    const validField = sdk.entry.fields[validFieldId].getForLocale(sdk.locales.default)
+    if (validFields) validField.setValue('true')
+    else validField.setValue('false')
+  }
+
+  const validateField = async () => {
+    const isValid = sites.every((site) => site && !!field[site])
+    setIsFieldValid(isValid)
+    sdk.field.setInvalid(!isValid)
+
+    validateEntry()
+  }
 
   useEffect(() => {
     if (sites && isMounted && field) {
@@ -65,45 +117,11 @@ const Field = () => {
   }, [sites])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    detachSiteChangeHandler = (sdk.entry.fields[siteFieldId] as EntryFieldAPI)?.onValueChanged(siteChangeHandler)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    detachExternalChangeHandler = sdk.field?.onValueChanged(onExternalChange)
-    return () => {
-      if (detachSiteChangeHandler) detachSiteChangeHandler()
-      if (detachExternalChangeHandler) detachExternalChangeHandler()
-    }
-  }, [])
-
-  useEffect(() => {
-    sdk.window.startAutoResizer()
-    if (contentTypeId) {
-      populateContentType()
-    }
-    return () => {
-      sdk.window.stopAutoResizer()
+    if (sites && isMounted && field) {
+      validateField()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const validateField = () => {
-    let flagInvalid = false
-    for (let site of sites) {
-      if (site && !field[site]) {
-        flagInvalid = true
-      }
-    }
-    if (Object.keys(field)?.length !== sites?.length) {
-      flagInvalid = true
-    }
-    setFieldValid(flagInvalid)
-    sdk.field.setInvalid(flagInvalid)
-  }
-
-  useEffect(() => {
-    validateField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [field, sites])
+  }, [field])
 
   if (!siteFieldId || !contentTypeId) {
     sdk.window.stopAutoResizer()
@@ -179,11 +197,12 @@ const Field = () => {
           </Table>
         )}
       </div>
-      {fieldValid && (
+      {!isFieldValid ? (
         <ValidationMessage style={{ marginTop: '0.5rem' }}>
-          {(sdk.parameters.instance as InstanceParameters)?.errorMessage ?? `You have to select an entry per site`}
+          {(sdk.parameters.instance as InstanceParameters)?.errorMessage ??
+            `You have to select an entry per site`}
         </ValidationMessage>
-      )}
+      ) : null}
     </div>
   )
 }
