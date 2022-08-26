@@ -4,4 +4,5 @@ export interface InstanceParameters {
   helpText?: string
   errorText?: string
   errorMessage?: string
+  validFieldId: string
 }
