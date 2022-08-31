@@ -43630,35 +43630,48 @@ require("./index.css");
 var react_1 = require("react");
 
 var App = function (props) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f, _g;
 
   var appEnvironmentUri = props.sdk.ids.environment !== 'master' ? "/environments/" + props.sdk.ids.environment : '';
   var appUriContentType = "https://app.contentful.com/spaces/" + props.sdk.ids.space + appEnvironmentUri + "/content_types/" + props.sdk.ids.contentType + "/fields";
 
-  var _e = react_1.useState(((_a = props.sdk.field) === null || _a === void 0 ? void 0 : _a.getValue()) ? props.sdk.field.getValue() : ''),
-      value = _e[0],
-      setValue = _e[1];
+  var _h = react_1.useState(((_a = props.sdk.field) === null || _a === void 0 ? void 0 : _a.getValue()) ? props.sdk.field.getValue() : ''),
+      value = _h[0],
+      setValue = _h[1];
 
-  var _f = react_1.useState(((_c = (_b = props.sdk.entry) === null || _b === void 0 ? void 0 : _b.fields['site']) === null || _c === void 0 ? void 0 : _c.getValue()) || ''),
-      site = _f[0],
-      setSite = _f[1];
+  var _j = react_1.useState(((_b = props.sdk.field) === null || _b === void 0 ? void 0 : _b.getValue()) ? props.sdk.field.getValue() : ''),
+      fieldValue = _j[0],
+      setFieldValue = _j[1];
 
-  var _g = react_1.useState(((_d = props.sdk.field) === null || _d === void 0 ? void 0 : _d.getValue()) ? props.sdk.field.getValue() : ''),
-      fieldValue = _g[0],
-      setFieldValue = _g[1];
-
-  var _h = react_1.useState(false),
-      isSlugUsed = _h[0],
-      setIsSlugUsed = _h[1];
+  var _k = react_1.useState(false),
+      isSlugUsed = _k[0],
+      setIsSlugUsed = _k[1];
 
   var detachExternalChangeHandler = null;
   var detachSiteChangeHandler = null;
+  var siteFielIdDefault = 'site';
+
+  if (!props.sdk.parameters.instance.siteFieldId || !props.sdk.parameters.instance.errorMessage) {
+    return React.createElement(React.Fragment, null, React.createElement(forma_36_react_components_1.ValidationMessage, {
+      style: {
+        marginTop: '0.5rem'
+      }
+    }, "Please complete the ui-extension setup for field ", React.createElement("strong", null, props.sdk.field.id), ' ', React.createElement("a", {
+      href: appUriContentType,
+      target: "_blank"
+    }, "here"), "."));
+  }
+
+  var _l = react_1.useState(((_e = (_c = props.sdk.entry) === null || _c === void 0 ? void 0 : _c.fields[(_d = props.sdk.parameters.instance.siteFieldId) !== null && _d !== void 0 ? _d : siteFielIdDefault]) === null || _e === void 0 ? void 0 : _e.getValue()) || ''),
+      site = _l[0],
+      setSite = _l[1];
+
   react_1.useEffect(function () {
-    var _a;
+    var _a, _b, _c;
 
-    props.sdk.window.startAutoResizer(); // detachSiteChangeHandler = props.sdk.entry?.fields['site'].onValueChanged(siteChangeHandler);
-
-    detachExternalChangeHandler = (_a = props.sdk.field) === null || _a === void 0 ? void 0 : _a.onValueChanged(onExternalChange);
+    props.sdk.window.startAutoResizer();
+    detachSiteChangeHandler = (_a = props.sdk.entry) === null || _a === void 0 ? void 0 : _a.fields[(_b = props.sdk.parameters.instance.siteFieldId) !== null && _b !== void 0 ? _b : siteFielIdDefault].onValueChanged(siteChangeHandler);
+    detachExternalChangeHandler = (_c = props.sdk.field) === null || _c === void 0 ? void 0 : _c.onValueChanged(onExternalChange);
     return function () {
       if (detachSiteChangeHandler) detachSiteChangeHandler();
       if (detachExternalChangeHandler) detachExternalChangeHandler();
@@ -43713,26 +43726,29 @@ var App = function (props) {
 
   var validateSlugUsed = function () {
     return __awaiter(void 0, void 0, void 0, function () {
-      var thisId, searchQuery, result;
+      var thisId, valueFormatted, searchQuery, result;
 
       var _a;
 
-      return __generator(this, function (_b) {
-        switch (_b.label) {
+      var _b;
+
+      return __generator(this, function (_c) {
+        switch (_c.label) {
           case 0:
             if (!(value && site)) return [3
             /*break*/
             , 2];
             thisId = props.sdk.entry.getSys().id;
+            valueFormatted = value === null || value === void 0 ? void 0 : value.toString();
             searchQuery = (_a = {
               limit: 5
-            }, _a['content_type'] = props.sdk.ids.contentType, _a['fields.site[in]'] = site, _a["fields." + props.sdk.field.id + "[in]"] = value, _a['sys.id[nin]'] = thisId, _a);
+            }, _a['content_type'] = props.sdk.ids.contentType, _a["fields." + ((_b = props.sdk.parameters.instance.siteFieldId) !== null && _b !== void 0 ? _b : siteFielIdDefault) + "[in]"] = site, _a["fields." + props.sdk.field.id + "[in]"] = valueFormatted, _a['sys.id[nin]'] = thisId, _a);
             return [4
             /*yield*/
             , props.sdk.space.getEntries(searchQuery)];
 
           case 1:
-            result = _b.sent();
+            result = _c.sent();
 
             if (result.total > 0) {
               setIsSlugUsed(true);
@@ -43741,7 +43757,7 @@ var App = function (props) {
               , true];
             }
 
-            _b.label = 2;
+            _c.label = 2;
 
           case 2:
             return [2
@@ -43765,23 +43781,12 @@ var App = function (props) {
     });
   };
 
-  if (!props.sdk.parameters.instance.siteFieldId || !props.sdk.parameters.instance.errorMessage) {
-    return React.createElement(React.Fragment, null, React.createElement(forma_36_react_components_1.ValidationMessage, {
-      style: {
-        marginTop: '0.5rem'
-      }
-    }, "Please complete the ui-extension setup for field ", React.createElement("strong", null, props.sdk.field.id), ' ', React.createElement("a", {
-      href: appUriContentType,
-      target: '_blank'
-    }, "here"), "."));
-  }
-
   return React.createElement(React.Fragment, null, React.createElement(forma_36_react_components_1.TextInput, {
     value: value,
     onChange: function (event) {
       return onChange(event);
     }
-  }), isSlugUsed && React.createElement(forma_36_react_components_1.ValidationMessage, {
+  }), ((_f = props.sdk.parameters.instance) === null || _f === void 0 ? void 0 : _f.helpMessage) && React.createElement(forma_36_react_components_1.HelpText, null, (_g = props.sdk.parameters.instance) === null || _g === void 0 ? void 0 : _g.helpMessage), isSlugUsed && React.createElement(forma_36_react_components_1.ValidationMessage, {
     style: {
       marginTop: '0.5rem'
     }
@@ -43828,7 +43833,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58348" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64327" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
