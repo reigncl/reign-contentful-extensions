@@ -23,7 +23,7 @@ const App = (props: AppProps) => {
   const [value, setValue] = useState<string>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
-  const [fieldValue, setFieldValue] = useState<string>(
+  const [fieldValue, setFieldValue] = useState<string | Array<string>>(
     props.sdk.field?.getValue() ? props.sdk.field.getValue() : ''
   );
   const [isSlugUsed, setIsSlugUsed] = useState<boolean>(false);
@@ -117,6 +117,7 @@ const App = (props: AppProps) => {
   const validateSlugUsed = async () => {
     if (value && site) {
       const thisId = props.sdk.entry.getSys().id;
+      const valueFormatted = value?.toString();
       const searchQuery: SearchQuery = {
         limit: 5,
         ['content_type']: props.sdk.ids.contentType,
@@ -124,7 +125,7 @@ const App = (props: AppProps) => {
           (props.sdk.parameters.instance as ExtensionParametersInstance).siteFieldId ??
           siteFielIdDefault
         }[in]`]: site,
-        [`fields.${props.sdk.field.id}[in]`]: value,
+        [`fields.${props.sdk.field.id}[in]`]: valueFormatted,
         ['sys.id[nin]']: thisId,
       };
       const result = await props.sdk.space.getEntries(searchQuery);
