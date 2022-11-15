@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Flex, Form, FormControl, Select, Textarea } from '@contentful/f36-components'
-import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
-import { DialogExtensionSDK } from '@contentful/app-sdk'
-import { css } from 'emotion'
-import { ConfigJsonStructureItem } from './ConfigScreen'
-import { CollectionProp, ContentFields, ContentTypeProps } from 'contentful-management'
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Form,
+  FormControl,
+  Pill,
+  Select,
+  Textarea,
+  TextInput,
+} from "@contentful/f36-components";
+import { useCMA, useSDK } from "@contentful/react-apps-toolkit";
+import { DialogExtensionSDK } from "@contentful/app-sdk";
+import { css } from "emotion";
+import { ConfigJsonStructureItem } from "./ConfigScreen";
+import {
+  CollectionProp,
+  ContentFields,
+  ContentTypeProps,
+} from "contentful-management";
 
 export enum DialogTypes {
   ADD,
@@ -12,58 +26,67 @@ export enum DialogTypes {
 }
 
 export interface DialogJsonStructureItem {
-  contentType: string
-  field: string
-  json: string
-  index?: number
+  contentType: string;
+  field: string;
+  content?: Array<string>;
+  index?: number;
 }
 
 export interface JsonItems {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 const Dialog = () => {
-  const cma = useCMA()
-  const sdk = useSDK<DialogExtensionSDK>()
-  const [submitted, setSubmitted] = useState(false)
-  const [contentTypesList, setContentTypesList] = useState<Array<Record<string, string>>>([])
-  const [fieldsList, setFieldsList] = useState<Array<string>>([])
-  const [validJson, setValidJson] = useState(false)
+  const cma = useCMA();
+  const sdk = useSDK<DialogExtensionSDK>();
+  const [submitted, setSubmitted] = useState(false);
+  const [contentTypesList, setContentTypesList] = useState<
+    Array<Record<string, string>>
+  >([]);
+  const [fieldsList, setFieldsList] = useState<Array<string>>([]);
+  const [validJson, setValidJson] = useState(false);
 
-  const { index } = sdk.parameters.invocation as unknown as DialogJsonStructureItem
-  const [contentTypeSelected, setContentTypeSelected] = useState<string | undefined>(
-    (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.contentType
-  )
+  const { index } = sdk.parameters
+    .invocation as unknown as DialogJsonStructureItem;
+  const [contentTypeSelected, setContentTypeSelected] = useState<
+    string | undefined
+  >(
+    (sdk.parameters.invocation as unknown as DialogJsonStructureItem)
+      ?.contentType
+  );
   const [fieldSelected, setFieldSelected] = useState<string | undefined>(
     (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.field
-  )
-  const [jsonStructure, setJsonStructure] = useState<string | undefined>(
-    (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.json
-  )
+  );
+  const [content, setContent] = useState<Array<string> | undefined>(
+    (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.content
+  );
+  const [colorValue, setColorValue] = useState<string | undefined>("");
 
   const submitForm = () => {
-    setSubmitted(true)
+    setSubmitted(true);
     sdk.close({
       contentType: contentTypeSelected,
       field: fieldSelected,
-      json: JSON.parse(jsonStructure ?? '{}'),
+      content: content,
       index,
-    } as ConfigJsonStructureItem)
-  }
+    } as ConfigJsonStructureItem);
+  };
 
   const onContentTypeChange = async (contentTypeId: string) => {
-    setContentTypeSelected(contentTypeId)
-  }
+    setContentTypeSelected(contentTypeId);
+  };
 
   const onFieldSiteChange = async (fieldId: string) => {
-    setFieldSelected(fieldId)
-  }
+    setFieldSelected(fieldId);
+  };
 
   const SelectContentType = () => {
     return (
       <FormControl>
-        <FormControl.Label>Choose a content type to list his fields.</FormControl.Label>
+        <FormControl.Label>
+          Choose a content type to list his fields.
+        </FormControl.Label>
         <Select
           id="optionSelect-SelectContentType"
           name="optionSelect-SelectContentType"
@@ -73,46 +96,23 @@ const Dialog = () => {
           }
         >
           <Select.Option value="">Select content type</Select.Option>
-          {contentTypesList?.map((ct: Record<string, string>, index: number) => {
-            return (
-              <Select.Option key={index} value={ct.id}>
-                {ct.name}
-              </Select.Option>
-            )
-          })}
+          {contentTypesList?.map(
+            (ct: Record<string, string>, index: number) => {
+              return (
+                <Select.Option key={index} value={ct.id}>
+                  {ct.name}
+                </Select.Option>
+              );
+            }
+          )}
         </Select>
       </FormControl>
-    )
-  }
-
-  const validateJson = (data: string) => {
-    try {
-      const jsonData: Record<string, unknown> = JSON.parse(data)
-      if (typeof jsonData === 'undefined') {
-        throw new Error('validateJson jsonData')
-      }
-      setValidJson(true)
-    } catch (error) {
-      // console.log(error)
-      setValidJson(false)
-    }
-  }
-
-  const formatPrettyJson = (data: string | undefined): string => {
-    try {
-      if (data) {
-        const jsonData: Record<string, unknown> = JSON.parse(data)
-        return JSON.stringify(jsonData, null, 2)
-      }
-      return data ?? ''
-    } catch (error) {
-      return data ?? ''
-    }
-  }
+    );
+  };
 
   const SelectField = () => (
     <FormControl>
-      <FormControl.Label>Select an Object type field</FormControl.Label>
+      <FormControl.Label>Select an Text type field</FormControl.Label>
       <Select
         id="optionSelect-SelectSiteField"
         name="optionSelect-SelectSiteField"
@@ -127,75 +127,112 @@ const Dialog = () => {
             <Select.Option key={index} value={field}>
               {field}
             </Select.Option>
-          )
+          );
         })}
       </Select>
     </FormControl>
-  )
+  );
 
   useEffect(() => {
-    ;(async () => {
-      if (!contentTypesList || (contentTypesList && contentTypesList?.length === 0)) {
-        const collectionResponse: CollectionProp<ContentTypeProps> = await cma.contentType.getMany({
-          query: { order: 'sys.id' },
-        })
-        const arrayOfContentTypes = collectionResponse?.items?.map((item: ContentTypeProps) => {
-          return {
-            name: item.name,
-            id: item.sys.id,
+    (async () => {
+      if (
+        !contentTypesList ||
+        (contentTypesList && contentTypesList?.length === 0)
+      ) {
+        const collectionResponse: CollectionProp<ContentTypeProps> =
+          await cma.contentType.getMany({
+            query: { order: "sys.id" },
+          });
+        const arrayOfContentTypes = collectionResponse?.items?.map(
+          (item: ContentTypeProps) => {
+            return {
+              name: item.name,
+              id: item.sys.id,
+            };
           }
-        })
-        setContentTypesList(arrayOfContentTypes)
+        );
+        setContentTypesList(arrayOfContentTypes);
       }
-    })()
-  }, [contentTypesList, cma.contentType])
+    })();
+  }, [contentTypesList, cma.contentType]);
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       const getArrayOfFieldsFromContentType = async (contentTypeId: string) => {
         const contentTypePage = await cma.contentType.get({
           contentTypeId,
-        })
+        });
         return contentTypePage?.fields
-          ?.filter((field: ContentFields) => field.type === 'Object')
-          ?.map((field: ContentFields) => field.id)
-      }
+          ?.filter((field: ContentFields) => field.type === "Symbol")
+          ?.map((field: ContentFields) => field.id);
+      };
       if (contentTypeSelected) {
-        const arrayOfFields = await getArrayOfFieldsFromContentType(contentTypeSelected)
-        setFieldsList(arrayOfFields)
+        const arrayOfFields = await getArrayOfFieldsFromContentType(
+          contentTypeSelected
+        );
+        setFieldsList(arrayOfFields);
       }
-    })()
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contentTypeSelected])
+  }, [contentTypeSelected]);
 
   return (
     <Flex padding="spacingM" fullWidth>
-      <Form className={css({ width: '100%' })} onSubmit={submitForm}>
+      <Form className={css({ width: "100%" })} onSubmit={submitForm}>
         <SelectContentType />
         <SelectField />
         <FormControl isRequired>
-          <FormControl.Label>JSON Structure</FormControl.Label>
-          <Textarea
-            rows={8}
-            defaultValue={formatPrettyJson(jsonStructure)}
-            name="dialog-label"
-            placeholder="{}"
-            onChange={(e) => {
-              validateJson(e.target.value)
-              setJsonStructure(e.target.value)
-            }}
-          />
+          <FormControl.Label>Hex Color</FormControl.Label>
+          <TextInput.Group>
+            <TextInput
+              value={colorValue}
+              name="dialog-label"
+              placeholder="#FFFFFF"
+              onChange={(e) => {
+                setColorValue(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setColorValue("");
+                  if (!content?.includes(e.currentTarget.value)) {
+                    setContent([...(content ?? []), e.currentTarget.value]);
+                  }
+                }
+              }}
+            />
+            <Box
+              className={css({
+                width: "60px",
+                backgroundColor: colorValue,
+                height: "40px",
+              })}
+            >
+              {" "}
+            </Box>
+          </TextInput.Group>
+          <Flex flexWrap='wrap'>
+            {content?.map((color: string, index: number) => {
+              return (
+                <Box
+                  key={index}
+                  className={css({ paddingRight: "10px", paddingTop: "10px" })}
+                >
+                  <Pill testId="pill-item" label={color} onClose={() => {}} />
+                </Box>
+              );
+            })}
+          </Flex>
         </FormControl>
         <Button
-          variant={typeof index !== 'undefined' ? 'positive' : 'primary'}
+          variant={typeof index !== "undefined" ? "positive" : "primary"}
           type="submit"
           isDisabled={submitted || !validJson}
         >
-          {typeof index !== 'undefined' ? 'Edit' : 'Add'}
+          {typeof index !== "undefined" ? "Edit" : "Add"}
         </Button>
       </Form>
     </Flex>
-  )
-}
+  );
+};
 
-export default Dialog
+export default Dialog;

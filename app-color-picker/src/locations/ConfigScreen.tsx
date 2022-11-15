@@ -14,7 +14,7 @@ export interface AppInstallationParameters {
 export interface ConfigJsonStructureItem {
   contentType: string
   field: string
-  json: Record<string, unknown>
+  content: Array<string>
   index?: number
 }
 
@@ -120,12 +120,12 @@ const ConfigScreen = () => {
   const openDialog = async (type: DialogTypes, item?: ConfigJsonStructureItem, index?: number) => {
     try {
       const result: ConfigJsonStructureItem = await sdk.dialogs.openCurrentApp({
-        title: type === DialogTypes.ADD ? 'Add new JSON' : 'Edit JSON',
+        title: type === DialogTypes.ADD ? 'Add new configuration' : 'Edit configuration',
         minHeight: 500,
         parameters: {
           contentType: item?.contentType,
           field: item?.field,
-          json: JSON.stringify(item?.json ?? {}),
+          content: item?.content ?? [],
           index,
         } as unknown as SerializedJSONValue,
       })
