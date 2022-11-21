@@ -18,7 +18,7 @@ export enum TypeColorPicker {
 export interface ExtensionParametersInstance {
   contentType?: string;
   field?: string;
-  colors?: string;
+  content?: Array<string>;
   type?: TypeColorPicker;
 }
 
@@ -30,17 +30,8 @@ const Field = () => {
   const detachExternalChangeHandler = useRef<Function>();
   const [parameters, setParameters] = useState<
     ExtensionParametersInstance | undefined
-  >(
-    (sdk.parameters.instance as Array<ExtensionParametersInstance>)?.find(
-      (value: ExtensionParametersInstance) =>
-        value?.contentType === sdk.ids.contentType &&
-        value?.field === sdk.ids.field
-    )
-  );
-  const availableColors =
-    parameters?.colors
-      ?.split(",")
-      ?.map((color: string) => color?.toLowerCase()?.trim()) || [];
+  >();
+  const availableColors = parameters?.content ?? [];
 
   const onChangeColor = async (color: ColorResult) => {
     setValue(color.hex);
@@ -73,6 +64,17 @@ const Field = () => {
         detachExternalChangeHandler.current();
     };
   }, [sdk]);
+
+  useEffect(() => {
+    const paramsFromField = (
+      sdk.parameters.installation?.items as Array<ExtensionParametersInstance>
+    )?.find(
+      (value: ExtensionParametersInstance) =>
+        value?.contentType === sdk.ids.contentType &&
+        value?.field === sdk.ids.field
+    );
+    setParameters(paramsFromField);
+  }, [sdk.parameters]);
 
   return (
     <div style={{ padding: "15px" }}>

@@ -7,7 +7,6 @@ import {
   FormControl,
   Pill,
   Select,
-  Textarea,
   TextInput,
 } from "@contentful/f36-components";
 import { useCMA, useSDK } from "@contentful/react-apps-toolkit";
@@ -19,6 +18,7 @@ import {
   ContentFields,
   ContentTypeProps,
 } from "contentful-management";
+import { TypeColorPicker } from "./Field";
 
 export enum DialogTypes {
   ADD,
@@ -29,6 +29,7 @@ export interface DialogJsonStructureItem {
   contentType: string;
   field: string;
   content?: Array<string>;
+  type?: TypeColorPicker;
   index?: number;
 }
 
@@ -40,12 +41,13 @@ export interface JsonItems {
 const Dialog = () => {
   const cma = useCMA();
   const sdk = useSDK<DialogExtensionSDK>();
+  const pickerTypes = TypeColorPicker;
   const [submitted, setSubmitted] = useState(false);
   const [contentTypesList, setContentTypesList] = useState<
     Array<Record<string, string>>
   >([]);
   const [fieldsList, setFieldsList] = useState<Array<string>>([]);
-  const [validJson, setValidJson] = useState(false);
+  const [validHex, setValidHex] = useState(true);
 
   const { index } = sdk.parameters
     .invocation as unknown as DialogJsonStructureItem;
@@ -58,6 +60,9 @@ const Dialog = () => {
   const [fieldSelected, setFieldSelected] = useState<string | undefined>(
     (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.field
   );
+  const [typeSelected, setTypeSelected] = useState<string | undefined>(
+    (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.type
+  );
   const [content, setContent] = useState<Array<string> | undefined>(
     (sdk.parameters.invocation as unknown as DialogJsonStructureItem)?.content
   );
@@ -69,6 +74,7 @@ const Dialog = () => {
       contentType: contentTypeSelected,
       field: fieldSelected,
       content: content,
+      type: typeSelected,
       index,
     } as ConfigJsonStructureItem);
   };
@@ -79,6 +85,18 @@ const Dialog = () => {
 
   const onFieldSiteChange = async (fieldId: string) => {
     setFieldSelected(fieldId);
+  };
+
+  const onClosePill = (idx: number) => {
+    const currentItems = [...(content ?? [])];
+    currentItems?.splice(idx, 1);
+    setContent(currentItems);
+  }
+
+  const validateHexColor = (color: string): boolean => {
+    const result = /^#[0-9A-F]{6}$/i.test(color);
+    setValidHex(result);
+    return result;
   };
 
   const SelectContentType = () => {
@@ -133,6 +151,29 @@ const Dialog = () => {
     </FormControl>
   );
 
+  const SelectPicker = () => (
+    <FormControl>
+      <FormControl.Label>Select a type of datepicker</FormControl.Label>
+      <Select
+        id="optionSelect-SelectPicker"
+        name="optionSelect-SelectPicker"
+        value={typeSelected}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          setTypeSelected(e.currentTarget.value)
+        }
+      >
+        <Select.Option value="">Select type</Select.Option>
+        {Object.keys(pickerTypes)?.map((field: string, index: number) => {
+          return (
+            <Select.Option key={index} value={field}>
+              {field}
+            </Select.Option>
+          );
+        })}
+      </Select>
+    </FormControl>
+  );
+
   useEffect(() => {
     (async () => {
       if (
@@ -176,12 +217,15 @@ const Dialog = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentTypeSelected]);
 
+  console.log('pickerTypes', Object.keys(pickerTypes))
+
   return (
     <Flex padding="spacingM" fullWidth>
-      <Form className={css({ width: "100%" })} onSubmit={submitForm}>
+      <Form className={css({ width: "100%" })}>
         <SelectContentType />
         <SelectField />
-        <FormControl isRequired>
+        <SelectPicker />
+        <FormControl isInvalid={!!!validHex}>
           <FormControl.Label>Hex Color</FormControl.Label>
           <TextInput.Group>
             <TextInput
@@ -190,9 +234,13 @@ const Dialog = () => {
               placeholder="#FFFFFF"
               onChange={(e) => {
                 setColorValue(e.target.value);
+                validateHexColor(e.currentTarget.value);
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
+                if (
+                  e.key === "Enter" &&
+                  validateHexColor(e.currentTarget.value) === true
+                ) {
                   setColorValue("");
                   if (!content?.includes(e.currentTarget.value)) {
                     setContent([...(content ?? []), e.currentTarget.value]);
@@ -200,24 +248,38 @@ const Dialog = () => {
                 }
               }}
             />
-            <Box
-              className={css({
-                width: "60px",
-                backgroundColor: colorValue,
-                height: "40px",
-              })}
-            >
-              {" "}
-            </Box>
+            {colorValue && colorValue?.length && (
+              <Box
+                className={css({
+                  width: "70px",
+                  backgroundColor: colorValue,
+                  height: "40px",
+                })}
+              >
+                {" "}
+              </Box>
+            )}
           </TextInput.Group>
-          <Flex flexWrap='wrap'>
+          {!!!validHex && (
+            <FormControl.ValidationMessage>
+              Please check your color
+            </FormControl.ValidationMessage>
+          )}
+          <FormControl.HelpText>
+            Add a Hex css color, like: <code>#FFFFFF</code> <code>#cccccc</code>
+          </FormControl.HelpText>
+          <Flex flexWrap="wrap">
             {content?.map((color: string, index: number) => {
               return (
                 <Box
                   key={index}
                   className={css({ paddingRight: "10px", paddingTop: "10px" })}
                 >
-                  <Pill testId="pill-item" label={color} onClose={() => {}} />
+                  <Pill
+                    testId="pill-item"
+                    label={color}
+                    onClose={() => onClosePill(index)}
+                  />
                 </Box>
               );
             })}
@@ -225,8 +287,9 @@ const Dialog = () => {
         </FormControl>
         <Button
           variant={typeof index !== "undefined" ? "positive" : "primary"}
-          type="submit"
-          isDisabled={submitted || !validJson}
+          type="button"
+          onClick={submitForm}
+          isDisabled={submitted}
         >
           {typeof index !== "undefined" ? "Edit" : "Add"}
         </Button>

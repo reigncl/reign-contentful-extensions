@@ -1,76 +1,87 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Flex, Heading, Table, TextLink, Box } from '@contentful/f36-components'
-import { AppExtensionSDK, SerializedJSONValue } from '@contentful/app-sdk'
-import { useCMA, useSDK } from '@contentful/react-apps-toolkit'
-import { css } from 'emotion'
-import { DeleteIcon, EditIcon, PlusIcon } from '@contentful/f36-icons'
-import { DialogTypes } from './Dialog'
-import { Control } from 'contentful-management'
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Flex,
+  Heading,
+  Table,
+  TextLink,
+  Box,
+} from "@contentful/f36-components";
+import { AppExtensionSDK, SerializedJSONValue } from "@contentful/app-sdk";
+import { useCMA, useSDK } from "@contentful/react-apps-toolkit";
+import { css } from "emotion";
+import { DeleteIcon, EditIcon, PlusIcon } from "@contentful/f36-icons";
+import { DialogTypes } from "./Dialog";
+import { Control } from "contentful-management";
+import { TypeColorPicker } from "./Field";
 
 export interface AppInstallationParameters {
-  items?: Array<ConfigJsonStructureItem>
+  items?: Array<ConfigJsonStructureItem>;
 }
 
 export interface ConfigJsonStructureItem {
-  contentType: string
-  field: string
-  content: Array<string>
-  index?: number
+  contentType: string;
+  field: string;
+  content: Array<string>;
+  type?: TypeColorPicker;
+  index?: number;
 }
 
 const ConfigScreen = () => {
-  const sdk = useSDK<AppExtensionSDK>()
-  const cma = useCMA()
-  const [parameters, setParameters] = useState<AppInstallationParameters>({})
+  const sdk = useSDK<AppExtensionSDK>();
+  const cma = useCMA();
+  const [parameters, setParameters] = useState<AppInstallationParameters>({});
 
   const onConfigure = useCallback(async () => {
-    const currentState = await sdk.app.getCurrentState()
+    const currentState = await sdk.app.getCurrentState();
 
     return {
       parameters,
       targetState: currentState,
-    }
-  }, [parameters, sdk])
+    };
+  }, [parameters, sdk]);
 
   const updateEditor = async (
     contentType: string,
     fieldId: string,
     widgetId: string,
-    widgetNamespace: string = 'builtin'
+    widgetNamespace: string = "builtin"
   ) => {
     try {
-      const editor = await cma.editorInterface.get({ contentTypeId: contentType })
+      const editor = await cma.editorInterface.get({
+        contentTypeId: contentType,
+      });
       const controls = editor.controls?.map((value: Control) => {
         if (value.fieldId === fieldId) {
-          return { ...value, widgetId, widgetNamespace }
+          return { ...value, widgetId, widgetNamespace };
         }
-        return value
-      })
+        return value;
+      });
       await cma.editorInterface.update(
         { contentTypeId: contentType },
         { ...editor, controls: controls }
-      )
+      );
     } catch (error) {}
-  }
+  };
 
   useEffect(() => {
-    sdk.app.onConfigure(() => onConfigure())
-  }, [sdk, onConfigure])
+    sdk.app.onConfigure(() => onConfigure());
+  }, [sdk, onConfigure]);
 
   useEffect(() => {
-    ;(async () => {
-      const currentParameters: AppInstallationParameters | null = await sdk.app.getParameters()
+    (async () => {
+      const currentParameters: AppInstallationParameters | null =
+        await sdk.app.getParameters();
 
       if (currentParameters) {
-        setParameters(currentParameters)
+        setParameters(currentParameters);
       }
-      sdk.app.setReady()
-    })()
-  }, [sdk])
+      sdk.app.setReady();
+    })();
+  }, [sdk]);
 
   const TableWithItems = () => {
     if (!parameters.items || parameters.items.length === 0) {
-      return <></>
+      return <></>;
     }
     return (
       <>
@@ -78,116 +89,145 @@ const ConfigScreen = () => {
           <Table.Head>
             <Table.Row>
               <Table.Cell>Content type</Table.Cell>
-              <Table.Cell>Field id</Table.Cell>
+              <Table.Cell>Field</Table.Cell>
+              <Table.Cell>Datepicker</Table.Cell>
               <Table.Cell>Actions</Table.Cell>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {parameters.items.map((itm: ConfigJsonStructureItem, itmIndex: number) => {
-              return (
-                <Table.Row key={itmIndex}>
-                  <Table.Cell>{itm?.contentType}</Table.Cell>
-                  <Table.Cell>{itm?.field}</Table.Cell>
-                  <Table.Cell>
-                    <TextLink
-                      as="button"
-                      variant="primary"
-                      icon={<EditIcon />}
-                      alignIcon="end"
-                      onClick={() => {
-                        openDialog(DialogTypes.UPDATE, itm, itmIndex)
-                      }}
-                    />
-                    <TextLink
-                      as="button"
-                      variant="negative"
-                      icon={<DeleteIcon />}
-                      alignIcon="end"
-                      onClick={() => {
-                        openDeleteDialog(itm, itmIndex)
-                      }}
-                    />
-                  </Table.Cell>
-                </Table.Row>
-              )
-            })}
+            {parameters.items.map(
+              (itm: ConfigJsonStructureItem, itmIndex: number) => {
+                return (
+                  <Table.Row key={itmIndex}>
+                    <Table.Cell>{itm?.contentType}</Table.Cell>
+                    <Table.Cell>{itm?.field}</Table.Cell>
+                    <Table.Cell>{itm?.type}</Table.Cell>
+                    <Table.Cell>
+                      <TextLink
+                        as="button"
+                        variant="primary"
+                        icon={<EditIcon />}
+                        alignIcon="end"
+                        onClick={() => {
+                          openDialog(DialogTypes.UPDATE, itm, itmIndex);
+                        }}
+                      />
+                      <TextLink
+                        as="button"
+                        variant="negative"
+                        icon={<DeleteIcon />}
+                        alignIcon="end"
+                        onClick={() => {
+                          openDeleteDialog(itm, itmIndex);
+                        }}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              }
+            )}
           </Table.Body>
         </Table>
       </>
-    )
-  }
+    );
+  };
 
-  const openDialog = async (type: DialogTypes, item?: ConfigJsonStructureItem, index?: number) => {
+  const openDialog = async (
+    type: DialogTypes,
+    item?: ConfigJsonStructureItem,
+    index?: number
+  ) => {
     try {
       const result: ConfigJsonStructureItem = await sdk.dialogs.openCurrentApp({
-        title: type === DialogTypes.ADD ? 'Add new configuration' : 'Edit configuration',
-        minHeight: 500,
+        title:
+          type === DialogTypes.ADD
+            ? "Add new configuration"
+            : "Edit configuration",
+        minHeight: 550,
         parameters: {
           contentType: item?.contentType,
           field: item?.field,
           content: item?.content ?? [],
+          type: item?.type,
           index,
         } as unknown as SerializedJSONValue,
-      })
-      const currentItems = parameters.items ?? []
+      });
+      const currentItems = parameters.items ?? [];
       if (type === DialogTypes.ADD && result) {
-        await updateEditor(result.contentType, result.field, sdk.ids.app, 'app')
-        currentItems.push(result)
+        await updateEditor(
+          result.contentType,
+          result.field,
+          sdk.ids.app,
+          "app"
+        );
+        currentItems.push(result);
       }
-      if (type === DialogTypes.UPDATE && typeof result?.index !== 'undefined') {
-        const previewItemVersion = currentItems[result?.index]
+      if (type === DialogTypes.UPDATE && typeof result?.index !== "undefined") {
+        const previewItemVersion = currentItems[result?.index];
         if (
           previewItemVersion.contentType !== result.contentType ||
           previewItemVersion.field !== result.field
         ) {
-          await updateEditor(previewItemVersion.contentType, previewItemVersion.field, 'singleLine')
-          await updateEditor(result.contentType, result.field, sdk.ids.app, 'app')
+          await updateEditor(
+            previewItemVersion.contentType,
+            previewItemVersion.field,
+            "singleLine"
+          );
+          await updateEditor(
+            result.contentType,
+            result.field,
+            sdk.ids.app,
+            "app"
+          );
         }
-        currentItems[result?.index] = result
+        currentItems[result?.index] = result;
       }
       if (result) {
         setParameters({
           ...parameters,
           items: currentItems,
-        })
+        });
       }
     } catch (error) {
-      console.log('openDialog error', error)
+      console.log("openDialog error", error);
     }
-  }
+  };
 
-  const openDeleteDialog = async (item: ConfigJsonStructureItem, index: number) => {
+  const openDeleteDialog = async (
+    item: ConfigJsonStructureItem,
+    index: number
+  ) => {
     try {
       const deleteResponse = await sdk.dialogs.openConfirm({
-        title: 'Are you sure to delete this JSON structure?',
+        title: "Are you sure to delete this JSON structure?",
         message: ``,
-      })
+      });
       if (deleteResponse) {
-        await updateEditor(item.contentType, item.field, 'singleLine')
-        const currentItems = parameters.items ?? []
-        currentItems.splice(index, 1)
+        await updateEditor(item.contentType, item.field, "singleLine");
+        const currentItems = parameters.items ?? [];
+        currentItems.splice(index, 1);
         setParameters({
           ...parameters,
           items: currentItems,
-        })
+        });
       }
     } catch (error) {
-      console.log('openDeleteDialog error', error)
+      console.log("openDeleteDialog error", error);
     }
-  }
+  };
 
   return (
-    <Flex className={css({ margin: '80px' })}>
+    <Flex className={css({ margin: "80px" })}>
       <Box paddingLeft="spacingL">
         <Heading>
-          Color picker configurations{' '}
+          Color picker configurations{" "}
           <TextLink
             as="button"
             variant="primary"
             icon={<PlusIcon />}
             alignIcon="start"
             onClick={() => {
-              openDialog(DialogTypes.ADD)
+              openDialog(DialogTypes.ADD);
             }}
           >
             Add config
@@ -196,7 +236,7 @@ const ConfigScreen = () => {
         <TableWithItems />
       </Box>
     </Flex>
-  )
-}
+  );
+};
 
-export default ConfigScreen
+export default ConfigScreen;
