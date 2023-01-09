@@ -16,6 +16,8 @@ This repo stores generic contentful extensions and apps.
 
 * **contentful/commercelayer**: Retrieves products from Commerce Layer.
 
+* **app-preview**: Allows authors to preview individual components within Contentful.
+
 ## UI Extensions
 
 * **ui-color-picker**: Allows to pick colors in many different ways.
