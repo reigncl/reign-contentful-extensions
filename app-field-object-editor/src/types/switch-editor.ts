@@ -4,4 +4,5 @@ export interface SwitchEditorProps {
   value: EditorTypeValue
   parentKey: string
   currentKey: string
+  index?: number
 }

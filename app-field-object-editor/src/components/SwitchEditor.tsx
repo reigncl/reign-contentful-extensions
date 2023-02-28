@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { EditorTypeValue, FieldActionTypes, SwitchEditorProps } from '../types'
-import { Form, Switch, TextInput } from '@contentful/f36-components'
+import { Switch, TextInput } from '@contentful/f36-components'
 import ChildMainEditor from './ChildMainEditor'
 import { FieldContext } from '../context/FieldContext'
 import { getValue, setValue } from '../util/set-value'
+import ArrayChildMainEditor from './ArrayChildMainEditor'
 
 const SwitchEditor = (props: SwitchEditorProps) => {
   const { value, parentKey } = props
@@ -11,6 +12,9 @@ const SwitchEditor = (props: SwitchEditorProps) => {
   const [valueField, setValueField] = useState(getValue({ ...(state.value as object) }, parentKey))
 
   const HandleDefault = (value: EditorTypeValue) => {
+    if (typeof value === 'object' && Array.isArray(value?.value)) {
+      return <ArrayChildMainEditor data={value?.value} parentKey={parentKey} />
+    }
     if (typeof value === 'object' && Object.keys(value).length > 0) {
       return <ChildMainEditor data={value?.value} parentKey={parentKey} />
     }

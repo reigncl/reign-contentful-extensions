@@ -1,8 +1,9 @@
 import { Table } from '@contentful/f36-components'
-import { EditorTypeValue, MainEditorProps } from '../types'
+import { EditorTypeValue } from '../types'
+import { ChildMainEditorProps } from '../types/child-main-editor'
 import SwitchEditor from './SwitchEditor'
 
-const ChildMainEditor = (props: MainEditorProps) => {
+const ChildMainEditor = (props: ChildMainEditorProps) => {
   const { data, parentKey } = props
   const preParentKey = parentKey ? `${parentKey}.` : parentKey
   if (!data) {
