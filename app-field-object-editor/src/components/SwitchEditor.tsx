@@ -13,7 +13,6 @@ const SwitchEditor = (props: SwitchEditorProps) => {
 
   const HandleDefault = (valueDefault: EditorTypeValue) => {
     if (typeof valueDefault === 'object' && Array.isArray(valueDefault?.value)) {
-      console.log('ARRAY', JSON.stringify(getValue({ ...(state.value as object) }, parentKey)))
       return <ArrayChildMainEditor data={valueDefault?.value} parentKey={parentKey} />
     }
     if (typeof value === 'object' && Object.keys(value).length > 0) {
@@ -24,37 +23,12 @@ const SwitchEditor = (props: SwitchEditorProps) => {
 
   useEffect(() => {
     if (index && prevParentKey) {
-      /*console.log('INIT!')
-      console.log('useEffect getValue  prevParentKey', prevParentKey)
-      console.log('useEffect getValue  index', index)
-      console.log('useEffect getValue  currentKey', currentKey)
-      console.log('useEffect getValue', getValue({ ...(state.value as object) }, prevParentKey))
-      console.log(
-        'useEffect getValue index',
-        getValue({ ...(state.value as object) }, prevParentKey)[index]
-      )*/
       const currentValue = getValue({ ...(state.value as object) }, prevParentKey)[index]
-      /*console.log('useEffect getValue  currentValue', currentValue)
-      console.log(
-        'useEffect getValue  setValueField',
-        currentValue && currentValue[currentKey] ? currentValue[currentKey] : null
-      )*/
       setValueField(currentValue && currentValue[currentKey] ? currentValue[currentKey] : null)
     } else {
-      console.log('MMMMM')
       setValueField(getValue({ ...(state.value as object) }, parentKey))
     }
   }, [state])
-
-  useEffect(() => {
-    const cv = getValue({ ...(state.value as object) }, prevParentKey ?? '')
-    console.log(`useEffect valueField=${JSON.stringify(valueField)} currentKey=${currentKey} parentKey=${parentKey} prevParentKey=${prevParentKey} index=${index}`)
-    console.log(`useEffect valueField=${JSON.stringify(valueField)} currentKey=${currentKey} parentKey=${parentKey} prevParentKey=${prevParentKey} index=${index}`)
-    console.log(`useEffect getValue=${JSON.stringify(cv)}`)
-    console.log(``)
-  }, [valueField])
-
-  console.log(`venga currentKey=${currentKey} valueField=${JSON.stringify(valueField)}`)
 
   switch (value) {
     case 'string':

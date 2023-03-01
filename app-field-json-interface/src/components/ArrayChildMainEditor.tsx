@@ -3,6 +3,7 @@ import * as icons from "@contentful/f36-icons";
 import { useState } from "react";
 import { EditorTypeValue } from "../types";
 import { ChildMainEditorProps } from "../types/child-main-editor";
+import { getValue, setValue } from "../util/set-value";
 import BooleanEditor from "./Editors/BooleanEditor";
 import LongStringEditor from "./Editors/LongStringEditor";
 import NumberEditor from "./Editors/NumberEditor";
@@ -10,16 +11,20 @@ import StringEditor from "./Editors/StringEditor";
 
 const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
   const { value, structure, handleUpdate, parentKey } = props;
-  const [dataToLoop, setDataToLoop] = useState<any[]>([]);
+  const currentValue = getValue(value, parentKey)
+  const [dataToLoop, setDataToLoop] = useState<any[]>(currentValue ?? []);
 
   const addEditorTable = () => {
     setDataToLoop([...(dataToLoop ?? []), {}]);
   };
 
   const removeEditorTable = (TableIndex: number) => {
-    const dataToLoopFiltered = dataToLoop?.filter(
+    const dataToLoopFiltered = currentValue?.filter(
       (value: any, i: number) => i !== TableIndex
     );
+    if (handleUpdate) {
+      handleUpdate(setValue(value as object, parentKey, dataToLoopFiltered))
+    }
     setDataToLoop(dataToLoopFiltered);
   };
 

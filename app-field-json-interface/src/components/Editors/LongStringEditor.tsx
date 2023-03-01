@@ -23,9 +23,7 @@ const LongStringEditor = (props: Editor) => {
             updateValue(
               value,
               pathObject as string,
-              e.currentTarget.value,
-              index,
-              currentKey
+              e.currentTarget.value
             )
           );
         }

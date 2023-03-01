@@ -23,9 +23,7 @@ const BooleanEditor = (props: Editor) => {
             updateValue(
               value,
               pathObject as string,
-              e.target.checked,
-              index,
-              currentKey
+              e.target.checked
             )
           );
         }

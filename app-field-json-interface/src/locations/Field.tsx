@@ -31,7 +31,6 @@ const Field = () => {
     );
 
     setStructure(structure?.json);
-    console.log(`Field value=${JSON.stringify(sdk.field.getValue())}`)
     setValue(sdk.field.getValue() ?? {});
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
