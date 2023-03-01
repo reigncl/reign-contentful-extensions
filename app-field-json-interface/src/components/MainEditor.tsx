@@ -11,7 +11,6 @@ const MainEditor = (props: MainEditorProps) => {
 
   return (
     <>
-      MainEditor
       <Table>
         <Table.Body>
           {Object.keys(structure)?.map((key: string, index: number) => {
