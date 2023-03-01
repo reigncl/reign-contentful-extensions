@@ -1,10 +1,14 @@
 import { TextInput } from "@contentful/f36-components";
 import { Editor } from "../../types/editor";
-import { setValue } from "../../util/set-value";
+import { setValue, updateValue } from "../../util/set-value";
 
 const NumberEditor = (props: Editor) => {
-  const { handleUpdate, parentKey, value, currentKey } = props
-  const valueField = ''
+  const { handleUpdate, parentKey, value, currentKey, index } = props;
+  const valueField = "";
+  let pathObject =
+    typeof index !== "undefined" && index > -1
+      ? parentKey
+      : `${parentKey}.${currentKey}`;
   return (
     <TextInput
       name={parentKey}
@@ -13,8 +17,15 @@ const NumberEditor = (props: Editor) => {
       defaultValue={valueField ?? ""}
       onBlurCapture={(e) => {
         if (handleUpdate) {
-          console.log(`NumberEditor parentKey=${parentKey}.${currentKey}`)
-          handleUpdate(e.currentTarget.value)
+          handleUpdate(
+            updateValue(
+              value,
+              pathObject as string,
+              e.currentTarget.value,
+              index,
+              currentKey
+            )
+          );
         }
       }}
     />

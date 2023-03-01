@@ -10,7 +10,7 @@ import LongStringEditor from "./Editors/LongStringEditor";
 const SwitchEditor = (props: SwitchEditorProps) => {
   const { value, structure, parentKey, handleUpdate, currentKey } = props;
 
-  const HandleDefault = (value: EditorTypeValue) => {
+  const HandleDefault = () => {
     if (typeof value === "object" && Array.isArray(structure)) {
       const arrKey = parentKey ? `${parentKey}.` : parentKey
       return (
@@ -75,7 +75,7 @@ const SwitchEditor = (props: SwitchEditorProps) => {
         />
       );
     default:
-      return <HandleDefault value={value} />;
+      return <HandleDefault />;
   }
 };
 

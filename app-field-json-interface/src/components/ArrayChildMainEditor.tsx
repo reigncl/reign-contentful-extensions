@@ -44,6 +44,7 @@ const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
             parentKey={parentKey}
             value={value}
             currentKey={`${currentKey}`}
+            index={index}
           />
         );
       case "longstring":
@@ -53,6 +54,7 @@ const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
             parentKey={parentKey}
             value={value}
             currentKey={`${currentKey}`}
+            index={index}
           />
         );
       case "boolean":
@@ -62,6 +64,7 @@ const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
             parentKey={parentKey}
             value={value}
             currentKey={`${currentKey}`}
+            index={index}
           />
         );
       case "number":
@@ -71,6 +74,7 @@ const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
             parentKey={parentKey}
             value={value}
             currentKey={`${currentKey}`}
+            index={index}
           />
         );
       default:
@@ -96,6 +100,7 @@ const ArrayChildMainEditor = (props: ChildMainEditorProps) => {
                             <Table.Cell>
                               <EditorArray
                                 currentKey={`${key}`}
+                                index={idx}
                                 type={
                                   (
                                     (

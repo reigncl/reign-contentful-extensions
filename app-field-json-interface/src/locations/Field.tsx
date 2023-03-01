@@ -49,12 +49,12 @@ const Field = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
-
+  console.log(`Field value=${value}`)
   return (
     <>
       <MainEditor
         structure={stucture as FieldState}
-        value={value as FieldState}
+        value={value as EditorTypeValue}
         handleUpdate={(e: any)=> {
           console.log('handleUpdate e', e)
         }}
