@@ -3,7 +3,6 @@ import { FieldExtensionSDK } from "@contentful/app-sdk";
 import { /* useCMA, */ useSDK } from "@contentful/react-apps-toolkit";
 import MainEditor from "../components/MainEditor";
 import { EditorTypeValue, FieldState } from "../types";
-import { deepEqual } from "../util/deep-equal";
 import {
   AppInstallationParameters,
   ConfigJsonStructureItem,
@@ -31,32 +30,20 @@ const Field = () => {
         value.field === sdk.ids.field
     );
 
-    console.log('')
-    console.log("Field useEffect structure", structure?.json);
-    console.log("Field useEffect structure", structure?.json);
-
     setStructure(structure?.json);
+    console.log(`Field value=${JSON.stringify(sdk.field.getValue())}`)
     setValue(sdk.field.getValue() ?? {});
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
 
-  useEffect(() => {
-    const currentValue =
-      (sdk.field.getValue() as Record<string, unknown>) ?? {};
-    if (deepEqual(currentValue, value as Record<string, unknown>) === false) {
-      sdk.field.setValue(value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-  console.log(`Field value=${value}`)
   return (
     <>
       <MainEditor
         structure={stucture as FieldState}
         value={value as EditorTypeValue}
-        handleUpdate={(e: any)=> {
-          console.log('handleUpdate e', e)
+        handleUpdate={(e: any) => {
+          sdk.field.setValue(e);
         }}
       />
     </>

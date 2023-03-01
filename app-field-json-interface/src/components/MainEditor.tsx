@@ -1,14 +1,10 @@
-import { EditorTypeValue, FieldState, MainEditorProps } from "../types";
+import { EditorTypeValue, MainEditorProps } from "../types";
 import { Table } from "@contentful/f36-components";
-import { useContext } from "react";
-import { FieldContext } from "../context/FieldContext";
 import SwitchEditor from "./SwitchEditor";
 
 const MainEditor = (props: MainEditorProps) => {
   const { structure, value, handleUpdate } = props;
-  console.log(`MainEditor structure=${JSON.stringify(structure)}`);
-  console.log(`MainEditor value=${JSON.stringify(value)}`);
-
+  
   if (!structure) {
     return <>Cargando</>;
   }

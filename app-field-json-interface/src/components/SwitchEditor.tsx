@@ -1,5 +1,5 @@
 import React from "react";
-import { EditorTypeValue, SwitchEditorProps } from "../types";
+import { SwitchEditorProps } from "../types";
 import ChildMainEditor from "./ChildMainEditor";
 import ArrayChildMainEditor from "./ArrayChildMainEditor";
 import StringEditor from "./Editors/StringEditor";

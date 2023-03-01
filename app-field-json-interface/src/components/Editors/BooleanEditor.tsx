@@ -1,11 +1,17 @@
 import { Switch } from "@contentful/f36-components";
 import { Editor } from "../../types/editor";
-import { updateValue } from "../../util/set-value";
+import { getValue, updateValue } from "../../util/set-value";
 
 const BooleanEditor = (props: Editor) => {
-  const { handleUpdate, parentKey, value, currentKey, index } = props
-  const valueField = ''
-  let pathObject = typeof index !== 'undefined' && index > -1 ? parentKey : `${parentKey}.${currentKey}`
+  const { handleUpdate, parentKey, value, currentKey, index } = props;
+  let pathObject = '';
+  if (typeof index !== "undefined" && index > -1) {
+    pathObject = `${parentKey}${parentKey ? "." : ""}${index}.${currentKey}`
+  } else {
+    pathObject = `${parentKey}${parentKey ? "." : ""}${currentKey}`
+  }
+
+  const valueField = getValue(value, pathObject as string);
   return (
     <Switch
       name={parentKey}
