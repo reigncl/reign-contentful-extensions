@@ -1,6 +1,6 @@
 {
   "name": "app-field-json-interface",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@contentful/app-sdk": "4.14.1",
