@@ -4,23 +4,24 @@ import { ChildMainEditorProps } from '../types/child-main-editor'
 import SwitchEditor from './SwitchEditor'
 
 const ChildMainEditor = (props: ChildMainEditorProps) => {
-  const { data, parentKey } = props
-  const preParentKey = parentKey ? `${parentKey}.` : parentKey
-  if (!data) {
+  const { value, structure, handleUpdate, parentKey } = props
+  if (!structure) {
     return <>Cargando</>
   }
   return (
     <Table>
       <Table.Body>
-        {Object.keys(data)?.map((key: string, index: number) => {
+        {Object.keys(structure)?.map((key: string, index: number) => {
           return (
             <Table.Row key={index}>
               <Table.Cell>{key}</Table.Cell>
               <Table.Cell>
                 <SwitchEditor
+                  parentKey={`${parentKey}`}
                   currentKey={`${key}`}
-                  parentKey={`${preParentKey}${key}`}
-                  value={(props?.data as Record<string, EditorTypeValue>)[key]}
+                  value={value}
+                  handleUpdate={handleUpdate}
+                  structure={(structure as Record<string, EditorTypeValue>)[key]}
                 />
               </Table.Cell>
             </Table.Row>

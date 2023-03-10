@@ -9,7 +9,6 @@ export const FieldReducer: (state: FieldState, action: FieldAction) => FieldStat
   state = INITIAL_FIELD_STATE,
   action: FieldAction
 ): FieldState => {
-  console.log(`FieldReducer action.type=${action.type}`, JSON.stringify(action.payload.value ?? state?.value))
   switch (action.type) {
     case FieldActionTypes.UPDATE_VALUE: {
       return {

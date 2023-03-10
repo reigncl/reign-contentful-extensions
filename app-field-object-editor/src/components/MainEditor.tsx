@@ -1,6 +1,6 @@
 import { EditorTypeValue, MainEditorProps } from '../types'
 import SwitchEditor from './SwitchEditor'
-import { Box, Form, FormControl, Stack, Table } from '@contentful/f36-components'
+import { Table } from '@contentful/f36-components'
 import { useContext } from 'react'
 import { FieldContext } from '../context/FieldContext'
 
