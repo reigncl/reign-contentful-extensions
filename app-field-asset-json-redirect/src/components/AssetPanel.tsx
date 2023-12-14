@@ -1,23 +1,19 @@
-import { AssetCard, Flex, MenuItem } from "@contentful/f36-components";
-import tokens from "@contentful/f36-tokens";
+import { FieldAppSDK } from "@contentful/app-sdk";
+import { WidgetType } from "@contentful/default-field-editors";
+import { Field } from "@contentful/default-field-editors";
+import { Flex } from "@contentful/f36-components";
 
-export default function AssetPanel() {
+export default function AssetPanel({
+  sdk,
+  widgetId,
+}: {
+  sdk: FieldAppSDK;
+  widgetId?: WidgetType;
+}) {
   return (
     <>
-      <Flex alignItems="center" justifyContent="center" paddingTop="spacingL">
-        <AssetCard
-          status="published"
-          type="plaintext"
-          title="Everest"
-          actions={[
-            <MenuItem key="copy" onClick={() => alert("copy")}>
-              Copy
-            </MenuItem>,
-            <MenuItem key="delete" onClick={() => alert("delete")}>
-              Delete
-            </MenuItem>,
-          ]}
-        />
+      <Flex paddingTop="spacingL">
+        <Field sdk={sdk} widgetId={widgetId} />
       </Flex>
     </>
   );

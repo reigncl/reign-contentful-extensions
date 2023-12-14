@@ -1,21 +1,19 @@
 import React, { useState } from "react";
 import {
-  Box,
   Button,
   Flex,
   Form,
   FormControl,
-  Paragraph,
   Select,
   Stack,
-  TextInput,
-  Textarea,
+  TextInput
 } from "@contentful/f36-components";
 import { DialogAppSDK } from "@contentful/app-sdk";
 import { /* useCMA, */ useSDK } from "@contentful/react-apps-toolkit";
 
 const Dialog = () => {
   const sdk = useSDK<DialogAppSDK>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [submitted, setSubmitted] = useState(false);
   const submitForm = () => {
     setSubmitted(true);

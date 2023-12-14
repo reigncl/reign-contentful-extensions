@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  AssetProps,
-  Button,
-  Paragraph,
-  Stack,
-  Tabs,
-} from "@contentful/f36-components";
+import { Button, Paragraph, Stack, Tabs } from "@contentful/f36-components";
 import { Asset, FieldAppSDK } from "@contentful/app-sdk";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import { PlusIcon, CycleIcon } from "@contentful/f36-icons";
 import RedirectsPanel from "../components/RedirectsPanel";
-import AssetPanel from "../components/AssetPanel";
 import { AssetFileProp } from "contentful-management";
+import AssetPanel from "../components/AssetPanel";
 
 interface IAssetRef {
   sys: IAssetRefSys;
@@ -126,8 +120,8 @@ const Field = () => {
   };
 
   const openDialog = () => {
-    sdk.dialogs.openCurrentApp({width: 600, minHeight: 500})
-  }
+    sdk.dialogs.openCurrentApp({ width: 600, minHeight: 500 });
+  };
 
   useEffect(() => {
     sdk.window.startAutoResizer();
@@ -147,7 +141,12 @@ const Field = () => {
         <Button size="small" startIcon={<CycleIcon />} variant="positive">
           Save configuration
         </Button>
-        <Button size="small" startIcon={<PlusIcon />} variant="primary" onClick={openDialog}>
+        <Button
+          size="small"
+          startIcon={<PlusIcon />}
+          variant="primary"
+          onClick={openDialog}
+        >
           Add redirect
         </Button>
       </Stack>
@@ -155,7 +154,7 @@ const Field = () => {
       <Tabs defaultTab="first">
         <Tabs.List variant="horizontal-divider">
           <Tabs.Tab panelId="first">Redirects</Tabs.Tab>
-          <Tabs.Tab panelId="second" isDisabled>
+          <Tabs.Tab panelId="second">
             Asset
           </Tabs.Tab>
         </Tabs.List>
@@ -163,7 +162,7 @@ const Field = () => {
           <RedirectsPanel redirects={redirects} />
         </Tabs.Panel>
         <Tabs.Panel id="second">
-          <AssetPanel />
+          <AssetPanel sdk={sdk} />
         </Tabs.Panel>
       </Tabs>
     </>
@@ -171,3 +170,4 @@ const Field = () => {
 };
 
 export default Field;
+
