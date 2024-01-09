@@ -27,15 +27,12 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   >(undefined);
 
   const handleUpdate = async (value: Record<string, unknown>) => {
-    console.log("handleUpdate value", value);
     await sdk.field.setValue(value);
     setValue(value);
-    setInterfaceField({...interfaceField as Interface})
+    setInterfaceField({ ...(interfaceField as Interface) });
   };
 
-  useEffect(() => {
-    console.log('useEffect value', {...value})
-  }, [value]);
+  useEffect(() => {}, [value]);
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
@@ -65,10 +62,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
-
-  console.log(`interfaceField`, { ...interfaceField });
-  console.log(`configurationField`, { ...configurationField });
-  console.log(`value`, { ...value });
 
   return (
     <>

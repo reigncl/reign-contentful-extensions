@@ -82,7 +82,6 @@ const ConfigScreen = () => {
         widgetId: "objectEditor",
       });
     }
-    console.log('resetForm')
     setContentTypeSelected('');
     setFieldSelected('');
     setParameters({});

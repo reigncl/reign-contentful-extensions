@@ -17,7 +17,7 @@ const SelectEditor = ({
           onBlurCapture={(e) => {
             handleUpdate(e?.currentTarget?.value);
           }}
-          value={value}
+          defaultValue={value}
           id={definition.key}
           name={definition.key}
         >
