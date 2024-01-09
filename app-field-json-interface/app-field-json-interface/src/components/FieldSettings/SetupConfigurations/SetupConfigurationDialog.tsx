@@ -19,7 +19,7 @@ import {
   Button,
   Box,
 } from "@contentful/f36-components";
-import { updateEditor } from "../../../tools";
+import { updateEditor } from "../../../util";
 
 const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
   const { contentType, fieldId } = sdk.parameters

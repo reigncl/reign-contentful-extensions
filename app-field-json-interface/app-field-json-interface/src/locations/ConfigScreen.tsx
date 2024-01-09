@@ -18,7 +18,7 @@ import {
   ContentTypeProps,
   ContentFields,
 } from "contentful-management";
-import { updateEditor } from "../tools";
+import { updateEditor } from "../util";
 
 export interface AppInstallationParameters {
   contentType?: string;

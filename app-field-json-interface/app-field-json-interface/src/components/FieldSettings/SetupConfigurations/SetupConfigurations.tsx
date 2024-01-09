@@ -12,7 +12,7 @@ import { FieldSetupItem, Interface } from "../FieldSetup.types";
 import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { CSSProperties, useEffect, useState } from "react";
 import { CollectionProp, ContentTypeProps } from "contentful-management";
-import { updateEditor } from "../../../tools";
+import { updateEditor } from "../../../util";
 
 const SetupConfigurations = ({
   sdk,
