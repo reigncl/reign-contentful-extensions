@@ -6,7 +6,6 @@ export type FieldValueType =
   | undefined;
 
 export interface InterfaceItem {
-  id: string;
   label: string;
   key: string;
   type: "Boolean" | "InputText" | "InputTextList" | "Select" | "Textarea";
@@ -16,8 +15,9 @@ export interface InterfaceItem {
 }
 
 export interface Interface {
-  name: string;
-  items: Array<InterfaceItem> | Array<Array<InterfaceItem> | InterfaceItem>;
+  name?: string;
+  isArray?: boolean;
+  items?: Array<InterfaceItem>;
 }
 
 export interface FieldSetupItem {
