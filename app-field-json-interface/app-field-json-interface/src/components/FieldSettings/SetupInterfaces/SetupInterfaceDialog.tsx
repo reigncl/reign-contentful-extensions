@@ -23,6 +23,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
     index?: number;
   };
   const [indexInterface] = useState<number | undefined>(parameters?.index);
+  const [idInterface] = useState<string | undefined>(parameters?.id);
   const [items, setItems] = useState<Array<InterfaceItem>>(
     parameters?.items ?? []
   );
@@ -31,6 +32,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
 
   const submitForm = () => {
     sdk.close({
+      id: idInterface,
       name,
       isArray,
       items,

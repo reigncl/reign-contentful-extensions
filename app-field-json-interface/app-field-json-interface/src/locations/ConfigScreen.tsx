@@ -69,8 +69,23 @@ const ConfigScreen = () => {
       });
     }
     setSubmitted(true);
-    
+
     Notification.info("Configuration created, now save settings.");
+  };
+
+  const resetForm = async () => {
+    if (parameters?.contentType && parameters?.fieldId) {
+      await updateEditor({
+        sdk,
+        contentType: parameters?.contentType,
+        fieldId: parameters?.fieldId,
+        widgetId: "objectEditor",
+      });
+    }
+    console.log('resetForm')
+    setContentTypeSelected('');
+    setFieldSelected('');
+    setParameters({});
   };
 
   const onConfigure = useCallback(async () => {
@@ -211,6 +226,9 @@ const ConfigScreen = () => {
         </FormControl>
         <Button variant="primary" type="submit" isDisabled={submitted}>
           Set up
+        </Button>{" "}
+        <Button variant="secondary" type="button" onClick={resetForm}>
+          Reset
         </Button>
       </Form>
     </Flex>

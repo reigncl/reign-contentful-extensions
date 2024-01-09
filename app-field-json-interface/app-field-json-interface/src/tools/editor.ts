@@ -1,11 +1,11 @@
-import { ConfigAppSDK } from "@contentful/app-sdk";
+import { ConfigAppSDK, DialogAppSDK, FieldAppSDK } from "@contentful/app-sdk";
 import { Control } from "contentful-management";
 
 export interface InterfaceUpdateEditor {
-  sdk: ConfigAppSDK;
-  contentType: string;
-  fieldId: string;
-  widgetId: string;
+  sdk?: ConfigAppSDK | FieldAppSDK | DialogAppSDK;
+  contentType?: string;
+  fieldId?: string;
+  widgetId?: string;
   widgetNamespace?: string;
 }
 
@@ -17,6 +17,9 @@ export const updateEditor = async ({
   widgetNamespace = "builtin",
 }: InterfaceUpdateEditor) => {
   try {
+    if (!!!sdk || !!!contentType || !!!fieldId || !!!widgetId) {
+      return;
+    }
     const editor = await sdk.cma.editorInterface.get({
       contentTypeId: contentType,
     });

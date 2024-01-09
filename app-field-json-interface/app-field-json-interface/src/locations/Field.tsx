@@ -19,7 +19,10 @@ const Field = () => {
   if (!contentType || !fieldId) {
     return (
       <Note variant="warning">
-        Please check the <a href={appConfigURL}>app configuration.</a>
+        Please check the{" "}
+        <a href={appConfigURL} target="_blank" rel="noreferrer">
+          app configuration.
+        </a>
       </Note>
     );
   }

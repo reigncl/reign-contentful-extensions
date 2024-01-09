@@ -47,7 +47,12 @@ const FieldSettings = ({ sdk }: FieldSetupProps) => {
           />
         </Tabs.Panel>
         <Tabs.Panel id="configurations">
-          <SetupConfigurations />
+          <SetupConfigurations
+            sdk={sdk}
+            items={interfaces}
+            onUpdate={handleChangeConfigurations}
+            configurations={configurations}
+          />
         </Tabs.Panel>
       </Tabs>
     </>

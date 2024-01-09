@@ -15,15 +15,16 @@ export interface InterfaceItem {
 }
 
 export interface Interface {
-  name?: string;
-  isArray?: boolean;
+  id: string;
+  name: string;
+  isArray: boolean;
   items?: Array<InterfaceItem>;
 }
 
 export interface FieldSetupItem {
   contentType: string;
   fieldId: string;
-  interface: Interface;
+  interfaceId: string;
 }
 
 export interface FieldSetup {
