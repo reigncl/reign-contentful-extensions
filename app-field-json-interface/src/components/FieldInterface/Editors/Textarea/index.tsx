@@ -17,7 +17,10 @@ const TextareaEditor = ({
           id={definition.key}
           defaultValue={value}
           onBlurCapture={(e) => {
-            handleUpdate(e?.currentTarget?.value);
+            const changeValue = e?.currentTarget?.value;
+            if (value !== changeValue) {
+              handleUpdate(e?.currentTarget?.value);
+            }
           }}
         />
       </Box>

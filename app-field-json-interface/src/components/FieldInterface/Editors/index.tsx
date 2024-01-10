@@ -71,7 +71,7 @@ const EditorsHandler = ({
 
   return (
     <FormControl>
-      <FormControl.Label isRequired={interfaceItem?.required === true}>
+      <FormControl.Label /*isRequired={interfaceItem?.required === true}*/>
         {interfaceItem?.label}
       </FormControl.Label>
       <RenderEditor type={interfaceItem?.type} />
