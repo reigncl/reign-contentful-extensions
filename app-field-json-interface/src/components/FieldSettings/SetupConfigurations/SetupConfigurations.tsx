@@ -97,15 +97,17 @@ const SetupConfigurations = ({
                     onClick={async () => {
                       const response = (await sdk.dialogs.openCurrentApp({
                         title: "Edit Configuration",
-                        width: "fullWidth",
-                        minHeight: 600,
+                        width: "medium",
+                        minHeight: 500,
                         parameters: {
                           ...config,
                           type: "configuration",
                           index,
+                          interfaces: items,
                         },
                       })) as FieldSetupItem & {
                         index?: number;
+                        interfaces?: Array<Interface>;
                       };
 
                       if (response && typeof response.index !== "undefined") {
