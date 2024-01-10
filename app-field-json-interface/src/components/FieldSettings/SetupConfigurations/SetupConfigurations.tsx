@@ -13,6 +13,7 @@ import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { CSSProperties, useEffect, useState } from "react";
 import { CollectionProp, ContentTypeProps } from "contentful-management";
 import { updateEditor } from "../../../util";
+import "../../css/badge.css";
 
 const SetupConfigurations = ({
   sdk,
@@ -23,7 +24,6 @@ const SetupConfigurations = ({
   const [contentTypes, setContentTypes] = useState<Record<string, string>>({});
   const [interfaces, setInterfaces] = useState<Record<string, string>>({});
   const styleCell: CSSProperties = { verticalAlign: "middle" };
-  const styleBadge: CSSProperties = { textTransform: "none" };
   const addConfiguration = async () => {
     try {
       const response = (await sdk.dialogs.openCurrentApp({
@@ -79,14 +79,18 @@ const SetupConfigurations = ({
                 <Table.Cell style={styleCell}>
                   <Box>{contentTypes[config?.contentType]}</Box>
                   <Box>
-                    <Badge style={styleBadge}>{config?.contentType}</Badge>
+                    <Badge className={"custom-badge"}>
+                      {config?.contentType}
+                    </Badge>
                   </Box>
                 </Table.Cell>
                 <Table.Cell style={styleCell}>{config?.fieldId}</Table.Cell>
                 <Table.Cell style={styleCell}>
                   <Box>{interfaces[config?.interfaceId]}</Box>
                   <Box>
-                    <Badge style={styleBadge}>{config?.interfaceId}</Badge>
+                    <Badge className={"custom-badge"}>
+                      {config?.interfaceId}
+                    </Badge>
                   </Box>
                 </Table.Cell>
                 <Table.Cell style={styleCell}>

@@ -9,7 +9,6 @@ import {
   Textarea,
   Button,
   Subheading,
-  Switch,
   Select,
   Table,
   IconButton,
@@ -128,7 +127,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
           )}
           {!!!["Select"].includes(item?.type) && <>N/A</>}
         </Table.Cell>
-        <Table.Cell>
+        {/*<Table.Cell>
           <Switch
             isChecked={item?.required}
             onChange={(e) => {
@@ -136,7 +135,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
             }}
           />
           <HelpText>Activate if this field is required</HelpText>
-        </Table.Cell>
+        </Table.Cell>*/}
         <Table.Cell>
           <Textarea
             rows={2}
@@ -179,7 +178,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               <Table.Cell>Label</Table.Cell>
               <Table.Cell>Type</Table.Cell>
               <Table.Cell>Options</Table.Cell>
-              <Table.Cell>Required</Table.Cell>
+              {/*<Table.Cell>Required</Table.Cell>*/}
               <Table.Cell>Help Text</Table.Cell>
               <Table.Cell>Remove</Table.Cell>
             </Table.Row>

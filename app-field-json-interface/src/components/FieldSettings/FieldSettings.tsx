@@ -34,10 +34,10 @@ const FieldSettings = ({ sdk }: FieldSetupProps) => {
 
   return (
     <>
-      <Tabs defaultTab="interfaces">
+      <Tabs defaultTab="configurations">
         <Tabs.List>
+          <Tabs.Tab panelId="configurations">Fields configurations</Tabs.Tab>
           <Tabs.Tab panelId="interfaces">Interfaces</Tabs.Tab>
-          <Tabs.Tab panelId="configurations">Configurations</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel id="interfaces">
           <SetupInterfaces
