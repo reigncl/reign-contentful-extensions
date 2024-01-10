@@ -33,9 +33,9 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     undefined
   );
 
-  const handleUpdate = async (value: FieldInterfaceValue) => {
-    await sdk.field.setValue(value);
-    setValue(value);
+  const handleUpdate = async (valueUpdate: FieldInterfaceValue) => {
+    await sdk.field.setValue(valueUpdate);
+    setValue(valueUpdate);
     setInterfaceField({ ...(interfaceField as Interface) });
   };
 
