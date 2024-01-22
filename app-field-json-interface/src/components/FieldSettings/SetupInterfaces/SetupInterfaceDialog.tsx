@@ -58,6 +58,8 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         type: item?.type,
         options: item?.options,
         required: item?.required ?? false,
+        inputTextType: item?.inputTextType,
+        regex: item?.regex,
         helpText: item?.helpText,
       };
       setItems(arrItems);
