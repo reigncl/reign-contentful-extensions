@@ -9,9 +9,11 @@ export interface InterfaceItem {
   label: string;
   key: string;
   type: "Boolean" | "InputText" | "InputTextList" | "Select" | "Textarea";
+  inputTextType?: "text" | "password" | "email" | "number" | "url" | "regex";
+  regex?: string;
   options?: Array<string>;
   helpText?: string;
-  required: boolean;
+  required?: boolean;
 }
 
 export interface Interface {

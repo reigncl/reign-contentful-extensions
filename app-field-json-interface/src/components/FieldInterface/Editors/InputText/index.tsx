@@ -12,9 +12,11 @@ const InputTextEditor = ({
 }) => {
   return (
     <>
+    {definition?.inputTextType} as
       <TextInput
         id={definition.key}
         defaultValue={value}
+        type={definition?.inputTextType ?? "text"}
         onBlurCapture={(e) => {
           const changeValue = e?.currentTarget?.value;
           if (value !== changeValue) {

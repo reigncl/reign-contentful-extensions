@@ -21,11 +21,7 @@ const SelectEditor = ({
           id={definition.key}
           name={definition.key}
         >
-          <Select.Option
-            key={`${definition.key}-default`}
-            value={""}
-            isDisabled={definition.required}
-          >
+          <Select.Option key={`${definition.key}-default`} value={""}>
             Select...
           </Select.Option>
           {definition?.options?.map((option: string, idx: number) => {

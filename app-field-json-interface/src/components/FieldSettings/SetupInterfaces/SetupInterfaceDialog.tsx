@@ -125,7 +125,51 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               </HelpText>
             </>
           )}
-          {!!!["Select"].includes(item?.type) && <>N/A</>}
+          {["InputText"].includes(item?.type) && (
+            <>
+              <Select
+                size="small"
+                value={item?.inputTextType}
+                onChange={(e) => {
+                  console.log(e?.currentTarget
+                    .value)
+                  setItem({
+                    ...item,
+                    inputTextType: e?.currentTarget
+                      .value as unknown as InterfaceItem["inputTextType"],
+                  });
+                }}
+              >
+                <Select.Option value="">Select a input type</Select.Option>
+                <Select.Option value="text">text</Select.Option>
+                <Select.Option value="password">password</Select.Option>
+                <Select.Option value="email">email</Select.Option>
+                <Select.Option value="number">number</Select.Option>
+                <Select.Option value="url">url</Select.Option>
+                <Select.Option value="regex">regex</Select.Option>
+              </Select>
+              <HelpText>Select a input type.</HelpText>
+              {item?.inputTextType === "regex" && (
+                <Box
+                  style={{
+                    borderTop: "1px solid rgb(207, 217, 224)",
+                    marginTop: "10px",
+                    paddingTop: "10px",
+                  }}
+                >
+                  <TextInput
+                    size="small"
+                    value={item?.regex}
+                    onChange={(e) => {
+                      setItem({ ...item, regex: e?.currentTarget.value });
+                    }}
+                  />
+                  <HelpText>Write regex expression</HelpText>
+                </Box>
+              )}
+            </>
+          )}
+          {!!!["Select", "InputText"].includes(item?.type) && <>N/A</>}
         </Table.Cell>
         {/*<Table.Cell>
           <Switch
