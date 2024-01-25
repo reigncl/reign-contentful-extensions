@@ -10,7 +10,7 @@ export interface InterfaceItem {
   key: string;
   type: "Boolean" | "InputText" | "InputTextList" | "Select" | "Textarea";
   inputTextType?: "text" | "password" | "email" | "number" | "url" | "regex";
-  regex?: string;
+  regex?: RegExp;
   options?: Array<string>;
   helpText?: string;
   required?: boolean;

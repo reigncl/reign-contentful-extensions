@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import { SetupInterfaceDialogProps } from "./SetupInterfaces.types";
 import { DeleteIcon } from "@contentful/f36-icons";
 import {
@@ -16,6 +16,7 @@ import {
   Note,
 } from "@contentful/f36-components";
 import { Interface, InterfaceItem } from "../FieldSetup.types";
+import tokens from "@contentful/f36-tokens";
 
 const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
   const parameters = sdk.parameters.invocation as unknown as Interface & {
@@ -66,9 +67,15 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item]);
 
+    const StyleHelpText: CSSProperties = {
+      fontSize: tokens.fontSizeS,
+      paddingBottom: tokens.spacingXs,
+    };
+
     return (
       <Table.Row>
         <Table.Cell>
+          <HelpText style={StyleHelpText}>Enter the key/id:</HelpText>
           <TextInput
             size="small"
             value={item?.key}
@@ -76,9 +83,9 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               setItem({ ...item, key: e?.currentTarget.value });
             }}
           />
-          <HelpText>Enter the key/id.</HelpText>
         </Table.Cell>
         <Table.Cell>
+          <HelpText style={StyleHelpText}>Enter the label:</HelpText>
           <TextInput
             size="small"
             value={item?.label}
@@ -86,9 +93,9 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               setItem({ ...item, label: e?.currentTarget.value });
             }}
           />
-          <HelpText>Enter the label.</HelpText>
         </Table.Cell>
         <Table.Cell>
+          <HelpText style={StyleHelpText}>Select a field type:</HelpText>
           <Select
             size="small"
             value={item?.type}
@@ -107,11 +114,13 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
             <Select.Option value="Select">Select</Select.Option>
             <Select.Option value="Textarea">Textarea</Select.Option>
           </Select>
-          <HelpText>Select a field type.</HelpText>
         </Table.Cell>
         <Table.Cell>
           {["Select"].includes(item?.type) && (
             <>
+              <HelpText style={StyleHelpText}>
+                Add the options to list, separate them by comma:
+              </HelpText>
               <Textarea
                 rows={2}
                 value={item?.options?.toString()}
@@ -122,19 +131,16 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
                   });
                 }}
               ></Textarea>
-              <HelpText>
-                Add the options to list, separate them by comma.
-              </HelpText>
             </>
           )}
           {["InputText"].includes(item?.type) && (
             <>
+              <HelpText style={StyleHelpText}>Select a input type:</HelpText>
               <Select
                 size="small"
                 value={item?.inputTextType}
                 onChange={(e) => {
-                  console.log(e?.currentTarget
-                    .value)
+                  console.log(e?.currentTarget.value);
                   setItem({
                     ...item,
                     inputTextType: e?.currentTarget
@@ -150,23 +156,27 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
                 <Select.Option value="url">url</Select.Option>
                 <Select.Option value="regex">regex</Select.Option>
               </Select>
-              <HelpText>Select a input type.</HelpText>
               {item?.inputTextType === "regex" && (
                 <Box
                   style={{
                     borderTop: "1px solid rgb(207, 217, 224)",
-                    marginTop: "10px",
-                    paddingTop: "10px",
+                    marginTop: tokens.spacingM,
+                    paddingTop: tokens.spacing2Xs,
                   }}
                 >
+                  <HelpText style={StyleHelpText}>
+                    Write regex expression:
+                  </HelpText>
                   <TextInput
                     size="small"
-                    value={item?.regex}
+                    value={item?.regex?.toString()}
                     onChange={(e) => {
-                      setItem({ ...item, regex: e?.currentTarget.value });
+                      setItem({
+                        ...item,
+                        regex: e?.currentTarget.value as unknown as RegExp,
+                      });
                     }}
                   />
-                  <HelpText>Write regex expression</HelpText>
                 </Box>
               )}
             </>
@@ -183,6 +193,9 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
           <HelpText>Activate if this field is required</HelpText>
         </Table.Cell>*/}
         <Table.Cell>
+          <HelpText style={StyleHelpText}>
+            Add some help text for the editors:
+          </HelpText>
           <Textarea
             rows={2}
             value={item?.helpText}
@@ -190,7 +203,6 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               setItem({ ...item, helpText: e?.currentTarget.value });
             }}
           ></Textarea>
-          <HelpText>Add some help text for the editors</HelpText>
         </Table.Cell>
         <Table.Cell>
           <IconButton

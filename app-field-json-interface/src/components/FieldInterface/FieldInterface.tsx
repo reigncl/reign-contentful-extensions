@@ -19,6 +19,7 @@ import {
 import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
 import { DeleteIcon } from "@contentful/f36-icons";
+import { validateEntryValue } from "../../util";
 
 export interface FieldSetupProps {
   sdk: FieldAppSDK;
@@ -39,7 +40,17 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     setInterfaceField({ ...(interfaceField as Interface) });
   };
 
-  useEffect(() => {}, [value]);
+  useEffect(() => {
+    if (interfaceField) {
+      const valid = validateEntryValue(value, interfaceField)
+      if (Array.isArray(valid)) {
+
+      } else {
+        
+      }
+      console.log('valid', valid)
+    }
+  }, [interfaceField, value]);
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
