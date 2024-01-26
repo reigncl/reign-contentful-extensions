@@ -15,6 +15,7 @@ import {
   Grid,
   IconButton,
   Badge,
+  Accordion,
 } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
@@ -94,42 +95,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     return false;
   };
 
-  useEffect(() => {
-    if (value) {
-      validate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interfaceField, value]);
-
-  useEffect(() => {
-    const { contentType, field } = sdk.ids;
-    sdk.cma.entry
-      .getMany({ query: { content_type: parameters?.contentType } })
-      ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
-        const item = response.items?.find(
-          (item: EntryProps<KeyValueMap>, idx: number) => idx === 0
-        );
-        const content = item?.fields[parameters?.fieldId ?? ""];
-        const currentLangEditor = sdk.locales.default;
-        if (content) {
-          const findConfig = (
-            content[currentLangEditor] as FieldSetup
-          )?.configurations?.find(
-            (config: FieldSetupItem) =>
-              config.contentType === contentType && config.fieldId === field
-          );
-          const findInterface = (
-            content[currentLangEditor] as FieldSetup
-          )?.interfaces?.find(
-            (inter: Interface) => inter.id === findConfig?.interfaceId
-          );
-          setInterfaceField(findInterface);
-        }
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sdk]);
-
-  if (interfaceField?.isArray) {
+  const RenderArray = () => {
     const arrValue = Array.isArray(value) ? value : [];
     return (
       <>
@@ -197,21 +163,78 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
         </Flex>
       </>
     );
+  };
+
+  const RenderDefault = () => {
+    return (
+      <>
+        {interfaceField?.items?.map((item: InterfaceItem, idx: number) => (
+          <EditorsHandler
+            key={`EditorsHandler-${idx}`}
+            interfaceItem={item}
+            updateValue={handleUpdate}
+            value={value as Record<string, unknown>}
+            isInvalid={checkIsInvalid(item.key)}
+          />
+        ))}
+      </>
+    );
+  };
+
+  const Render = () => {
+    if (interfaceField?.isArray) {
+      return <RenderArray />;
+    } else {
+      return <RenderDefault />;
+    }
+  };
+
+  useEffect(() => {
+    if (value) {
+      validate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interfaceField, value]);
+
+  useEffect(() => {
+    const { contentType, field } = sdk.ids;
+    sdk.cma.entry
+      .getMany({ query: { content_type: parameters?.contentType } })
+      ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
+        const item = response.items?.find(
+          (item: EntryProps<KeyValueMap>, idx: number) => idx === 0
+        );
+        const content = item?.fields[parameters?.fieldId ?? ""];
+        const currentLangEditor = sdk.locales.default;
+        if (content) {
+          const findConfig = (
+            content[currentLangEditor] as FieldSetup
+          )?.configurations?.find(
+            (config: FieldSetupItem) =>
+              config.contentType === contentType && config.fieldId === field
+          );
+          const findInterface = (
+            content[currentLangEditor] as FieldSetup
+          )?.interfaces?.find(
+            (inter: Interface) => inter.id === findConfig?.interfaceId
+          );
+          setInterfaceField(findInterface);
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sdk]);
+
+  if (interfaceField?.isCollapsed) {
+    return (
+      <Accordion>
+        <Accordion.Item title={interfaceField.name}>
+          <Render />
+        </Accordion.Item>
+      </Accordion>
+    );
   }
 
-  return (
-    <>
-      {interfaceField?.items?.map((item: InterfaceItem, idx: number) => (
-        <EditorsHandler
-          key={`EditorsHandler-${idx}`}
-          interfaceItem={item}
-          updateValue={handleUpdate}
-          value={value as Record<string, unknown>}
-          isInvalid={checkIsInvalid(item.key)}
-        />
-      ))}
-    </>
-  );
+  return <Render />;
 };
 
 export default FieldInterface;

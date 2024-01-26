@@ -33,6 +33,7 @@ const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
           id: nanoid(),
           name: response.name,
           isArray: response.isArray,
+          isCollapsed: response.isCollapsed,
           items: response.items,
         });
         onUpdate(arrItems);
@@ -97,6 +98,7 @@ const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
                           id: response.id,
                           name: response.name,
                           isArray: response.isArray,
+                          isCollapsed: response.isCollapsed,
                           items: response.items,
                         };
                         onUpdate(arrItems);

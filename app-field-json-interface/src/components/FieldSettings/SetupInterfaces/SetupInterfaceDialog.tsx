@@ -29,12 +29,14 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
   );
   const [name, setName] = useState<string>(parameters?.name ?? "");
   const [isArray, setIsArray] = useState<boolean>(parameters?.isArray ?? false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(parameters?.isCollapsed ?? false);
 
   const submitForm = () => {
     sdk.close({
       id: idInterface,
       name,
       isArray,
+      isCollapsed,
       items,
       index: indexInterface,
     } as Interface & {
@@ -296,8 +298,8 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
             <FormControl.Label isRequired>Single or Multiple</FormControl.Label>
             <Select
               value={isArray?.toString()}
-              id="optionSelect-controlled"
-              name="optionSelect-controlled"
+              id="optionSelect-isArray"
+              name="optionSelect-isArray"
               onChange={(e) => {
                 setIsArray(e?.currentTarget?.value === "true" ? true : false);
               }}
@@ -307,6 +309,23 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
             </Select>
             <FormControl.HelpText>
               Select multiple if you need an array of objects.
+            </FormControl.HelpText>
+          </FormControl>
+          <FormControl>
+            <FormControl.Label isRequired>Collapse content</FormControl.Label>
+            <Select
+              value={isCollapsed?.toString()}
+              id="optionSelect-isCollapsed"
+              name="optionSelect-isCollapsed"
+              onChange={(e) => {
+                setIsCollapsed(e?.currentTarget?.value === "true" ? true : false);
+              }}
+            >
+              <Select.Option value={"false"}>Keep UI Interface by default</Select.Option>
+              <Select.Option value={"true"}>Set up a collapsible</Select.Option>
+            </Select>
+            <FormControl.HelpText>
+            Set up a collapsible as a wrapper for you UI Interface.
             </FormControl.HelpText>
           </FormControl>
         </Box>

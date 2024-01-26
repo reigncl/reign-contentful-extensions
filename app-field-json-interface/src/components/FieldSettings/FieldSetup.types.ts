@@ -21,6 +21,7 @@ export interface Interface {
   id: string;
   name: string;
   isArray: boolean;
+  isCollapsed: boolean;
   items?: Array<InterfaceItem>;
 }
 
