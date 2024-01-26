@@ -75,7 +75,7 @@ const EditorsHandler = ({
   return (
     <FormControl isInvalid={isInvalid}>
       <FormControl.Label /*isRequired={interfaceItem?.required === true}*/>
-        {interfaceItem?.label} isInvalid{isInvalid?.toString()}
+        {interfaceItem?.label}
       </FormControl.Label>
       <RenderEditor type={interfaceItem?.type} />
       <FormControl.HelpText>{interfaceItem?.helpText}</FormControl.HelpText>
