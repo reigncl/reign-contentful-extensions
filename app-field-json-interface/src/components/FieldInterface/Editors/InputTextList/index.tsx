@@ -28,7 +28,7 @@ const InputTextListEditor = ({
       <Box padding="spacingS">
         {value?.map((val: string, idx: number) => {
           return (
-            <>
+            <span key={`Pill-${idx}`}>
               <Pill
                 style={{ marginBottom: "5px" }}
                 testId={val}
@@ -39,7 +39,7 @@ const InputTextListEditor = ({
                   handleUpdate(newValue);
                 }}
               />{" "}
-            </>
+            </span>
           );
         })}
       </Box>

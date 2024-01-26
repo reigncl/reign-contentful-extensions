@@ -48,8 +48,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     if (interfaceField) {
       let isInvalid = false;
       const validateResponse = validateEntryValue(val ?? value, interfaceField);
-      console.log("validateResponse", validateResponse);
-      console.log(validateResponse);
       setValidations(validateResponse);
       if (Array.isArray(validateResponse)) {
         validateResponse.forEach((item: ValidateEntryValueOutput) => {
@@ -70,8 +68,36 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     }
   };
 
+  const checkIsInvalid = (
+    key: string,
+    isMultiple: boolean = false,
+    idx?: number
+  ): boolean => {
+    if (key && validations) {
+      if (isMultiple === true && typeof idx === "number") {
+        const item = (validations as Array<ValidateEntryValueOutput>)[idx];
+        return item &&
+          typeof item[key] !== "undefined" &&
+          typeof item[key] === "boolean"
+          ? item[key]
+          : false;
+      }
+      if (isMultiple === false) {
+        const item = validations as ValidateEntryValueOutput;
+        return item &&
+          typeof item[key] !== "undefined" &&
+          typeof item[key] === "boolean"
+          ? item[key]
+          : false;
+      }
+    }
+    return false;
+  };
+
   useEffect(() => {
-    validate();
+    if (value) {
+      validate();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interfaceField, value]);
 
@@ -125,12 +151,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             <Grid.Item>
               {interfaceField?.items?.map(
                 (item: InterfaceItem, idx: number) => (
-                  <>
-                  sss{
-                      (({...validations} as Array<ValidateEntryValueOutput>)?.[idx]?.[
-                        item.key
-                      ] as boolean)
-                    ?.toString()}
                   <EditorsHandler
                     key={`EditorsHandler-${idx}`}
                     interfaceItem={item}
@@ -139,12 +159,8 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
                       handleUpdate(arrValue);
                     }}
                     value={val as Record<string, unknown>}
-                    isInvalid={
-                      ({...validations} as Array<ValidateEntryValueOutput>)?.[idx]?.[
-                        item.key
-                      ] as boolean
-                    }
-                  /></>
+                    isInvalid={checkIsInvalid(item.key, true, index)}
+                  />
                 )
               )}
             </Grid.Item>
@@ -187,12 +203,11 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     <>
       {interfaceField?.items?.map((item: InterfaceItem, idx: number) => (
         <EditorsHandler
+          key={`EditorsHandler-${idx}`}
           interfaceItem={item}
           updateValue={handleUpdate}
           value={value as Record<string, unknown>}
-          isInvalid={
-            (validations as ValidateEntryValueOutput)?.[item.key] as boolean
-          }
+          isInvalid={checkIsInvalid(item.key)}
         />
       ))}
     </>
