@@ -4,19 +4,20 @@ import InputTextEditor from "./InputText";
 import InputTextListEditor from "./InputTextList";
 import SelectEditor from "./Select";
 import TextareaEditor from "./Textarea";
-import { ValidateEntryValueOutput, getValue, setValue } from "../../../util";
+import { getValue, setValue } from "../../../util";
 import { InterfaceItem } from "../../FieldSettings/FieldSetup.types";
+import { useEffect } from "react";
 
 const EditorsHandler = ({
   interfaceItem,
   updateValue,
   value,
-  validations,
+  isInvalid,
 }: {
   interfaceItem: InterfaceItem;
   updateValue: Function;
   value: Record<string, unknown>;
-  validations: ValidateEntryValueOutput;
+  isInvalid: boolean;
 }) => {
   const fieldValue = getValue(value, interfaceItem.key);
 
@@ -71,20 +72,18 @@ const EditorsHandler = ({
     }
   };
 
-  const getValidation = (key: string): boolean => {
-    if (key && validations && typeof validations[key] !== "undefined") {
-      return validations[key];
-    }
-    return false;
-  };
-
   return (
-    <FormControl isInvalid={getValidation(interfaceItem.key)}>
+    <FormControl isInvalid={isInvalid}>
       <FormControl.Label /*isRequired={interfaceItem?.required === true}*/>
-        {interfaceItem?.label}
+        {interfaceItem?.label} isInvalid{isInvalid?.toString()}
       </FormControl.Label>
       <RenderEditor type={interfaceItem?.type} />
       <FormControl.HelpText>{interfaceItem?.helpText}</FormControl.HelpText>
+      {isInvalid && interfaceItem?.errorMessage && (
+        <FormControl.ValidationMessage>
+          {interfaceItem?.errorMessage}
+        </FormControl.ValidationMessage>
+      )}
     </FormControl>
   );
 };

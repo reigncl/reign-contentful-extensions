@@ -60,6 +60,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         options: item?.options,
         required: item?.required ?? false,
         inputTextType: item?.inputTextType,
+        errorMessage: item?.errorMessage,
         regex: item?.regex,
         helpText: item?.helpText,
       };
@@ -205,6 +206,18 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
           ></Textarea>
         </Table.Cell>
         <Table.Cell>
+          <HelpText style={StyleHelpText}>
+            Add a custom error message for this field:
+          </HelpText>
+          <Textarea
+            rows={2}
+            value={item?.errorMessage}
+            onChange={(e) => {
+              setItem({ ...item, errorMessage: e?.currentTarget.value });
+            }}
+          ></Textarea>
+        </Table.Cell>
+        <Table.Cell>
           <IconButton
             variant="transparent"
             aria-label="Remove Field"
@@ -238,6 +251,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               <Table.Cell>Options</Table.Cell>
               {/*<Table.Cell>Required</Table.Cell>*/}
               <Table.Cell>Help Text</Table.Cell>
+              <Table.Cell>Error Message</Table.Cell>
               <Table.Cell>Remove</Table.Cell>
             </Table.Row>
           </Table.Head>

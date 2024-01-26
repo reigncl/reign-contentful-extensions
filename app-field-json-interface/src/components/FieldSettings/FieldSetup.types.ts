@@ -13,6 +13,7 @@ export interface InterfaceItem {
   regex?: RegExp;
   options?: Array<string>;
   helpText?: string;
+  errorMessage?: string;
   required?: boolean;
 }
 

@@ -48,7 +48,8 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     if (interfaceField) {
       let isInvalid = false;
       const validateResponse = validateEntryValue(val ?? value, interfaceField);
-      console.log(validateResponse)
+      console.log("validateResponse", validateResponse);
+      console.log(validateResponse);
       setValidations(validateResponse);
       if (Array.isArray(validateResponse)) {
         validateResponse.forEach((item: ValidateEntryValueOutput) => {
@@ -72,7 +73,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   useEffect(() => {
     validate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [interfaceField, value]);
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
@@ -124,6 +125,12 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             <Grid.Item>
               {interfaceField?.items?.map(
                 (item: InterfaceItem, idx: number) => (
+                  <>
+                  sss{
+                      (({...validations} as Array<ValidateEntryValueOutput>)?.[idx]?.[
+                        item.key
+                      ] as boolean)
+                    ?.toString()}
                   <EditorsHandler
                     key={`EditorsHandler-${idx}`}
                     interfaceItem={item}
@@ -132,10 +139,12 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
                       handleUpdate(arrValue);
                     }}
                     value={val as Record<string, unknown>}
-                    validations={
-                      (validations as Array<ValidateEntryValueOutput>)[idx]
+                    isInvalid={
+                      ({...validations} as Array<ValidateEntryValueOutput>)?.[idx]?.[
+                        item.key
+                      ] as boolean
                     }
-                  />
+                  /></>
                 )
               )}
             </Grid.Item>
@@ -181,7 +190,9 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
           interfaceItem={item}
           updateValue={handleUpdate}
           value={value as Record<string, unknown>}
-          validations={validations as ValidateEntryValueOutput}
+          isInvalid={
+            (validations as ValidateEntryValueOutput)?.[item.key] as boolean
+          }
         />
       ))}
     </>
