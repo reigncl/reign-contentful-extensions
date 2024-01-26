@@ -19,7 +19,7 @@ import {
 import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
 import { DeleteIcon } from "@contentful/f36-icons";
-import { validateEntryValue } from "../../util";
+import { ValidateEntryValueOutput, validateEntryValue } from "../../util";
 
 export interface FieldSetupProps {
   sdk: FieldAppSDK;
@@ -33,24 +33,46 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   const [interfaceField, setInterfaceField] = useState<Interface | undefined>(
     undefined
   );
+  const [validations, setValidations] = useState<
+    Array<ValidateEntryValueOutput> | ValidateEntryValueOutput | undefined
+  >(undefined);
 
   const handleUpdate = async (valueUpdate: FieldInterfaceValue) => {
     await sdk.field.setValue(valueUpdate);
+    validate(valueUpdate);
     setValue(valueUpdate);
     setInterfaceField({ ...(interfaceField as Interface) });
   };
 
-  useEffect(() => {
+  const validate = (val?: FieldInterfaceValue) => {
     if (interfaceField) {
-      const valid = validateEntryValue(value, interfaceField)
-      if (Array.isArray(valid)) {
-
+      let isInvalid = false;
+      const validateResponse = validateEntryValue(val ?? value, interfaceField);
+      console.log(validateResponse)
+      setValidations(validateResponse);
+      if (Array.isArray(validateResponse)) {
+        validateResponse.forEach((item: ValidateEntryValueOutput) => {
+          Object.keys(item).forEach((key: string) => {
+            if (item[key] === true) {
+              isInvalid = true;
+            }
+          });
+        });
       } else {
-        
+        Object.keys(validateResponse).forEach((key: string) => {
+          if (validateResponse[key] === true) {
+            isInvalid = true;
+          }
+        });
       }
-      console.log('valid', valid)
+      sdk.field.setInvalid(isInvalid);
     }
-  }, [interfaceField, value]);
+  };
+
+  useEffect(() => {
+    validate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
@@ -110,6 +132,9 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
                       handleUpdate(arrValue);
                     }}
                     value={val as Record<string, unknown>}
+                    validations={
+                      (validations as Array<ValidateEntryValueOutput>)[idx]
+                    }
                   />
                 )
               )}
@@ -156,6 +181,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
           interfaceItem={item}
           updateValue={handleUpdate}
           value={value as Record<string, unknown>}
+          validations={validations as ValidateEntryValueOutput}
         />
       ))}
     </>

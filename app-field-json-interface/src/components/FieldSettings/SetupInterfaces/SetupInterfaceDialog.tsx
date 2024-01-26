@@ -328,7 +328,11 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
           </Button>
         </Box>
 
-        <Button variant="primary" type="submit">
+        <Button
+          isDisabled={!!!name || !!!items || items.length === 0}
+          variant="primary"
+          type="submit"
+        >
           {typeof indexInterface === "undefined"
             ? "Create interface"
             : "Edit interface"}

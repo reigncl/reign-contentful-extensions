@@ -4,17 +4,19 @@ import InputTextEditor from "./InputText";
 import InputTextListEditor from "./InputTextList";
 import SelectEditor from "./Select";
 import TextareaEditor from "./Textarea";
-import { getValue, setValue } from "../../../util";
+import { ValidateEntryValueOutput, getValue, setValue } from "../../../util";
 import { InterfaceItem } from "../../FieldSettings/FieldSetup.types";
 
 const EditorsHandler = ({
   interfaceItem,
   updateValue,
   value,
+  validations,
 }: {
   interfaceItem: InterfaceItem;
   updateValue: Function;
   value: Record<string, unknown>;
+  validations: ValidateEntryValueOutput;
 }) => {
   const fieldValue = getValue(value, interfaceItem.key);
 
@@ -69,8 +71,15 @@ const EditorsHandler = ({
     }
   };
 
+  const getValidation = (key: string): boolean => {
+    if (key && validations && typeof validations[key] !== "undefined") {
+      return validations[key];
+    }
+    return false;
+  };
+
   return (
-    <FormControl>
+    <FormControl isInvalid={getValidation(interfaceItem.key)}>
       <FormControl.Label /*isRequired={interfaceItem?.required === true}*/>
         {interfaceItem?.label}
       </FormControl.Label>

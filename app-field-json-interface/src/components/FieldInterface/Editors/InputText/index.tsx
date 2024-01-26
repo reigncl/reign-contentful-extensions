@@ -12,7 +12,6 @@ const InputTextEditor = ({
 }) => {
   return (
     <>
-    {definition?.inputTextType} as
       <TextInput
         id={definition.key}
         defaultValue={value}

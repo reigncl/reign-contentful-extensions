@@ -10,7 +10,7 @@ const validateField = (
   value: string | number | boolean,
   item: InterfaceItem
 ): boolean => {
-  let isValid = false;
+  let isInvalid = false;
   if (item?.type === "InputText") {
     let regexString: RegExp | undefined;
     switch (item?.inputTextType) {
@@ -28,15 +28,15 @@ const validateField = (
         regexString = item?.regex;
         break;
       default:
-        isValid = true;
+        isInvalid = false;
         break;
     }
     if (regexString) {
       const regex = new RegExp(regexString);
-      return regex.test(value?.toString());
+      return !!!regex.test(value?.toString());
     }
   }
-  return isValid;
+  return isInvalid;
 };
 
 const validateEntryValue = (
