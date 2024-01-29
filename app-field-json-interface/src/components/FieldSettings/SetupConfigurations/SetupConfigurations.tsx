@@ -120,6 +120,8 @@ const SetupConfigurations = ({
                           contentType: response.contentType,
                           fieldId: response.fieldId,
                           interfaceId: response.interfaceId,
+                          min: response?.min,
+                          max: response?.max,
                         } as FieldSetupItem;
                         onUpdate(arrConfigurations);
                       }

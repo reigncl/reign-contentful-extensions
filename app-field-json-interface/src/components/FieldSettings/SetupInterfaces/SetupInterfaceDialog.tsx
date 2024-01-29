@@ -143,7 +143,6 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
                 size="small"
                 value={item?.inputTextType}
                 onChange={(e) => {
-                  console.log(e?.currentTarget.value);
                   setItem({
                     ...item,
                     inputTextType: e?.currentTarget

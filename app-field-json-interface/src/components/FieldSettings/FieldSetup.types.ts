@@ -1,4 +1,4 @@
-import { FieldAppSDK } from "@contentful/app-sdk";
+import { ConfigAppSDK, FieldAppSDK, SerializedJSONValue } from "@contentful/app-sdk";
 
 export type FieldValueType =
   | Record<string, unknown>
@@ -29,6 +29,8 @@ export interface FieldSetupItem {
   contentType: string;
   fieldId: string;
   interfaceId: string;
+  min?: number;
+  max?: number;
 }
 
 export interface FieldSetup {
@@ -36,6 +38,12 @@ export interface FieldSetup {
   configurations?: Array<FieldSetupItem>;
 }
 
+export type FieldUpdateValueFunction = <Value = any>(
+  value: Value | FieldSetup
+) => void;
+
 export interface FieldSetupProps {
-  sdk: FieldAppSDK;
+  sdk: FieldAppSDK | ConfigAppSDK;
+  value: FieldSetup;
+  updateValue: FieldUpdateValueFunction;
 }

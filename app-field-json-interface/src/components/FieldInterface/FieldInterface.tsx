@@ -7,7 +7,12 @@ import {
 } from "../FieldSettings/FieldSetup.types";
 import { useEffect, useState } from "react";
 import { AppInstallationParameters } from "../../locations/ConfigScreen";
-import { CollectionProp, EntryProps, KeyValueMap } from "contentful-management";
+import {
+  AppDefinitionProps,
+  CollectionProp,
+  EntryProps,
+  KeyValueMap,
+} from "contentful-management";
 import EditorsHandler from "./Editors";
 import {
   Flex,
@@ -16,6 +21,9 @@ import {
   IconButton,
   Badge,
   Accordion,
+  HelpText,
+  Box,
+  FormControl,
 } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
@@ -30,13 +38,20 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   const [value, setValue] = useState<FieldInterfaceValue>(
     (sdk.field.getValue() as Record<string, unknown>) ?? {}
   );
-  const parameters = sdk.parameters.installation as AppInstallationParameters;
+  // const parameters = sdk.parameters.installation as AppInstallationParameters;
   const [interfaceField, setInterfaceField] = useState<Interface | undefined>(
+    undefined
+  );
+  const [configField, setConfigField] = useState<FieldSetupItem | undefined>(
     undefined
   );
   const [validations, setValidations] = useState<
     Array<ValidateEntryValueOutput> | ValidateEntryValueOutput | undefined
   >(undefined);
+
+  const [isValidQtyItems, setIsValidQtyItems] = useState<boolean | undefined>(
+    undefined
+  );
 
   const handleUpdate = async (valueUpdate: FieldInterfaceValue) => {
     await sdk.field.setValue(valueUpdate);
@@ -65,6 +80,15 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
           }
         });
       }
+      if (typeof configField?.min === "number") {
+        const arrValue = Array.isArray(value) ? value : [];
+        if (arrValue.length < configField.min) {
+          isInvalid = true;
+          setIsValidQtyItems(false);
+        } else {
+          setIsValidQtyItems(true);
+        }
+      }
       sdk.field.setInvalid(isInvalid);
     }
   };
@@ -91,6 +115,24 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
           ? item[key]
           : false;
       }
+    }
+    return false;
+  };
+
+  const checkIfSetMinMax = (): boolean => {
+    return (
+      typeof configField?.min === "number" &&
+      typeof configField?.max === "number"
+    );
+  };
+
+  const disableAddItem = (): boolean => {
+    if (
+      typeof configField?.min === "number" &&
+      typeof configField?.max === "number"
+    ) {
+      const arrValue = Array.isArray(value) ? value : [];
+      return arrValue?.length >= configField.max;
     }
     return false;
   };
@@ -157,10 +199,47 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             }}
             variant="primary"
             size="small"
+            isDisabled={disableAddItem()}
           >
             Add item
           </Button>
         </Flex>
+        {checkIfSetMinMax() && (
+          <>
+            <Flex justifyContent="right">
+              <HelpText
+                style={{
+                  fontSize: tokens.fontSizeS,
+                  paddingRight: tokens.spacingS,
+                }}
+              >
+                Current items {`{ ${arrValue?.length} / ${configField?.max} }`}
+              </HelpText>
+            </Flex>
+            <Flex justifyContent="right">
+              <HelpText
+                style={{
+                  fontSize: tokens.fontSizeS,
+                  paddingRight: tokens.spacingS,
+                }}
+              >
+                Min items: <strong>{configField?.min}</strong> / Max items:{" "}
+                <strong>{configField?.max}</strong>
+              </HelpText>
+            </Flex>
+          </>
+        )}
+        {isValidQtyItems === false && typeof configField?.min === "number" && (
+          <>
+            <Flex justifyContent="right">
+              <FormControl.ValidationMessage>
+                You need to add at least <strong>{configField?.min}</strong>{" "}
+                item
+                {configField.min > 1 ? "s" : ""}
+              </FormControl.ValidationMessage>
+            </Flex>
+          </>
+        )}
       </>
     );
   };
@@ -198,6 +277,24 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
+    const { interfaces, configurations } = sdk.parameters
+      .installation as FieldSetup;
+    const findConfig = configurations?.find(
+      (config: FieldSetupItem) =>
+        config.contentType === contentType && config.fieldId === field
+    );
+    const findInterface = interfaces?.find(
+      (inter: Interface) => inter.id === findConfig?.interfaceId
+    );
+    if (findInterface) {
+      setInterfaceField(findInterface);
+      setConfigField(findConfig);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sdk]);
+
+  /*useEffect(() => {
+    const { contentType, field } = sdk.ids;
     sdk.cma.entry
       .getMany({ query: { content_type: parameters?.contentType } })
       ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
@@ -221,6 +318,46 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
           setInterfaceField(findInterface);
         }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sdk]);*/
+
+  useEffect(() => {
+    const { contentType, field } = sdk.ids;
+    const { interfaces, configurations } = sdk.parameters
+      .installation as FieldSetup;
+    const findConfig = configurations?.find(
+      (config: FieldSetupItem) =>
+        config.contentType === contentType && config.fieldId === field
+    );
+    const findInterface = interfaces?.find(
+      (inter: Interface) => inter.id === findConfig?.interfaceId
+    );
+    if (findInterface) {
+      setInterfaceField(findInterface);
+    }
+    /*sdk.cma.entry
+      .getMany({ query: { content_type: parameters?.contentType } })
+      ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
+        const item = response.items?.find(
+          (item: EntryProps<KeyValueMap>, idx: number) => idx === 0
+        );
+        const content = item?.fields[parameters?.fieldId ?? ""];
+        const currentLangEditor = sdk.locales.default;
+        if (content) {
+          const findConfig = (
+            content[currentLangEditor] as FieldSetup
+          )?.configurations?.find(
+            (config: FieldSetupItem) =>
+              config.contentType === contentType && config.fieldId === field
+          );
+          const findInterface = (
+            content[currentLangEditor] as FieldSetup
+          )?.interfaces?.find(
+            (inter: Interface) => inter.id === findConfig?.interfaceId
+          );
+          setInterfaceField(findInterface);
+        }
+      });*/
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
 

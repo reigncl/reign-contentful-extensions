@@ -18,6 +18,7 @@ import {
   Select,
   Button,
   Box,
+  TextInput,
 } from "@contentful/f36-components";
 import { updateEditor } from "../../../util";
 
@@ -42,6 +43,8 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
   const [interfaceSelected, setInterfaceSelected] = useState<
     string | undefined
   >(parameters?.interfaceId);
+  const [min, setMin] = useState<number | undefined>(parameters?.min);
+  const [max, setMax] = useState<number | undefined>(parameters?.max);
   const [interfaces] = useState<Interface[]>(parameters?.interfaces ?? []);
 
   const submitForm = async () => {
@@ -56,10 +59,19 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
       contentType: contentTypeSelected,
       fieldId: fieldSelected,
       interfaceId: interfaceSelected,
+      min,
+      max,
       index: indexConfiguration,
     } as FieldSetupItem & {
       index?: number;
     });
+  };
+
+  const isInvalidMinMax = (): boolean => {
+    if (typeof min === "number" && typeof max === "number") {
+      return min > max;
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -191,7 +203,43 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
           </Select>
           <HelpText>Select the interface you want to attach.</HelpText>
         </FormControl>
-        <Button variant="primary" type="submit">
+        {interfaces?.find((iface: Interface) => interfaceSelected === iface.id)
+          ?.isArray && (
+          <>
+            <FormControl>
+              <FormControl.Label>Min & max items</FormControl.Label>
+              <TextInput.Group>
+                <TextInput
+                  id="config-min-items"
+                  name="config-min-items"
+                  placeholder="min"
+                  type="number"
+                  min={0}
+                  value={min?.toString()}
+                  onChange={(e) =>
+                    setMin(parseInt(e.currentTarget.value ?? null))
+                  }
+                />
+                <TextInput
+                  id="config-max-items"
+                  name="config-max-items"
+                  placeholder="max"
+                  type="number"
+                  min={max ?? 0}
+                  value={max?.toString()}
+                  onChange={(e) =>
+                    setMax(parseInt(e.currentTarget.value ?? null))
+                  }
+                />
+              </TextInput.Group>
+              <HelpText>
+                If the interface is multiple, you can set up a minimum and
+                maximum quantity of items.
+              </HelpText>
+            </FormControl>
+          </>
+        )}
+        <Button variant="primary" type="submit" isDisabled={isInvalidMinMax()}>
           {typeof indexConfiguration === "undefined" ? "Add" : "Edit"}{" "}
           configuration
         </Button>

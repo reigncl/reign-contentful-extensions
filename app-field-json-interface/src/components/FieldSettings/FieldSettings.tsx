@@ -9,28 +9,29 @@ import SetupInterfaces from "./SetupInterfaces/SetupInterfaces";
 import SetupConfigurations from "./SetupConfigurations/SetupConfigurations";
 import { useEffect, useState } from "react";
 
-const FieldSettings = ({ sdk }: FieldSetupProps) => {
+const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
   const [configurations, setConfigurations] = useState<Array<FieldSetupItem>>(
-    (sdk.field.getValue() as FieldSetup)?.configurations ?? []
+    (value as FieldSetup)?.configurations ?? []
   );
   const [interfaces, setInterfaces] = useState<Array<Interface>>(
-    (sdk.field.getValue() as FieldSetup)?.interfaces ?? []
+    (value as FieldSetup)?.interfaces ?? []
   );
 
   const handleChangeInterfaces = (update: Array<Interface>) => {
     setInterfaces(update ?? []);
+    updateValue({ configurations, interfaces: update ?? [] });
   };
 
   const handleChangeConfigurations = (update: Array<FieldSetupItem>) => {
     setConfigurations(update ?? []);
+    updateValue({ configurations: update ?? [], interfaces });
   };
 
   useEffect(() => {
-    sdk.field.setValue({ configurations, interfaces }).catch((error) => {
-      console.log(error);
-    });
+    setConfigurations((value as FieldSetup)?.configurations ?? []);
+    setInterfaces((value as FieldSetup)?.interfaces ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configurations, interfaces]);
+  }, [value]);
 
   return (
     <>
