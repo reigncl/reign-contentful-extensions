@@ -22,7 +22,6 @@ import {
   Badge,
   Accordion,
   HelpText,
-  Box,
   FormControl,
 } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
@@ -38,7 +37,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   const [value, setValue] = useState<FieldInterfaceValue>(
     (sdk.field.getValue() as Record<string, unknown>) ?? {}
   );
-  // const parameters = sdk.parameters.installation as AppInstallationParameters;
   const [interfaceField, setInterfaceField] = useState<Interface | undefined>(
     undefined
   );
@@ -121,7 +119,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
 
   const checkIfSetMinMax = (): boolean => {
     return (
-      typeof configField?.min === "number" &&
+      typeof configField?.min === "number" ||
       typeof configField?.max === "number"
     );
   };
@@ -204,6 +202,20 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             Add item
           </Button>
         </Flex>
+        <Flex justifyContent="right">
+          <HelpText
+            style={{
+              fontSize: tokens.fontSizeS,
+              paddingRight: tokens.spacingS,
+            }}
+          >
+            Current items {`{ ${arrValue?.length} `}
+            {typeof configField?.max === "number"
+              ? " / " + configField?.max
+              : ""}
+            {` }`}
+          </HelpText>
+        </Flex>
         {checkIfSetMinMax() && (
           <>
             <Flex justifyContent="right">
@@ -213,18 +225,15 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
                   paddingRight: tokens.spacingS,
                 }}
               >
-                Current items {`{ ${arrValue?.length} / ${configField?.max} }`}
-              </HelpText>
-            </Flex>
-            <Flex justifyContent="right">
-              <HelpText
-                style={{
-                  fontSize: tokens.fontSizeS,
-                  paddingRight: tokens.spacingS,
-                }}
-              >
-                Min items: <strong>{configField?.min}</strong> / Max items:{" "}
-                <strong>{configField?.max}</strong>
+                Min items: <strong>{configField?.min}</strong>{" "}
+                {typeof configField?.max === "number" ? (
+                  <>
+                    {" "}
+                    / Max items <strong>{configField?.max}</strong>{" "}
+                  </>
+                ) : (
+                  <></>
+                )}
               </HelpText>
             </Flex>
           </>
@@ -293,34 +302,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
 
-  /*useEffect(() => {
-    const { contentType, field } = sdk.ids;
-    sdk.cma.entry
-      .getMany({ query: { content_type: parameters?.contentType } })
-      ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
-        const item = response.items?.find(
-          (item: EntryProps<KeyValueMap>, idx: number) => idx === 0
-        );
-        const content = item?.fields[parameters?.fieldId ?? ""];
-        const currentLangEditor = sdk.locales.default;
-        if (content) {
-          const findConfig = (
-            content[currentLangEditor] as FieldSetup
-          )?.configurations?.find(
-            (config: FieldSetupItem) =>
-              config.contentType === contentType && config.fieldId === field
-          );
-          const findInterface = (
-            content[currentLangEditor] as FieldSetup
-          )?.interfaces?.find(
-            (inter: Interface) => inter.id === findConfig?.interfaceId
-          );
-          setInterfaceField(findInterface);
-        }
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sdk]);*/
-
   useEffect(() => {
     const { contentType, field } = sdk.ids;
     const { interfaces, configurations } = sdk.parameters
@@ -335,29 +316,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     if (findInterface) {
       setInterfaceField(findInterface);
     }
-    /*sdk.cma.entry
-      .getMany({ query: { content_type: parameters?.contentType } })
-      ?.then((response: CollectionProp<EntryProps<KeyValueMap>>) => {
-        const item = response.items?.find(
-          (item: EntryProps<KeyValueMap>, idx: number) => idx === 0
-        );
-        const content = item?.fields[parameters?.fieldId ?? ""];
-        const currentLangEditor = sdk.locales.default;
-        if (content) {
-          const findConfig = (
-            content[currentLangEditor] as FieldSetup
-          )?.configurations?.find(
-            (config: FieldSetupItem) =>
-              config.contentType === contentType && config.fieldId === field
-          );
-          const findInterface = (
-            content[currentLangEditor] as FieldSetup
-          )?.interfaces?.find(
-            (inter: Interface) => inter.id === findConfig?.interfaceId
-          );
-          setInterfaceField(findInterface);
-        }
-      });*/
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
 

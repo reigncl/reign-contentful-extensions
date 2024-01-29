@@ -3,7 +3,7 @@ import { ConfigAppSDK } from "@contentful/app-sdk";
 import { useSDK } from "@contentful/react-apps-toolkit";
 import FieldSettings from "../components/FieldSettings/FieldSettings";
 import { FieldSetup } from "../components/FieldSettings/FieldSetup.types";
-import { Box, Flex, Heading } from "@contentful/f36-components";
+import { Box, Heading } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
 
 const ConfigScreen = () => {
