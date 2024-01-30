@@ -45,6 +45,7 @@ const ConfigScreen = () => {
         maxWidth: tokens.contentWidthText,
         margin: "0 auto",
         paddingTop: tokens.spacingM,
+        paddingBottom: tokens.spacingM,
       }}
     >
       <Heading>Configuration</Heading>

@@ -34,6 +34,8 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
 
   const [settings, setSettings] = useState<FieldSetup | undefined>(undefined);
   const [validSettings, setValidSettings] = useState<boolean>(false);
+  
+  const [newSetupSubmitted, setNewSetupSubmitted] = useState<boolean>(false);
 
   const handleChangeInterfaces = (update: Array<Interface>) => {
     setInterfaces(update ?? []);
@@ -270,14 +272,17 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
               size="small"
               startIcon={<CycleIcon />}
               variant="primary"
-              isDisabled={!!!validSettings}
+              isDisabled={!!!validSettings || newSetupSubmitted}
+              isLoading={newSetupSubmitted}
               onClick={async () => {
                 if (settings) {
+                  setNewSetupSubmitted(true);
                   await uninstallAllEditors();
                   await setupAllEditors(settings?.configurations);
                   updateValue(settings);
                   setSettings(undefined);
                   setValidSettings(false);
+                  setNewSetupSubmitted(false);
                   Notification.info(
                     "Config have changed, remember to save settings."
                   );
@@ -290,6 +295,7 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
           <Textarea
             placeholder="Paste a JSON definition."
             value={JSON.stringify(settings, null, 2) ?? ""}
+            isDisabled={newSetupSubmitted}
             rows={15}
             onChange={(e) => {
               try {
