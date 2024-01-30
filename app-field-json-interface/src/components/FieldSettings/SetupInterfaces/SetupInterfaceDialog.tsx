@@ -60,7 +60,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         key: item?.key,
         type: item?.type,
         options: item?.options,
-        required: item?.required ?? false,
+        // required: item?.required ?? false,
         inputTextType: item?.inputTextType,
         errorMessage: item?.errorMessage,
         regex: item?.regex,
