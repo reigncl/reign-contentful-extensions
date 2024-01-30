@@ -18,6 +18,7 @@ import SetupConfigurations from "./SetupConfigurations/SetupConfigurations";
 import tokens from "@contentful/f36-tokens";
 import { CopyIcon, CheckCircleIcon, CycleIcon } from "@contentful/f36-icons";
 import { deepEqual, updateEditor } from "../../util";
+import { CollectionProp, ContentFields, ContentTypeProps, KeyValueMap } from "contentful-management";
 
 const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
   const [configurations, setConfigurations] = useState<Array<FieldSetupItem>>(
@@ -25,6 +26,10 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
   );
   const [interfaces, setInterfaces] = useState<Array<Interface>>(
     (value as FieldSetup)?.interfaces ?? []
+  );
+
+  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
+    {}
   );
 
   const [settings, setSettings] = useState<FieldSetup | undefined>(undefined);
@@ -82,6 +87,18 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
     setInterfaces((value as FieldSetup)?.interfaces ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
+
+  useEffect(() => {
+    const updateContentTypes: Record<string, string[]> = {};
+    sdk.cma.contentType.getMany({ query: { limit: 1000 } })
+    ?.then((value: CollectionProp<ContentTypeProps>) => {
+      for (let ct of value?.items) {
+        const fields = ct?.fields?.map((value: ContentFields<KeyValueMap>) => value?.id);
+        updateContentTypes[ct.sys.id] = fields
+      }
+      setContentTypes(updateContentTypes);
+    });
+  }, [sdk]);
 
   return (
     <>
@@ -205,6 +222,13 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
                             !!!value.fieldId ||
                             !!!value.interfaceId
                           ) {
+                            validConfigurations = false;
+                          }
+                          const findContentType = contentTypes[value.contentType];
+                          if (!!!findContentType) {
+                            validConfigurations = false;
+                          }
+                          if (!!!findContentType.includes(value.fieldId)) {
                             validConfigurations = false;
                           }
                         }
