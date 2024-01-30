@@ -202,7 +202,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
               paddingRight: tokens.spacingS,
             }}
           >
-            Current items {`{ ${arrValue?.length} `}
+            Total items {`{ ${arrValue?.length} `}
             {typeof configField?.max === "number"
               ? " / " + configField?.max
               : ""}
