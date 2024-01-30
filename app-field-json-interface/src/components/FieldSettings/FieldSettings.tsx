@@ -2,13 +2,9 @@ import { useEffect, useState } from "react";
 import {
   Tabs,
   Notification,
-  Subheading,
-  Flex,
   Textarea,
   Stack,
   Button,
-  Text,
-  IconButton,
 } from "@contentful/f36-components";
 import {
   FieldSetupItem,

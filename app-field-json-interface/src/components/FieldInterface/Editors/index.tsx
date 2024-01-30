@@ -6,7 +6,6 @@ import SelectEditor from "./Select";
 import TextareaEditor from "./Textarea";
 import { getValue, setValue } from "../../../util";
 import { InterfaceItem } from "../../FieldSettings/FieldSetup.types";
-import { useEffect } from "react";
 
 const EditorsHandler = ({
   interfaceItem,

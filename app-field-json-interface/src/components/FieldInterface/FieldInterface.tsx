@@ -6,13 +6,6 @@ import {
   InterfaceItem,
 } from "../FieldSettings/FieldSetup.types";
 import { useEffect, useState } from "react";
-import { AppInstallationParameters } from "../../locations/ConfigScreen";
-import {
-  AppDefinitionProps,
-  CollectionProp,
-  EntryProps,
-  KeyValueMap,
-} from "contentful-management";
 import EditorsHandler from "./Editors";
 import {
   Flex,
