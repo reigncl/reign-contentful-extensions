@@ -6,3 +6,8 @@ export interface SetupImportProps {
   updateValue: FieldUpdateValueFunction;
   configurations: Array<FieldSetupItem>;
 }
+
+export interface ErrorItem {
+  position: number;
+  errors: Array<string>;
+}

@@ -17,7 +17,7 @@ import {
 } from "../FieldSetup.types";
 import { CheckCircleIcon, CycleIcon } from "@contentful/f36-icons";
 import { useEffect, useState } from "react";
-import { SetupImportProps } from "./SetupImport.types";
+import { ErrorItem, SetupImportProps } from "./SetupImport.types";
 import {
   CollectionProp,
   ContentTypeProps,
@@ -25,7 +25,11 @@ import {
   KeyValueMap,
 } from "contentful-management";
 
-const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => {
+const SetupImport = ({
+  sdk,
+  updateValue,
+  configurations,
+}: SetupImportProps) => {
   const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
     {}
   );
@@ -34,6 +38,14 @@ const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => 
   const [validSettings, setValidSettings] = useState<boolean>(false);
 
   const [newSetupSubmitted, setNewSetupSubmitted] = useState<boolean>(false);
+
+  const [configurationsErrors, setConfigurationErrors] = useState<
+    Array<ErrorItem>
+  >([]);
+
+  const [interfacesErrors, setInterfacesErrors] = useState<Array<ErrorItem>>(
+    []
+  );
 
   const uninstallAllEditors = async () => {
     if (configurations?.length) {
@@ -117,6 +129,8 @@ const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => 
           variant="secondary"
           onClick={() => {
             let valid = false;
+            const cfgErrors: Array<ErrorItem> = [];
+            const interErrors: Array<ErrorItem> = [];
             if (settings) {
               if (
                 deepEqual(
@@ -130,51 +144,83 @@ const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => 
                 let validInterfaces = false;
                 if (typeof settings.configurations !== "undefined") {
                   validConfigurations = true;
-                  settings?.configurations?.forEach((value: FieldSetupItem) => {
-                    if (
-                      !!!value ||
-                      !!!value.contentType ||
-                      !!!value.fieldId ||
-                      !!!value.interfaceId
-                    ) {
-                      validConfigurations = false;
+                  settings?.configurations?.forEach(
+                    (value: FieldSetupItem, configIndex: number) => {
+                      const errorsMessages: Array<string> = [];
+                      if (
+                        !!!value ||
+                        !!!value.contentType ||
+                        !!!value.fieldId ||
+                        !!!value.interfaceId
+                      ) {
+                        validConfigurations = false;
+                        errorsMessages.push(
+                          `Missing required props (contentType, fieldId, interfaceId)`
+                        );
+                      }
+                      const findContentType = contentTypes[value.contentType];
+                      if (!!!findContentType) {
+                        validConfigurations = false;
+                        errorsMessages.push(
+                          `Content type "${value.contentType}" not exists`
+                        );
+                      }
+                      if (!!!findContentType.includes(value.fieldId)) {
+                        validConfigurations = false;
+                        errorsMessages.push(`Field id "${
+                          value.fieldId
+                        }" not exists in content type${" "}
+                        "${value.contentType}"`);
+                      }
+                      if (errorsMessages?.length > 0) {
+                        cfgErrors.push({
+                          position: configIndex + 1,
+                          errors: errorsMessages,
+                        });
+                      }
                     }
-                    const findContentType = contentTypes[value.contentType];
-                    if (!!!findContentType) {
-                      validConfigurations = false;
-                    }
-                    if (!!!findContentType.includes(value.fieldId)) {
-                      validConfigurations = false;
-                    }
-                  });
+                  );
                 }
                 if (typeof settings.interfaces !== "undefined") {
                   validInterfaces = true;
-                  settings?.interfaces?.forEach((value: Interface) => {
-                    let validFields = true;
-                    value?.items?.forEach((item: InterfaceItem) => {
-                      if (
-                        !!!item ||
-                        !!!item.key ||
-                        !!!item.label ||
-                        !!!item.type
-                      ) {
-                        validFields = false;
+                  settings?.interfaces?.forEach(
+                    (value: Interface, interfaceIndex: number) => {
+                      const errorsMessages: Array<string> = [];
+                      if (!!!value || !!!value.id || !!!value.name) {
+                        validInterfaces = false;
+                        errorsMessages.push(
+                          `Missing required props (id, name)`
+                        );
                       }
-                    });
-                    if (
-                      !!!value ||
-                      !!!value.id ||
-                      !!!value.name ||
-                      !validFields
-                    ) {
-                      validInterfaces = false;
+                      value?.items?.forEach(
+                        (item: InterfaceItem, itemIndex: number) => {
+                          if (
+                            !!!item ||
+                            !!!item.key ||
+                            !!!item.label ||
+                            !!!item.type
+                          ) {
+                            validInterfaces = false;
+                            errorsMessages.push(
+                              `Interface is missing required props (key, label, type) in Item #${itemIndex}`
+                            );
+                          }
+                        }
+                      );
+                      if (errorsMessages?.length > 0) {
+                        interErrors.push({
+                          position: interfaceIndex + 1,
+                          errors: errorsMessages,
+                        });
+                      }
                     }
-                  });
+                  );
                 }
                 valid = validConfigurations && validInterfaces;
               }
             }
+            setConfigurationErrors(cfgErrors);
+            setInterfacesErrors(interErrors);
             setValidSettings(valid);
           }}
         >
@@ -209,37 +255,59 @@ const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => 
           paddingBottom: tokens.spacingS,
         }}
       >
-        <Note variant="warning" style={{ width: tokens.contentWidthFull }}>
-          <Text>Configurations with errors</Text>
-          <List>
-            <List.Item>Configuration #1</List.Item>
-            <List.Item>
-              <List>
-                <List.Item>
-                  Missing required props (contentType, fieldId, interfaceId)
-                </List.Item>
-                <List.Item>Content type {"contenttype"} not exists</List.Item>
-                <List.Item>
-                  Field id {"fieldid"} not exists in content type{" "}
-                  {"contenttype"}
-                </List.Item>
-              </List>
-            </List.Item>
-          </List>
-          <Text>Interfaces with errors</Text>
-          <List>
-            <List.Item>Interface #1</List.Item>
-            <List.Item>
-              <List>
-                <List.Item>Missing required props (id, name)</List.Item>
-                <List.Item>
-                  Interface is missing required props (key, label, type) in Item
-                  #4
-                </List.Item>
-              </List>
-            </List.Item>
-          </List>
-        </Note>
+        {(configurationsErrors?.length > 0 || interfacesErrors?.length > 0) && (
+          <Note variant="warning" style={{ width: tokens.contentWidthFull }}>
+            {configurationsErrors?.length > 0 && (
+              <>
+                <Text>Configurations with errors</Text>
+                <List>
+                  {configurationsErrors?.map((configError: ErrorItem) => (
+                    <>
+                      <List.Item>
+                        Configuration #{configError.position}
+                      </List.Item>
+                      {configError.errors.length > 0 && (
+                        <>
+                          <List.Item>
+                            <List>
+                              {configError.errors?.map((text: string) => (
+                                <List.Item>{text}</List.Item>
+                              ))}
+                            </List>
+                          </List.Item>
+                        </>
+                      )}
+                    </>
+                  ))}
+                </List>
+              </>
+            )}
+
+            {interfacesErrors?.length > 0 && (
+              <>
+                <Text>Interfaces with errors</Text>
+                <List>
+                  {interfacesErrors?.map((configError: ErrorItem) => (
+                    <>
+                      <List.Item>Interface #{configError.position}</List.Item>
+                      {configError.errors.length > 0 && (
+                        <>
+                          <List.Item>
+                            <List>
+                              {configError.errors?.map((text: string) => (
+                                <List.Item>{text}</List.Item>
+                              ))}
+                            </List>
+                          </List.Item>
+                        </>
+                      )}
+                    </>
+                  ))}
+                </List>
+              </>
+            )}
+          </Note>
+        )}
       </Stack>
       <Textarea
         placeholder="Paste a JSON definition."
@@ -253,6 +321,8 @@ const SetupImport = ({ sdk, updateValue, configurations }: SetupImportProps) => 
             );
             setValidSettings(false);
             setSettings(settingsAsObject);
+            setConfigurationErrors([]);
+            setInterfacesErrors([]);
           } catch (error) {
             console.log(error);
           }
