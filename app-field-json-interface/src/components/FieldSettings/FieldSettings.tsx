@@ -2,23 +2,17 @@ import { useEffect, useState } from "react";
 import {
   Tabs,
   Notification,
-  Textarea,
-  Stack,
-  Button,
 } from "@contentful/f36-components";
 import {
   FieldSetupItem,
   FieldSetupProps,
   Interface,
   FieldSetup,
-  InterfaceItem,
 } from "./FieldSetup.types";
 import SetupInterfaces from "./SetupInterfaces/SetupInterfaces";
 import SetupConfigurations from "./SetupConfigurations/SetupConfigurations";
-import tokens from "@contentful/f36-tokens";
-import { CopyIcon, CheckCircleIcon, CycleIcon } from "@contentful/f36-icons";
-import { deepEqual, updateEditor } from "../../util";
-import { CollectionProp, ContentFields, ContentTypeProps, KeyValueMap } from "contentful-management";
+import SetupExport from "./SetupExport/SetupExport";
+import SetupImport from "./SetupImport/SetupImport";
 
 const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
   const [configurations, setConfigurations] = useState<Array<FieldSetupItem>>(
@@ -27,15 +21,6 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
   const [interfaces, setInterfaces] = useState<Array<Interface>>(
     (value as FieldSetup)?.interfaces ?? []
   );
-
-  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
-    {}
-  );
-
-  const [settings, setSettings] = useState<FieldSetup | undefined>(undefined);
-  const [validSettings, setValidSettings] = useState<boolean>(false);
-  
-  const [newSetupSubmitted, setNewSetupSubmitted] = useState<boolean>(false);
 
   const handleChangeInterfaces = (update: Array<Interface>) => {
     setInterfaces(update ?? []);
@@ -53,54 +38,11 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
     );
   };
 
-  const uninstallAllEditors = async () => {
-    if (configurations?.length) {
-      for (let value of configurations) {
-        if (value?.contentType && value?.fieldId) {
-          await updateEditor({
-            sdk,
-            contentType: value?.contentType,
-            fieldId: value?.fieldId,
-            widgetId: "objectEditor",
-          });
-        }
-      }
-    }
-  };
-
-  const setupAllEditors = async (setups?: Array<FieldSetupItem>) => {
-    if (setups?.length) {
-      for (let value of setups) {
-        if (value?.contentType && value?.fieldId) {
-          await updateEditor({
-            sdk,
-            contentType: value?.contentType,
-            fieldId: value?.fieldId,
-            widgetId: sdk.ids.app,
-            widgetNamespace: "app",
-          });
-        }
-      }
-    }
-  };
-
   useEffect(() => {
     setConfigurations((value as FieldSetup)?.configurations ?? []);
     setInterfaces((value as FieldSetup)?.interfaces ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
-
-  useEffect(() => {
-    const updateContentTypes: Record<string, string[]> = {};
-    sdk.cma.contentType.getMany({ query: { limit: 1000 } })
-    ?.then((value: CollectionProp<ContentTypeProps>) => {
-      for (let ct of value?.items) {
-        const fields = ct?.fields?.map((value: ContentFields<KeyValueMap>) => value?.id);
-        updateContentTypes[ct.sys.id] = fields
-      }
-      setContentTypes(updateContentTypes);
-    });
-  }, [sdk]);
 
   return (
     <>
@@ -127,188 +69,14 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
           />
         </Tabs.Panel>
         <Tabs.Panel id="export">
-          <Stack
-            style={{
-              color: tokens.gray500,
-              fontWeight: tokens.fontWeightMedium,
-              paddingBottom: tokens.spacingS,
-              paddingTop: tokens.spacingS,
-            }}
-          >
-            Export settings
-          </Stack>
-          <Stack
-            style={{
-              color: tokens.gray500,
-              paddingBottom: tokens.spacingS,
-            }}
-          >
-            In this textarea you will find the application definitions such as
-            interfaces and configurations.
-          </Stack>
-          <Stack
-            flexDirection="row"
-            justifyContent="right"
-            style={{
-              paddingBottom: tokens.spacingS,
-            }}
-          >
-            <Button
-              onClick={() => {
-                navigator.clipboard.writeText(JSON.stringify(value, null, 2));
-                Notification.info("Copied settings.");
-              }}
-              size="small"
-              startIcon={<CopyIcon />}
-              variant="secondary"
-            >
-              Copy current config
-            </Button>
-          </Stack>
-          <Textarea rows={15} isReadOnly>
-            {JSON.stringify(value, null, 2)}
-          </Textarea>
+          <SetupExport value={value} />
         </Tabs.Panel>
         <Tabs.Panel id="import">
-          <Stack
-            style={{
-              color: tokens.gray500,
-              fontWeight: tokens.fontWeightMedium,
-              paddingBottom: tokens.spacingS,
-              paddingTop: tokens.spacingS,
-            }}
-          >
-            Import settings
-          </Stack>
-          <Stack
-            style={{
-              color: tokens.gray500,
-              paddingBottom: tokens.spacingS,
-            }}
-          >
-            If you have a definitions backup, you can paste in this textarea,
-            after you should validate it then if pass the validation process,
-            the save definition button is going to be available.
-          </Stack>
-          <Stack
-            flexDirection="row"
-            justifyContent="right"
-            style={{
-              paddingBottom: tokens.spacingS,
-            }}
-          >
-            <Button
-              size="small"
-              startIcon={<CheckCircleIcon />}
-              variant="secondary"
-              onClick={() => {
-                let valid = false;
-                if (settings) {
-                  if (
-                    deepEqual(
-                      settings as unknown as Record<string, unknown>,
-                      {}
-                    ) === true
-                  ) {
-                    valid = true;
-                  } else {
-                    let validConfigurations = false;
-                    let validInterfaces = false;
-                    if (typeof settings.configurations !== "undefined") {
-                      validConfigurations = true;
-                      settings?.configurations?.forEach(
-                        (value: FieldSetupItem) => {
-                          if (
-                            !!!value ||
-                            !!!value.contentType ||
-                            !!!value.fieldId ||
-                            !!!value.interfaceId
-                          ) {
-                            validConfigurations = false;
-                          }
-                          const findContentType = contentTypes[value.contentType];
-                          if (!!!findContentType) {
-                            validConfigurations = false;
-                          }
-                          if (!!!findContentType.includes(value.fieldId)) {
-                            validConfigurations = false;
-                          }
-                        }
-                      );
-                    }
-                    if (typeof settings.interfaces !== "undefined") {
-                      validInterfaces = true;
-                      settings?.interfaces?.forEach((value: Interface) => {
-                        let validFields = true;
-                        value?.items?.forEach((item: InterfaceItem) => {
-                          if (
-                            !!!item ||
-                            !!!item.key ||
-                            !!!item.label ||
-                            !!!item.type
-                          ) {
-                            validFields = false;
-                          }
-                        });
-                        if (
-                          !!!value ||
-                          !!!value.id ||
-                          !!!value.name ||
-                          !validFields
-                        ) {
-                          validInterfaces = false;
-                        }
-                      });
-                    }
-                    valid = validConfigurations && validInterfaces;
-                  }
-                }
-                setValidSettings(valid);
-              }}
-            >
-              Validate JSON
-            </Button>
-            <Button
-              size="small"
-              startIcon={<CycleIcon />}
-              variant="primary"
-              isDisabled={!!!validSettings || newSetupSubmitted}
-              isLoading={newSetupSubmitted}
-              onClick={async () => {
-                if (settings) {
-                  setNewSetupSubmitted(true);
-                  await uninstallAllEditors();
-                  await setupAllEditors(settings?.configurations);
-                  updateValue(settings);
-                  setSettings(undefined);
-                  setValidSettings(false);
-                  setNewSetupSubmitted(false);
-                  Notification.info(
-                    "Config have changed, remember to save settings."
-                  );
-                }
-              }}
-            >
-              Set up new config
-            </Button>
-          </Stack>
-          <Textarea
-            placeholder="Paste a JSON definition."
-            value={JSON.stringify(settings, null, 2) ?? ""}
-            isDisabled={newSetupSubmitted}
-            rows={15}
-            onChange={(e) => {
-              try {
-                const settingsAsObject: FieldSetup = JSON.parse(
-                  e?.currentTarget?.value
-                );
-                setValidSettings(false);
-                setSettings(settingsAsObject);
-              } catch (error) {
-                console.log(error);
-              }
-            }}
-          ></Textarea>
+          <SetupImport
+            sdk={sdk}
+            updateValue={updateValue}
+            configurations={configurations}
+          />
         </Tabs.Panel>
       </Tabs>
     </>
