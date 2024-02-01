@@ -5,8 +5,20 @@ import FieldSettings from "../components/FieldSettings/FieldSettings";
 import { FieldSetup } from "../components/FieldSettings/FieldSetup.types";
 import { Box, Heading } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
+import {
+  CollectionProp,
+  ContentTypeProps,
+  ContentFields,
+  KeyValueMap,
+} from "contentful-management";
+
+export type ContentTypeInfo = Record<
+  string,
+  { name: string; fields: string[] }
+>;
 
 const ConfigScreen = () => {
+  const [contentTypes, setContentTypes] = useState<ContentTypeInfo>({});
   const [parameters, setParameters] = useState<FieldSetup>({});
   const sdk = useSDK<ConfigAppSDK>();
 
@@ -39,6 +51,24 @@ const ConfigScreen = () => {
     })();
   }, [sdk]);
 
+  useEffect(() => {
+    const updateContentTypes: ContentTypeInfo = {};
+    sdk.cma.contentType
+      .getMany({ query: { limit: 1000 } })
+      ?.then((value: CollectionProp<ContentTypeProps>) => {
+        for (let ct of value?.items) {
+          const fields = ct?.fields?.map(
+            (value: ContentFields<KeyValueMap>) => value?.id
+          );
+          updateContentTypes[ct.sys.id] = {
+            name: ct.name,
+            fields,
+          };
+        }
+        setContentTypes(updateContentTypes);
+      });
+  }, [sdk]);
+
   return (
     <Box
       style={{
@@ -53,6 +83,7 @@ const ConfigScreen = () => {
         sdk={sdk}
         value={parameters}
         updateValue={(newValue) => onUpdate(newValue as FieldSetup)}
+        contentTypes={contentTypes}
       />
     </Box>
   );

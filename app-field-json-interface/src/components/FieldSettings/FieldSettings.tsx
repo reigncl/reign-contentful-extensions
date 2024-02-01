@@ -14,7 +14,7 @@ import SetupConfigurations from "./SetupConfigurations/SetupConfigurations";
 import SetupExport from "./SetupExport/SetupExport";
 import SetupImport from "./SetupImport/SetupImport";
 
-const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
+const FieldSettings = ({ sdk, value, updateValue, contentTypes }: FieldSetupProps) => {
   const [configurations, setConfigurations] = useState<Array<FieldSetupItem>>(
     (value as FieldSetup)?.configurations ?? []
   );
@@ -66,6 +66,7 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
             items={interfaces}
             onUpdate={handleChangeConfigurations}
             configurations={configurations}
+            contentTypes={contentTypes}
           />
         </Tabs.Panel>
         <Tabs.Panel id="export">
@@ -76,6 +77,7 @@ const FieldSettings = ({ sdk, value, updateValue }: FieldSetupProps) => {
             sdk={sdk}
             updateValue={updateValue}
             configurations={configurations}
+            contentTypes={contentTypes}
           />
         </Tabs.Panel>
       </Tabs>

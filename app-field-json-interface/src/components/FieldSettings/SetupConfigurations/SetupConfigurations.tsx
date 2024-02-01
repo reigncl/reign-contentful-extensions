@@ -11,7 +11,6 @@ import { SetupConfigurationsProps } from "./SetupConfigurations.types";
 import { FieldSetupItem, Interface } from "../FieldSetup.types";
 import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { CSSProperties, useEffect, useState } from "react";
-import { CollectionProp, ContentTypeProps } from "contentful-management";
 import { updateEditor } from "../../../util";
 import "../../css/badge.css";
 
@@ -20,8 +19,8 @@ const SetupConfigurations = ({
   items,
   configurations,
   onUpdate,
+  contentTypes,
 }: SetupConfigurationsProps) => {
-  const [contentTypes, setContentTypes] = useState<Record<string, string>>({});
   const [interfaces, setInterfaces] = useState<Record<string, string>>({});
   const styleCell: CSSProperties = { verticalAlign: "middle" };
   const addConfiguration = async () => {
@@ -77,7 +76,7 @@ const SetupConfigurations = ({
             {configurations?.map((config: FieldSetupItem, index: number) => (
               <Table.Row key={`configuration-${index}`}>
                 <Table.Cell style={styleCell}>
-                  <Box>{contentTypes[config?.contentType]}</Box>
+                  <Box>{contentTypes[config?.contentType]?.name}</Box>
                   <Box>
                     <Badge className={"custom-badge"}>
                       {config?.contentType}
@@ -160,15 +159,6 @@ const SetupConfigurations = ({
   };
 
   useEffect(() => {
-    sdk.cma.contentType
-      .getMany({})
-      .then((items: CollectionProp<ContentTypeProps>) => {
-        let updateContentTypes = { ...contentTypes };
-        items.items?.forEach((value: ContentTypeProps) => {
-          updateContentTypes[value?.sys?.id] = value?.name;
-        });
-        setContentTypes(updateContentTypes);
-      });
     if (items?.length) {
       let updateInterfaces = { ...interfaces };
       items?.forEach((item: Interface) => {
@@ -177,7 +167,7 @@ const SetupConfigurations = ({
       setInterfaces(updateInterfaces);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sdk, items]);
+  }, [items]);
 
   return (
     <>

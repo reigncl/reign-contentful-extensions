@@ -16,23 +16,15 @@ import {
   FieldSetup,
 } from "../FieldSetup.types";
 import { CheckCircleIcon, CycleIcon } from "@contentful/f36-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ErrorItem, SetupImportProps } from "./SetupImport.types";
-import {
-  CollectionProp,
-  ContentTypeProps,
-  ContentFields,
-  KeyValueMap,
-} from "contentful-management";
 
 const SetupImport = ({
   sdk,
   updateValue,
   configurations,
+  contentTypes,
 }: SetupImportProps) => {
-  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
-    {}
-  );
 
   const [settings, setSettings] = useState<FieldSetup | undefined>(undefined);
   const [validSettings, setValidSettings] = useState<boolean>(false);
@@ -77,21 +69,6 @@ const SetupImport = ({
       }
     }
   };
-
-  useEffect(() => {
-    const updateContentTypes: Record<string, string[]> = {};
-    sdk.cma.contentType
-      .getMany({ query: { limit: 1000 } })
-      ?.then((value: CollectionProp<ContentTypeProps>) => {
-        for (let ct of value?.items) {
-          const fields = ct?.fields?.map(
-            (value: ContentFields<KeyValueMap>) => value?.id
-          );
-          updateContentTypes[ct.sys.id] = fields;
-        }
-        setContentTypes(updateContentTypes);
-      });
-  }, [sdk]);
   return (
     <>
       <Stack
@@ -165,7 +142,7 @@ const SetupImport = ({
                           `Content type "${value.contentType}" not exists`
                         );
                       }
-                      if (!!!findContentType.includes(value.fieldId)) {
+                      if (!!!findContentType?.fields.includes(value.fieldId)) {
                         validConfigurations = false;
                         errorsMessages.push(`Field id "${
                           value.fieldId

@@ -1,4 +1,5 @@
 import { ConfigAppSDK, FieldAppSDK, SerializedJSONValue } from "@contentful/app-sdk";
+import { ContentTypeInfo } from "../../locations/ConfigScreen";
 
 export type FieldValueType =
   | Record<string, unknown>
@@ -46,4 +47,5 @@ export interface FieldSetupProps {
   sdk: FieldAppSDK | ConfigAppSDK;
   value: FieldSetup;
   updateValue: FieldUpdateValueFunction;
+  contentTypes: ContentTypeInfo;
 }
