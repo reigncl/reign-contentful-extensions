@@ -13,6 +13,7 @@ import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { CSSProperties, useEffect, useState } from "react";
 import { updateEditor } from "../../../util";
 import "../../css/badge.css";
+import { ContentTypeInfo } from "../../../locations/ConfigScreen";
 
 const SetupConfigurations = ({
   sdk,
@@ -32,6 +33,7 @@ const SetupConfigurations = ({
         parameters: {
           type: "configuration",
           interfaces: items,
+          contentTypes: contentTypes,
         },
       })) as FieldSetupItem & {
         index?: number;
@@ -39,11 +41,18 @@ const SetupConfigurations = ({
 
       if (response) {
         const arrConfigurations = [...(configurations ?? [])];
-        arrConfigurations.push({
+        let newItem: FieldSetupItem = {
           contentType: response?.contentType,
           fieldId: response?.fieldId,
           interfaceId: response?.interfaceId,
-        });
+        };
+        if (typeof response.min !== 'number') {
+          newItem = {...newItem, min: response.min}
+        }
+        if (typeof response.max !== 'number') {
+          newItem = {...newItem, max: response.max}
+        }
+        arrConfigurations.push(newItem);
         onUpdate(arrConfigurations);
       }
     } catch (error) {}
@@ -76,7 +85,13 @@ const SetupConfigurations = ({
             {configurations?.map((config: FieldSetupItem, index: number) => (
               <Table.Row key={`configuration-${index}`}>
                 <Table.Cell style={styleCell}>
-                  <Box>{contentTypes[config?.contentType]?.name}</Box>
+                  <Box>
+                    {
+                      contentTypes?.find(
+                        (ct: ContentTypeInfo) => ct.id === config?.contentType
+                      )?.name
+                    }
+                  </Box>
                   <Box>
                     <Badge className={"custom-badge"}>
                       {config?.contentType}
@@ -107,6 +122,7 @@ const SetupConfigurations = ({
                           type: "configuration",
                           index,
                           interfaces: items,
+                          contentTypes: contentTypes,
                         },
                       })) as FieldSetupItem & {
                         index?: number;

@@ -7,7 +7,7 @@ export interface SetupConfigurationsProps {
   configurations?: Array<FieldSetupItem>;
   sdk: FieldAppSDK | ConfigAppSDK;
   onUpdate: (update: Array<FieldSetupItem>) => void;
-  contentTypes: ContentTypeInfo;
+  contentTypes: Array<ContentTypeInfo>;
 }
 export interface SetupConfigurationDialogProps {
   sdk: DialogAppSDK;

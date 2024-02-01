@@ -12,13 +12,14 @@ import {
   KeyValueMap,
 } from "contentful-management";
 
-export type ContentTypeInfo = Record<
-  string,
-  { name: string; fields: string[] }
->;
+export type ContentTypeInfo = {
+  id: string;
+  name: string;
+  fields: Array<ContentFields<KeyValueMap>>;
+};
 
 const ConfigScreen = () => {
-  const [contentTypes, setContentTypes] = useState<ContentTypeInfo>({});
+  const [contentTypes, setContentTypes] = useState<Array<ContentTypeInfo>>([]);
   const [parameters, setParameters] = useState<FieldSetup>({});
   const sdk = useSDK<ConfigAppSDK>();
 
@@ -52,19 +53,17 @@ const ConfigScreen = () => {
   }, [sdk]);
 
   useEffect(() => {
-    const updateContentTypes: ContentTypeInfo = {};
+    let updateContentTypes: Array<ContentTypeInfo> = [];
     sdk.cma.contentType
-      .getMany({ query: { limit: 1000 } })
+      .getMany({ query: { limit: 1000, order: "sys.id" } })
       ?.then((value: CollectionProp<ContentTypeProps>) => {
-        for (let ct of value?.items) {
-          const fields = ct?.fields?.map(
-            (value: ContentFields<KeyValueMap>) => value?.id
-          );
-          updateContentTypes[ct.sys.id] = {
+        updateContentTypes = value?.items?.map((ct: ContentTypeProps) => {
+          return {
             name: ct.name,
-            fields,
+            id: ct.sys.id,
+            fields: ct?.fields,
           };
-        }
+        });
         setContentTypes(updateContentTypes);
       });
   }, [sdk]);

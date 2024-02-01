@@ -47,5 +47,5 @@ export interface FieldSetupProps {
   sdk: FieldAppSDK | ConfigAppSDK;
   value: FieldSetup;
   updateValue: FieldUpdateValueFunction;
-  contentTypes: ContentTypeInfo;
+  contentTypes: Array<ContentTypeInfo>;
 }

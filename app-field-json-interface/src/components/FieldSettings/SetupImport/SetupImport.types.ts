@@ -6,7 +6,7 @@ export interface SetupImportProps {
   sdk: FieldAppSDK | ConfigAppSDK;
   updateValue: FieldUpdateValueFunction;
   configurations: Array<FieldSetupItem>;
-  contentTypes: ContentTypeInfo;
+  contentTypes: Array<ContentTypeInfo>;
 }
 
 export interface ErrorItem {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   AppInstallationContentType,
   AppInstallationParameters,
+  ContentTypeInfo,
 } from "../../../locations/ConfigScreen";
 import { FieldSetupItem, Interface } from "../FieldSetup.types";
 import { SetupConfigurationDialogProps } from "./SetupConfigurations.types";
@@ -9,6 +10,7 @@ import {
   CollectionProp,
   ContentTypeProps,
   ContentFields,
+  KeyValueMap,
 } from "contentful-management";
 import {
   Form,
@@ -23,16 +25,11 @@ import {
 import { updateEditor } from "../../../util";
 
 const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
-  const { contentType, fieldId } = sdk.parameters
-    .installation as AppInstallationParameters;
   const parameters = sdk.parameters.invocation as unknown as FieldSetupItem & {
     index?: number;
     interfaces?: Interface[];
+    contentTypes?: Array<ContentTypeInfo>;
   };
-  const [contentTypesList, setContentTypesList] = useState<
-    Array<AppInstallationContentType>
-  >([]);
-  const [fieldsList, setFieldsList] = useState<Array<string>>([]);
   const [indexConfiguration] = useState<number | undefined>(parameters?.index);
   const [contentTypeSelected, setContentTypeSelected] = useState<
     string | undefined
@@ -46,6 +43,7 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
   const [min, setMin] = useState<number | undefined>(parameters?.min);
   const [max, setMax] = useState<number | undefined>(parameters?.max);
   const [interfaces] = useState<Interface[]>(parameters?.interfaces ?? []);
+  const [fieldsList, setFieldsList] = useState<ContentTypeInfo["fields"]>([]);
 
   const submitForm = async () => {
     await updateEditor({
@@ -75,45 +73,13 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (
-        !contentTypesList ||
-        (contentTypesList && contentTypesList?.length === 0)
-      ) {
-        const collectionResponse: CollectionProp<ContentTypeProps> =
-          await sdk.cma.contentType.getMany({
-            query: { order: "sys.id" },
-          });
-        const arrayOfContentTypes = collectionResponse?.items?.map(
-          (item: ContentTypeProps) => {
-            return {
-              name: item.name,
-              id: item.sys.id,
-            };
-          }
-        );
-        setContentTypesList(arrayOfContentTypes);
-      }
-    })();
-  }, [contentTypesList, sdk.cma.contentType]);
-
-  useEffect(() => {
-    (async () => {
-      const getArrayOfFieldsFromContentType = async (contentTypeId: string) => {
-        const contentTypePage = await sdk.cma.contentType.get({
-          contentTypeId,
-        });
-        return contentTypePage?.fields
-          ?.filter((field: ContentFields) => field.type === "Object")
-          ?.map((field: ContentFields) => field.id);
-      };
-      if (contentTypeSelected) {
-        const arrayOfFields = await getArrayOfFieldsFromContentType(
-          contentTypeSelected
-        );
-        setFieldsList(arrayOfFields);
-      }
-    })();
+    setFieldsList([]);
+    if (parameters && parameters?.contentTypes && contentTypeSelected) {
+      const arrayOfFields = parameters.contentTypes?.find(
+        (ct: ContentTypeInfo) => contentTypeSelected === ct.id
+      )?.fields;
+      setFieldsList(arrayOfFields ?? []);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentTypeSelected]);
 
@@ -132,11 +98,11 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
             }
           >
             <Select.Option value="">Select content type</Select.Option>
-            {contentTypesList?.map(
-              (ct: AppInstallationContentType, index: number) => {
+            {parameters?.contentTypes?.map(
+              (ctInfo: ContentTypeInfo, index: number) => {
                 return (
-                  <Select.Option key={index} value={ct.id}>
-                    {ct.name}
+                  <Select.Option key={index} value={ctInfo.id}>
+                    {ctInfo?.name}
                   </Select.Option>
                 );
               }
@@ -162,25 +128,25 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
                   widgetId: "objectEditor",
                 });
               }
-              setFieldSelected(e.currentTarget.value);
+              setFieldSelected(e?.currentTarget?.value ?? undefined);
             }}
           >
             <Select.Option value="">Select field</Select.Option>
-            {fieldsList?.map((field: string, index: number) => {
-              return (
-                <Select.Option
-                  key={index}
-                  value={field}
-                  isDisabled={
-                    contentTypeSelected === contentType && field === fieldId
-                  }
-                >
-                  {field}
-                </Select.Option>
-              );
-            })}
+            {fieldsList?.map(
+              (field: ContentFields<KeyValueMap>, index: number) => {
+                return (
+                  <Select.Option
+                    key={index}
+                    value={field.id}
+                    isDisabled={field.type !== "Object"}
+                  >
+                    {field.id}
+                  </Select.Option>
+                );
+              }
+            )}
           </Select>
-          <HelpText>Select the field you want to configure.</HelpText>
+          <HelpText>Select the field with type Object to configure.</HelpText>
         </FormControl>
         <FormControl>
           <FormControl.Label isRequired>Interface</FormControl.Label>
