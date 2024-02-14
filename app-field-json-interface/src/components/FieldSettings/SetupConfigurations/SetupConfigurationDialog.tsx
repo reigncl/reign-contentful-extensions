@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  AppInstallationContentType,
-  AppInstallationParameters,
   ContentTypeInfo,
 } from "../../../locations/ConfigScreen";
 import { FieldSetupItem, Interface } from "../FieldSetup.types";
 import { SetupConfigurationDialogProps } from "./SetupConfigurations.types";
 import {
-  CollectionProp,
-  ContentTypeProps,
   ContentFields,
   KeyValueMap,
 } from "contentful-management";
@@ -29,6 +25,7 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
     index?: number;
     interfaces?: Interface[];
     contentTypes?: Array<ContentTypeInfo>;
+    configurations?: Array<FieldSetupItem>;
   };
   const [indexConfiguration] = useState<number | undefined>(parameters?.index);
   const [contentTypeSelected, setContentTypeSelected] = useState<
@@ -120,7 +117,7 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
             name="optionSelect-SelectSiteField"
             value={fieldSelected}
             onChange={async (e: React.ChangeEvent<HTMLSelectElement>) => {
-              if (fieldSelected) {
+              if (fieldSelected && interfaceSelected && typeof parameters?.index === 'number') {
                 await updateEditor({
                   sdk,
                   contentType: contentTypeSelected,
@@ -134,11 +131,17 @@ const SetupConfigurationDialog = ({ sdk }: SetupConfigurationDialogProps) => {
             <Select.Option value="">Select field</Select.Option>
             {fieldsList?.map(
               (field: ContentFields<KeyValueMap>, index: number) => {
+                const config: FieldSetupItem | undefined =
+                  parameters?.configurations?.find(
+                    (cf) =>
+                      cf.contentType === contentTypeSelected &&
+                      field.id === cf.fieldId
+                  );
                 return (
                   <Select.Option
                     key={index}
                     value={field.id}
-                    isDisabled={field.type !== "Object"}
+                    isDisabled={typeof config !== 'undefined'}
                   >
                     {field.id}
                   </Select.Option>

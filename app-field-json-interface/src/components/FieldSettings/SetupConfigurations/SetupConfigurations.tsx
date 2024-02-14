@@ -34,9 +34,11 @@ const SetupConfigurations = ({
           type: "configuration",
           interfaces: items,
           contentTypes: contentTypes,
+          configurations,
         },
       })) as FieldSetupItem & {
         index?: number;
+        configurations?: Array<FieldSetupItem>;
       };
 
       if (response) {
@@ -46,11 +48,11 @@ const SetupConfigurations = ({
           fieldId: response?.fieldId,
           interfaceId: response?.interfaceId,
         };
-        if (typeof response.min !== 'number') {
-          newItem = {...newItem, min: response.min}
+        if (typeof response.min === "number") {
+          newItem = { ...newItem, min: response.min };
         }
-        if (typeof response.max !== 'number') {
-          newItem = {...newItem, max: response.max}
+        if (typeof response.max === "number") {
+          newItem = { ...newItem, max: response.max };
         }
         arrConfigurations.push(newItem);
         onUpdate(arrConfigurations);
@@ -123,10 +125,12 @@ const SetupConfigurations = ({
                           index,
                           interfaces: items,
                           contentTypes: contentTypes,
+                          configurations,
                         },
                       })) as FieldSetupItem & {
                         index?: number;
                         interfaces?: Array<Interface>;
+                        configurations?: Array<FieldSetupItem>;
                       };
 
                       if (response && typeof response.index !== "undefined") {
