@@ -29,7 +29,9 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
   );
   const [name, setName] = useState<string>(parameters?.name ?? "");
   const [isArray, setIsArray] = useState<boolean>(parameters?.isArray ?? false);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(parameters?.isCollapsed ?? false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(
+    parameters?.isCollapsed ?? false
+  );
 
   const submitForm = () => {
     sdk.close({
@@ -65,6 +67,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         errorMessage: item?.errorMessage,
         regex: item?.regex,
         helpText: item?.helpText,
+        output: item?.output,
       };
       setItems(arrItems);
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,7 +141,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
           )}
           {["InputText"].includes(item?.type) && (
             <>
-              <HelpText style={StyleHelpText}>Select a input type:</HelpText>
+              <HelpText style={StyleHelpText}>Select an input type:</HelpText>
               <Select
                 size="small"
                 value={item?.inputTextType}
@@ -150,13 +153,14 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
                   });
                 }}
               >
-                <Select.Option value="">Select a input type</Select.Option>
+                <Select.Option value="">Select an input type</Select.Option>
                 <Select.Option value="text">text</Select.Option>
                 <Select.Option value="password">password</Select.Option>
                 <Select.Option value="email">email</Select.Option>
                 <Select.Option value="number">number</Select.Option>
                 <Select.Option value="url">url</Select.Option>
                 <Select.Option value="regex">regex</Select.Option>
+                <Select.Option value="colorpicker">colorpicker</Select.Option>
               </Select>
               {item?.inputTextType === "regex" && (
                 <Box
@@ -180,6 +184,61 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
                     }}
                   />
                 </Box>
+              )}
+              {item?.inputTextType === "colorpicker" && (
+                <>
+                  <Box
+                    style={{
+                      borderTop: "1px solid rgb(207, 217, 224)",
+                      marginTop: tokens.spacingM,
+                      paddingTop: tokens.spacing2Xs,
+                    }}
+                  >
+                    <HelpText style={StyleHelpText}>
+                      (Optional) Add the hex colors to list, separate them by
+                      comma. (Ex. #ffffff,#000000):
+                    </HelpText>
+                    <Textarea
+                      rows={2}
+                      value={item?.options?.toString()}
+                      onChange={(e) => {
+                        setItem({
+                          ...item,
+                          options: e?.currentTarget.value?.split(","),
+                        });
+                      }}
+                    ></Textarea>
+                  </Box>
+
+                  <Box
+                    style={{
+                      borderTop: "1px solid rgb(207, 217, 224)",
+                      marginTop: tokens.spacingM,
+                      paddingTop: tokens.spacing2Xs,
+                    }}
+                  >
+                    <HelpText style={StyleHelpText}>
+                      Select an output type:
+                    </HelpText>
+                    <Select
+                      size="small"
+                      value={item?.output}
+                      onChange={(e) => {
+                        setItem({
+                          ...item,
+                          output: e?.currentTarget
+                            .value as unknown as InterfaceItem["output"],
+                        });
+                      }}
+                    >
+                      <Select.Option value="">
+                        Select an output type
+                      </Select.Option>
+                      <Select.Option value="hex">hex</Select.Option>
+                      <Select.Option value="rgb">rgb</Select.Option>
+                    </Select>
+                  </Box>
+                </>
               )}
             </>
           )}
@@ -317,14 +376,18 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
               id="optionSelect-isCollapsed"
               name="optionSelect-isCollapsed"
               onChange={(e) => {
-                setIsCollapsed(e?.currentTarget?.value === "true" ? true : false);
+                setIsCollapsed(
+                  e?.currentTarget?.value === "true" ? true : false
+                );
               }}
             >
-              <Select.Option value={"false"}>Keep UI Interface by default</Select.Option>
+              <Select.Option value={"false"}>
+                Keep UI Interface by default
+              </Select.Option>
               <Select.Option value={"true"}>Set up a collapsible</Select.Option>
             </Select>
             <FormControl.HelpText>
-            Set up a collapsible as a wrapper for you UI Interface.
+              Set up a collapsible as a wrapper for you UI Interface.
             </FormControl.HelpText>
           </FormControl>
         </Box>

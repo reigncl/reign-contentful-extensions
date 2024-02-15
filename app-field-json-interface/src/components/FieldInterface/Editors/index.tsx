@@ -6,6 +6,7 @@ import SelectEditor from "./Select";
 import TextareaEditor from "./Textarea";
 import { getValue, setValue } from "../../../util";
 import { InterfaceItem } from "../../FieldSettings/FieldSetup.types";
+import ColorPicker from "./ColorPicker";
 
 const EditorsHandler = ({
   interfaceItem,
@@ -27,13 +28,23 @@ const EditorsHandler = ({
   const RenderEditor = ({ type }: { type: string }) => {
     switch (type) {
       case "InputText":
-        return (
-          <InputTextEditor
-            value={fieldValue}
-            handleUpdate={handleUpdate}
-            definition={interfaceItem}
-          />
-        );
+        if (interfaceItem?.inputTextType === "colorpicker") {
+          return (
+            <ColorPicker
+              value={fieldValue}
+              handleUpdate={handleUpdate}
+              definition={interfaceItem}
+            />
+          );
+        } else {
+          return (
+            <InputTextEditor
+              value={fieldValue}
+              handleUpdate={handleUpdate}
+              definition={interfaceItem}
+            />
+          );
+        }
       case "InputTextList":
         return (
           <InputTextListEditor

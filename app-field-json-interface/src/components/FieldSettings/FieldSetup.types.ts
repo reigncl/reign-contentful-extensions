@@ -1,4 +1,4 @@
-import { ConfigAppSDK, FieldAppSDK, SerializedJSONValue } from "@contentful/app-sdk";
+import { ConfigAppSDK, FieldAppSDK } from "@contentful/app-sdk";
 import { ContentTypeInfo } from "../../locations/ConfigScreen";
 
 export type FieldValueType =
@@ -10,7 +10,8 @@ export interface InterfaceItem {
   label: string;
   key: string;
   type: "Boolean" | "InputText" | "InputTextList" | "Select" | "Textarea";
-  inputTextType?: "text" | "password" | "email" | "number" | "url" | "regex";
+  inputTextType?: "text" | "password" | "email" | "number" | "url" | "regex" | "colorpicker";
+  output?: "hex" | "rgb";
   regex?: RegExp;
   options?: Array<string>;
   helpText?: string;
