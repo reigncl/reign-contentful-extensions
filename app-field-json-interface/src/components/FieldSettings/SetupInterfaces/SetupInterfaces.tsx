@@ -11,7 +11,7 @@ import { SetupInterfacesProps } from "./SetupInterfaces.types";
 import { Interface } from "../FieldSetup.types";
 import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { nanoid } from "nanoid";
-import "../../css/badge.css";
+import CustomBadge from "../../CustomBadge/CustomBadge";
 
 const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
   const addInterface = async () => {
@@ -64,7 +64,7 @@ const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
                 <Table.Cell style={{ verticalAlign: "middle" }}>
                   <Box>{item?.name}</Box>
                   <Box>
-                    <Badge className={"custom-badge"}>{item?.id}</Badge>
+                    <CustomBadge>{item?.id}</CustomBadge>
                   </Box>
                 </Table.Cell>
                 <Table.Cell style={{ verticalAlign: "middle" }}>

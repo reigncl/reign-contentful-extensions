@@ -12,7 +12,6 @@ import {
   Button,
   Grid,
   IconButton,
-  Badge,
   Accordion,
   HelpText,
   FormControl,
@@ -21,6 +20,7 @@ import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
 import { DeleteIcon } from "@contentful/f36-icons";
 import { ValidateEntryValueOutput, validateEntryValue } from "../../util";
+import CustomBadge from "../CustomBadge/CustomBadge";
 
 export interface FieldSetupProps {
   sdk: FieldAppSDK;
@@ -145,7 +145,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             columnGap="spacingM"
           >
             <Grid.Item>
-              <Badge>{index + 1}</Badge>
+              <CustomBadge>{index + 1}</CustomBadge>
             </Grid.Item>
             <Grid.Item>
               {interfaceField?.items?.map(

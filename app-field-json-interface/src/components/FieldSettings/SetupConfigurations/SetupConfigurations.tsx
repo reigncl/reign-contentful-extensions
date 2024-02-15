@@ -4,7 +4,6 @@ import {
   IconButton,
   Note,
   Table,
-  Badge,
   Box,
 } from "@contentful/f36-components";
 import { SetupConfigurationsProps } from "./SetupConfigurations.types";
@@ -12,8 +11,8 @@ import { FieldSetupItem, Interface } from "../FieldSetup.types";
 import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { CSSProperties, useEffect, useState } from "react";
 import { updateEditor } from "../../../util";
-import "../../css/badge.css";
 import { ContentTypeInfo } from "../../../locations/ConfigScreen";
+import CustomBadge from "../../CustomBadge/CustomBadge";
 
 const SetupConfigurations = ({
   sdk,
@@ -95,18 +94,16 @@ const SetupConfigurations = ({
                     }
                   </Box>
                   <Box>
-                    <Badge className={"custom-badge"}>
-                      {config?.contentType}
-                    </Badge>
+                    <CustomBadge>{config?.contentType}</CustomBadge>
                   </Box>
                 </Table.Cell>
                 <Table.Cell style={styleCell}>{config?.fieldId}</Table.Cell>
                 <Table.Cell style={styleCell}>
                   <Box>{interfaces[config?.interfaceId]}</Box>
                   <Box>
-                    <Badge className={"custom-badge"}>
+                    <CustomBadge>
                       {config?.interfaceId}
-                    </Badge>
+                    </CustomBadge>
                   </Box>
                 </Table.Cell>
                 <Table.Cell style={styleCell}>
