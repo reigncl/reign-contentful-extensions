@@ -5,7 +5,7 @@ import {
   Interface,
   InterfaceItem,
 } from "../FieldSettings/FieldSetup.types";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import EditorsHandler from "./Editors";
 import {
   Flex,
@@ -21,15 +21,17 @@ import { FieldInterfaceValue } from "./FieldInterface.types";
 import { DeleteIcon } from "@contentful/f36-icons";
 import { ValidateEntryValueOutput, validateEntryValue } from "../../util";
 import CustomBadge from "../CustomBadge/CustomBadge";
+import { FieldValueContext } from "../../context/FieldValueContex";
 
 export interface FieldSetupProps {
   sdk: FieldAppSDK;
 }
 
 const FieldInterface = ({ sdk }: FieldSetupProps) => {
-  const [value, setValue] = useState<FieldInterfaceValue>(
+  const { fieldValue, fieldValueUpdate } = useContext(FieldValueContext);
+  /*const [value, setValue] = useState<FieldInterfaceValue>(
     (sdk.field.getValue() as Record<string, unknown>) ?? {}
-  );
+  );*/
   const [interfaceField, setInterfaceField] = useState<Interface | undefined>(
     undefined
   );
@@ -45,16 +47,16 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   );
 
   const handleUpdate = async (valueUpdate: FieldInterfaceValue) => {
-    await sdk.field.setValue(valueUpdate);
+    // await sdk.field.setValue(valueUpdate);
     validate(valueUpdate);
-    setValue(valueUpdate);
+    fieldValueUpdate(valueUpdate);
     setInterfaceField({ ...(interfaceField as Interface) });
   };
 
   const validate = (val?: FieldInterfaceValue) => {
     if (interfaceField) {
       let isInvalid = false;
-      const validateResponse = validateEntryValue(val ?? value, interfaceField);
+      const validateResponse = validateEntryValue(val ?? fieldValue, interfaceField);
       setValidations(validateResponse);
       if (Array.isArray(validateResponse)) {
         validateResponse.forEach((item: ValidateEntryValueOutput) => {
@@ -72,7 +74,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
         });
       }
       if (typeof configField?.min === "number") {
-        const arrValue = Array.isArray(value) ? value : [];
+        const arrValue = Array.isArray(fieldValue) ? fieldValue : [];
         if (arrValue.length < configField.min) {
           isInvalid = true;
           setIsValidQtyItems(false);
@@ -122,14 +124,14 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
       typeof configField?.min === "number" &&
       typeof configField?.max === "number"
     ) {
-      const arrValue = Array.isArray(value) ? value : [];
+      const arrValue = Array.isArray(fieldValue) ? fieldValue : [];
       return arrValue?.length >= configField.max;
     }
     return false;
   };
 
   const RenderArray = () => {
-    const arrValue = Array.isArray(value) ? value : [];
+    const arrValue = Array.isArray(fieldValue) ? fieldValue : [];
     return (
       <>
         {arrValue?.map((val: Record<string, unknown>, index: number) => (
@@ -254,7 +256,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
             key={`EditorsHandler-${idx}`}
             interfaceItem={item}
             updateValue={handleUpdate}
-            value={value as Record<string, unknown>}
+            value={fieldValue as Record<string, unknown>}
             isInvalid={checkIsInvalid(item.key)}
           />
         ))}
@@ -271,11 +273,11 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   };
 
   useEffect(() => {
-    if (value) {
+    if (fieldValue) {
       validate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interfaceField, value]);
+  }, [interfaceField, fieldValue]);
 
   useEffect(() => {
     const { contentType, field } = sdk.ids;
@@ -309,6 +311,7 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     if (findInterface) {
       setInterfaceField(findInterface);
     }
+    fieldValueUpdate(sdk.field.getValue());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sdk]);
 
