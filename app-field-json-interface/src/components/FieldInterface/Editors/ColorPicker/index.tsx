@@ -1,6 +1,7 @@
-import { Stack } from "@contentful/f36-components";
+import { IconButton, Stack, TextInput } from "@contentful/f36-components";
 import { InterfaceItem } from "../../../FieldSettings/FieldSetup.types";
-import { useEffect, useState } from "react";
+import { CloseIcon } from "@contentful/f36-icons";
+import { useEffect, useRef, useState } from "react";
 
 type ColorPickerValue = { r: number; g: number; b: number };
 
@@ -15,6 +16,7 @@ const ColorPicker = ({
 }) => {
   const [colorHEX, setColorHEX] = useState<string>();
   const [options, setOptions] = useState<Array<string>>([]);
+  const inputElement = useRef<HTMLInputElement>(null);
   const hexToRgb = (hex: string): ColorPickerValue | null => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
@@ -30,14 +32,6 @@ const ColorPicker = ({
     return "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
   };
 
-  useEffect(() => {
-    if (typeof value === "string") {
-      setColorHEX(value);
-    } else if (typeof value === "object") {
-      setColorHEX(rgbToHex(value?.r, value?.g, value?.b));
-    }
-  }, [value]);
-
   const handleUpdateColor = (hexColor: string) => {
     if (definition?.output === "rgb") {
       handleUpdate(hexToRgb(hexColor));
@@ -45,6 +39,19 @@ const ColorPicker = ({
       handleUpdate(hexColor);
     }
   };
+
+  useEffect(() => {
+    if (!!!colorHEX) {
+      if (typeof value === "string" && value !== "") {
+        setColorHEX(value);
+      } else if (typeof value === "object") {
+        setColorHEX(rgbToHex(value?.r, value?.g, value?.b));
+      } else {
+        setColorHEX("");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   useEffect(() => {
     if (definition?.options && definition?.options?.length > 0) {
@@ -55,6 +62,10 @@ const ColorPicker = ({
     }
   }, [definition?.options]);
 
+  if (typeof colorHEX === "undefined") {
+    return <>...</>;
+  }
+
   return (
     <>
       <Stack>
@@ -63,32 +74,55 @@ const ColorPicker = ({
             return <option value={option}></option>;
           })}
         </datalist>
-        {options?.length > 0 ? (
-          <input
-            type="color"
+        <TextInput.Group style={{ width: "250px" }}>
+          {options?.length > 0 ? (
+            <TextInput
+              style={{ width: "100px" }}
+              type="color"
+              defaultValue={colorHEX}
+              id={`input-with-datalist-${definition.key}`}
+              list="color-picker-list"
+              ref={inputElement}
+              onBlur={(e) => {
+                const newColor = e?.currentTarget?.value;
+                setColorHEX(newColor);
+                handleUpdateColor(newColor);
+              }}
+            />
+          ) : (
+            <TextInput
+              style={{ width: "100px" }}
+              type="color"
+              defaultValue={colorHEX}
+              id={`input-${definition.key}`}
+              ref={inputElement}
+              onBlur={(e) => {
+                const newColor = e?.currentTarget?.value;
+                setColorHEX(newColor);
+                handleUpdateColor(newColor);
+              }}
+            />
+          )}
+          <TextInput
+            style={{ width: "100px" }}
+            type="text"
             value={colorHEX}
-            id={definition.key}
-            list="color-picker-list"
             onChange={(e) => {
-              const changeValue = e?.currentTarget?.value;
-              if (colorHEX !== changeValue) {
-                handleUpdateColor(e?.currentTarget?.value);
-              }
+              const newColor = e?.currentTarget?.value;
+              setColorHEX(newColor);
+              handleUpdateColor(newColor);
             }}
           />
-        ) : (
-          <input
-            type="color"
-            value={colorHEX}
-            id={definition.key}
-            onChange={(e) => {
-              const changeValue = e?.currentTarget?.value;
-              if (colorHEX !== changeValue) {
-                handleUpdateColor(e?.currentTarget?.value);
-              }
+          <IconButton
+            variant="secondary"
+            icon={<CloseIcon />}
+            onClick={() => {
+              setColorHEX("");
+              handleUpdate("");
             }}
+            aria-label="Reset"
           />
-        )}
+        </TextInput.Group>
       </Stack>
     </>
   );
