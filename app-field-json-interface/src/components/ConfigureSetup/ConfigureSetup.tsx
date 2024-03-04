@@ -25,7 +25,7 @@ import { updateEditor } from "../../util";
 
 export interface ConfigureSetupProps {
   sdk: ConfigAppSDK;
-  parameters: AppInstallationParameters;
+  parameters: { contentType: string; fieldId: string };
   setParameters: Function;
 }
 

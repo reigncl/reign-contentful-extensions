@@ -18,6 +18,8 @@ import {
 import { CheckCircleIcon, CycleIcon } from "@contentful/f36-icons";
 import { useState } from "react";
 import { ErrorItem, SetupImportProps } from "./SetupImport.types";
+import { ContentTypeInfo } from "../../../locations/ConfigScreen";
+import { ContentFields, KeyValueMap } from "contentful-management";
 
 const SetupImport = ({
   sdk,
@@ -25,7 +27,6 @@ const SetupImport = ({
   configurations,
   contentTypes,
 }: SetupImportProps) => {
-
   const [settings, setSettings] = useState<FieldSetup | undefined>(undefined);
   const [validSettings, setValidSettings] = useState<boolean>(false);
 
@@ -135,14 +136,21 @@ const SetupImport = ({
                           `Missing required props (contentType, fieldId, interfaceId)`
                         );
                       }
-                      const findContentType = contentTypes[value.contentType];
+                      const findContentType = contentTypes?.find(
+                        (ct: ContentTypeInfo) => ct.id === value.contentType
+                      );
                       if (!!!findContentType) {
                         validConfigurations = false;
                         errorsMessages.push(
                           `Content type "${value.contentType}" not exists`
                         );
-                      }
-                      if (!!!findContentType?.fields.includes(value.fieldId)) {
+                      } //
+                      if (
+                        !!!findContentType?.fields?.find(
+                          (field: ContentFields<KeyValueMap>) =>
+                            field.id === value.fieldId
+                        )
+                      ) {
                         validConfigurations = false;
                         errorsMessages.push(`Field id "${
                           value.fieldId
