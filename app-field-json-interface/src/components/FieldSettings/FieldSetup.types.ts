@@ -17,6 +17,13 @@ export interface InterfaceItem {
   helpText?: string;
   errorMessage?: string;
   required?: boolean;
+  /**
+   * Optional 1-based "row group" used by the field renderer to put multiple
+   * items side-by-side. Items sharing the same `row` render together; missing
+   * or non-finite values fall into a trailing group. Numbers are opaque ids,
+   * not display order: `1, 1, 5, 5` and `1, 1, 2, 2` render identically.
+   */
+  row?: number;
 }
 
 export interface Interface {

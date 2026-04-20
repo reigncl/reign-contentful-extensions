@@ -10,18 +10,32 @@ import EditorsHandler from "./Editors";
 import {
   Flex,
   Button,
-  Grid,
-  IconButton,
   Accordion,
   HelpText,
   FormControl,
 } from "@contentful/f36-components";
 import tokens from "@contentful/f36-tokens";
 import { FieldInterfaceValue } from "./FieldInterface.types";
-import { DeleteIcon } from "@contentful/f36-icons";
 import { ValidateEntryValueOutput, validateEntryValue } from "../../util";
-import CustomBadge from "../CustomBadge/CustomBadge";
 import { FieldValueContext } from "../../context/FieldValueContex";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import SortableEntry from "./SortableEntry/SortableEntry";
+import { useEntryIds } from "./SortableEntry/useEntryIds";
+import { groupItemsByRow } from "./groupItemsByRow";
 
 export interface FieldSetupProps {
   sdk: FieldAppSDK;
@@ -29,9 +43,6 @@ export interface FieldSetupProps {
 
 const FieldInterface = ({ sdk }: FieldSetupProps) => {
   const { fieldValue, fieldValueUpdate } = useContext(FieldValueContext);
-  /*const [value, setValue] = useState<FieldInterfaceValue>(
-    (sdk.field.getValue() as Record<string, unknown>) ?? {}
-  );*/
   const [interfaceField, setInterfaceField] = useState<Interface | undefined>(
     undefined
   );
@@ -47,7 +58,6 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   );
 
   const handleUpdate = async (valueUpdate: FieldInterfaceValue) => {
-    // await sdk.field.setValue(valueUpdate);
     validate(valueUpdate);
     fieldValueUpdate(valueUpdate);
     setInterfaceField({ ...(interfaceField as Interface) });
@@ -130,65 +140,87 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
     return false;
   };
 
+  const arrValue: Array<Record<string, unknown>> = Array.isArray(fieldValue)
+    ? (fieldValue as Array<Record<string, unknown>>)
+    : [];
+  const entryIds = useEntryIds(arrValue.length);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 4 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      return;
+    }
+    const oldIndex = entryIds.ids.indexOf(String(active.id));
+    const newIndex = entryIds.ids.indexOf(String(over.id));
+    if (oldIndex === -1 || newIndex === -1) {
+      return;
+    }
+    entryIds.move(oldIndex, newIndex);
+    const reordered = arrayMove(arrValue, oldIndex, newIndex);
+    handleUpdate(reordered);
+  };
+
   const RenderArray = () => {
-    const arrValue = Array.isArray(fieldValue) ? fieldValue : [];
     return (
       <>
-        {arrValue?.map((val: Record<string, unknown>, index: number) => (
-          <Grid
-            key={`grid-${index}`}
-            style={{
-              width: "100%",
-              borderBottom: "1px solid rgb(207, 217, 224)",
-              paddingTop: tokens.spacingS,
-            }}
-            columns="0.8fr 6fr 0.3fr"
-            rowGap="spacingM"
-            columnGap="spacingM"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={entryIds.ids}
+            strategy={verticalListSortingStrategy}
           >
-            <Grid.Item>
-              <CustomBadge>{index + 1}</CustomBadge>
-            </Grid.Item>
-            <Grid.Item>
-              {interfaceField?.items?.map(
-                (item: InterfaceItem, idx: number) => (
-                  <EditorsHandler
-                    key={`EditorsHandler-${idx}`}
-                    interfaceItem={item}
-                    updateValue={(update: Record<string, unknown>) => {
-                      arrValue[index] = update;
-                      handleUpdate(arrValue);
-                    }}
-                    value={val as Record<string, unknown>}
-                    isInvalid={checkIsInvalid(item.key, true, index)}
-                  />
-                )
-              )}
-            </Grid.Item>
-            <Grid.Item>
-              <IconButton
-                variant="transparent"
-                aria-label="Remove Item"
-                icon={<DeleteIcon />}
-                onClick={async () => {
-                  const response = await sdk.dialogs.openConfirm({
-                    title: "Remove Item",
-                    message: "Are you sure you want to delete this item?",
-                  });
-                  if (response) {
-                    arrValue.splice(index, 1);
-                    handleUpdate(arrValue);
+            {arrValue.map(
+              (val: Record<string, unknown>, index: number) => (
+                <SortableEntry
+                  key={entryIds.ids[index]}
+                  id={entryIds.ids[index]}
+                  index={index}
+                  total={arrValue.length}
+                  value={val}
+                  items={interfaceField?.items ?? []}
+                  defaultCollapsed={
+                    arrValue.length > 2 && index > 0
                   }
-                }}
-              />
-            </Grid.Item>
-          </Grid>
-        ))}
+                  onChange={(updated) => {
+                    const next = arrValue.slice();
+                    next[index] = updated;
+                    handleUpdate(next);
+                  }}
+                  onDelete={async () => {
+                    const response = await sdk.dialogs.openConfirm({
+                      title: "Remove Item",
+                      message: "Are you sure you want to delete this item?",
+                    });
+                    if (response) {
+                      const next = arrValue.slice();
+                      next.splice(index, 1);
+                      entryIds.remove(index);
+                      handleUpdate(next);
+                    }
+                  }}
+                  checkIsInvalid={(key) => checkIsInvalid(key, true, index)}
+                />
+              )
+            )}
+          </SortableContext>
+        </DndContext>
         <Flex padding="spacingS" justifyContent="right">
           <Button
             onClick={async () => {
-              arrValue.push({});
-              handleUpdate(arrValue);
+              entryIds.append();
+              handleUpdate([...arrValue, {}]);
             }}
             variant="primary"
             size="small"
@@ -249,17 +281,49 @@ const FieldInterface = ({ sdk }: FieldSetupProps) => {
   };
 
   const RenderDefault = () => {
+    const rows = groupItemsByRow(interfaceField?.items ?? []);
     return (
       <>
-        {interfaceField?.items?.map((item: InterfaceItem, idx: number) => (
-          <EditorsHandler
-            key={`EditorsHandler-${idx}`}
-            interfaceItem={item}
-            updateValue={handleUpdate}
-            value={fieldValue as Record<string, unknown>}
-            isInvalid={checkIsInvalid(item.key)}
-          />
-        ))}
+        {rows.map((row) => {
+          if (row.items.length === 1) {
+            const item = row.items[0];
+            return (
+              <div
+                key={row.rowKey}
+                style={{ marginBottom: tokens.spacingS }}
+              >
+                <EditorsHandler
+                  interfaceItem={item}
+                  updateValue={handleUpdate}
+                  value={fieldValue as Record<string, unknown>}
+                  isInvalid={checkIsInvalid(item.key)}
+                />
+              </div>
+            );
+          }
+          return (
+            <div
+              key={row.rowKey}
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${row.items.length}, minmax(0, 1fr))`,
+                columnGap: tokens.spacingM,
+                rowGap: tokens.spacingS,
+                marginBottom: tokens.spacingS,
+              }}
+            >
+              {row.items.map((item: InterfaceItem) => (
+                <EditorsHandler
+                  key={item.key}
+                  interfaceItem={item}
+                  updateValue={handleUpdate}
+                  value={fieldValue as Record<string, unknown>}
+                  isInvalid={checkIsInvalid(item.key)}
+                />
+              ))}
+            </div>
+          );
+        })}
       </>
     );
   };

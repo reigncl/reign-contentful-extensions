@@ -84,11 +84,13 @@ const EditorsHandler = ({
 
   return (
     <FormControl isInvalid={isInvalid}>
-      <FormControl.Label /*isRequired={interfaceItem?.required === true}*/>
+      <FormControl.Label htmlFor={interfaceItem?.key}>
         {interfaceItem?.label}
       </FormControl.Label>
       <RenderEditor type={interfaceItem?.type} />
-      <FormControl.HelpText>{interfaceItem?.helpText}</FormControl.HelpText>
+      {interfaceItem?.helpText && (
+        <FormControl.HelpText>{interfaceItem?.helpText}</FormControl.HelpText>
+      )}
       {isInvalid && interfaceItem?.errorMessage && (
         <FormControl.ValidationMessage>
           {interfaceItem?.errorMessage}

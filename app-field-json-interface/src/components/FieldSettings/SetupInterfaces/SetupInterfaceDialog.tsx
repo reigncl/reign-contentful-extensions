@@ -14,6 +14,7 @@ import {
   IconButton,
   HelpText,
   Note,
+  Grid,
 } from "@contentful/f36-components";
 import { Interface, InterfaceItem } from "../FieldSetup.types";
 import tokens from "@contentful/f36-tokens";
@@ -68,6 +69,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         regex: item?.regex,
         helpText: item?.helpText,
         output: item?.output,
+        row: item?.row,
       };
       setItems(arrItems);
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,6 +82,32 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
 
     return (
       <Table.Row>
+        <Table.Cell style={{ width: "64px", verticalAlign: "top" }}>
+          <HelpText style={StyleHelpText}>Row #:</HelpText>
+          <TextInput
+            size="small"
+            type="number"
+            min={1}
+            value={
+              typeof item?.row === "number" && Number.isFinite(item.row)
+                ? String(item.row)
+                : ""
+            }
+            onChange={(e) => {
+              const raw = e?.currentTarget.value;
+              if (raw === "") {
+                setItem({ ...item, row: undefined });
+                return;
+              }
+              const parsed = Number(raw);
+              setItem({
+                ...item,
+                row: Number.isFinite(parsed) ? parsed : undefined,
+              });
+            }}
+            style={{ width: "56px", textAlign: "center" }}
+          />
+        </Table.Cell>
         <Table.Cell>
           <HelpText style={StyleHelpText}>Enter the key/id:</HelpText>
           <TextInput
@@ -305,6 +333,7 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         <Table>
           <Table.Head>
             <Table.Row>
+              <Table.Cell style={{ width: "64px" }}>Row</Table.Cell>
               <Table.Cell>Key</Table.Cell>
               <Table.Cell>Label</Table.Cell>
               <Table.Cell>Type</Table.Cell>
@@ -335,61 +364,81 @@ const SetupInterfaceDialog = ({ sdk }: SetupInterfaceDialogProps) => {
         <Box
           style={{
             borderBottom: "1px solid rgb(207, 217, 224)",
-            maxWidth: "600px",
           }}
           marginBottom="spacingM"
+          paddingBottom="spacingM"
         >
           <Subheading>Interface setup</Subheading>
-          <FormControl>
-            <FormControl.Label isRequired>Name</FormControl.Label>
-            <TextInput
-              value={name}
-              onChange={(e) => {
-                setName(e?.currentTarget?.value);
-              }}
-            />
-            <FormControl.HelpText>
-              Please enter a name to indentify the interface
-            </FormControl.HelpText>
-          </FormControl>
-          <FormControl>
-            <FormControl.Label isRequired>Single or Multiple</FormControl.Label>
-            <Select
-              value={isArray?.toString()}
-              id="optionSelect-isArray"
-              name="optionSelect-isArray"
-              onChange={(e) => {
-                setIsArray(e?.currentTarget?.value === "true" ? true : false);
-              }}
-            >
-              <Select.Option value={"false"}>Single</Select.Option>
-              <Select.Option value={"true"}>Multiple</Select.Option>
-            </Select>
-            <FormControl.HelpText>
-              Select multiple if you need an array of objects.
-            </FormControl.HelpText>
-          </FormControl>
-          <FormControl>
-            <FormControl.Label isRequired>Collapse content</FormControl.Label>
-            <Select
-              value={isCollapsed?.toString()}
-              id="optionSelect-isCollapsed"
-              name="optionSelect-isCollapsed"
-              onChange={(e) => {
-                setIsCollapsed(
-                  e?.currentTarget?.value === "true" ? true : false
-                );
-              }}
-            >
-              <Select.Option value={"false"}>
-                Keep UI Interface by default
-              </Select.Option>
-              <Select.Option value={"true"}>Set up a collapsible</Select.Option>
-            </Select>
-            <FormControl.HelpText>
-              Set up a collapsible as a wrapper for you UI Interface.
-            </FormControl.HelpText>
-          </FormControl>
+          <Grid
+            columns="repeat(3, minmax(0, 1fr))"
+            columnGap="spacingM"
+            rowGap="spacingS"
+          >
+            <Grid.Item>
+              <FormControl>
+                <FormControl.Label isRequired>Name</FormControl.Label>
+                <TextInput
+                  value={name}
+                  onChange={(e) => {
+                    setName(e?.currentTarget?.value);
+                  }}
+                />
+                <FormControl.HelpText>
+                  Please enter a name to indentify the interface
+                </FormControl.HelpText>
+              </FormControl>
+            </Grid.Item>
+            <Grid.Item>
+              <FormControl>
+                <FormControl.Label isRequired>
+                  Single or Multiple
+                </FormControl.Label>
+                <Select
+                  value={isArray?.toString()}
+                  id="optionSelect-isArray"
+                  name="optionSelect-isArray"
+                  onChange={(e) => {
+                    setIsArray(
+                      e?.currentTarget?.value === "true" ? true : false
+                    );
+                  }}
+                >
+                  <Select.Option value={"false"}>Single</Select.Option>
+                  <Select.Option value={"true"}>Multiple</Select.Option>
+                </Select>
+                <FormControl.HelpText>
+                  Select multiple if you need an array of objects.
+                </FormControl.HelpText>
+              </FormControl>
+            </Grid.Item>
+            <Grid.Item>
+              <FormControl>
+                <FormControl.Label isRequired>
+                  Collapse content
+                </FormControl.Label>
+                <Select
+                  value={isCollapsed?.toString()}
+                  id="optionSelect-isCollapsed"
+                  name="optionSelect-isCollapsed"
+                  onChange={(e) => {
+                    setIsCollapsed(
+                      e?.currentTarget?.value === "true" ? true : false
+                    );
+                  }}
+                >
+                  <Select.Option value={"false"}>
+                    Keep UI Interface by default
+                  </Select.Option>
+                  <Select.Option value={"true"}>
+                    Set up a collapsible
+                  </Select.Option>
+                </Select>
+                <FormControl.HelpText>
+                  Set up a collapsible as a wrapper for you UI Interface.
+                </FormControl.HelpText>
+              </FormControl>
+            </Grid.Item>
+          </Grid>
         </Box>
 
         <Box

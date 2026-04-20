@@ -13,13 +13,20 @@ import { DeleteIcon, EditIcon } from "@contentful/f36-icons";
 import { nanoid } from "nanoid";
 import CustomBadge from "../../CustomBadge/CustomBadge";
 
+const computeDialogMinHeight = (): number => {
+  if (typeof window === "undefined") {
+    return 800;
+  }
+  return Math.max(600, Math.floor(window.innerHeight * 0.9));
+};
+
 const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
   const addInterface = async () => {
     try {
       const response = (await sdk.dialogs.openCurrentApp({
         title: "Add Interface",
         width: "fullWidth",
-        minHeight: 600,
+        minHeight: computeDialogMinHeight(),
         parameters: {
           type: "interface",
         },
@@ -86,7 +93,7 @@ const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
                       const response = (await sdk.dialogs.openCurrentApp({
                         title: "Edit Interface",
                         width: "fullWidth",
-                        minHeight: 600,
+                        minHeight: computeDialogMinHeight(),
                         parameters: { ...item, type: "interface", index },
                       })) as Interface & {
                         index?: number;
