@@ -6,6 +6,8 @@ This repo stores generic contentful extensions and apps.
 
 * **app-custom-map-asset-string**: Allows to build string-asset pairs in a JSON object.
 
+* **app-field-icon-picker**: Icon picker field. Bundled with Phosphor Icons; pluggable for other sets.
+
 * **app-field-reference-multisite**: Allows to define entries for specific sites based on a Short Text List field.
 
 * **app-ml-form-field-editor**: Custom form field editor. Supports validations, services customization, multiple select options, among others.
