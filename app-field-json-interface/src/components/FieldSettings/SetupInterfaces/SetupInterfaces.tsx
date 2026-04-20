@@ -15,9 +15,9 @@ import CustomBadge from "../../CustomBadge/CustomBadge";
 
 const computeDialogMinHeight = (): number => {
   if (typeof window === "undefined") {
-    return 800;
+    return 700;
   }
-  return Math.max(600, Math.floor(window.innerHeight * 0.9));
+  return Math.max(600, Math.min(900, Math.floor(window.innerHeight * 0.75)));
 };
 
 const SetupInterfaces = ({ sdk, items, onUpdate }: SetupInterfacesProps) => {
