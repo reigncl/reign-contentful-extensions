@@ -1,11 +1,13 @@
+import { vi } from 'vitest';
+
 const mockCma: any = {
   contentType: {
-    getMany: jest.fn().mockResolvedValue({ items: [] }),
-    get: jest.fn().mockResolvedValue({ fields: [] }),
+    getMany: vi.fn().mockResolvedValue({ items: [] }),
+    get: vi.fn().mockResolvedValue({ fields: [] }),
   },
   editorInterface: {
-    get: jest.fn().mockResolvedValue({ controls: [] }),
-    update: jest.fn().mockResolvedValue({}),
+    get: vi.fn().mockResolvedValue({ controls: [] }),
+    update: vi.fn().mockResolvedValue({}),
   },
 };
 

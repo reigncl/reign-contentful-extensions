@@ -1,9 +1,11 @@
+import { vi } from 'vitest';
+
 const mockSdk: any = {
   app: {
-    onConfigure: jest.fn(),
-    getParameters: jest.fn().mockReturnValueOnce({}),
-    setReady: jest.fn(),
-    getCurrentState: jest.fn(),
+    onConfigure: vi.fn(),
+    getParameters: vi.fn().mockReturnValueOnce({}),
+    setReady: vi.fn(),
+    getCurrentState: vi.fn(),
   },
   ids: {
     app: 'test-app',
@@ -16,19 +18,19 @@ const mockSdk: any = {
   },
   field: {
     id: 'test-field',
-    getValue: jest.fn().mockReturnValue(undefined),
-    setValue: jest.fn(),
-    removeValue: jest.fn(),
-    onValueChanged: jest.fn().mockReturnValue(() => {}),
+    getValue: vi.fn().mockReturnValue(undefined),
+    setValue: vi.fn(),
+    removeValue: vi.fn(),
+    onValueChanged: vi.fn().mockReturnValue(() => {}),
   },
   window: {
-    startAutoResizer: jest.fn(),
+    startAutoResizer: vi.fn(),
   },
   dialogs: {
-    openCurrentApp: jest.fn(),
-    openConfirm: jest.fn(),
+    openCurrentApp: vi.fn(),
+    openConfirm: vi.fn(),
   },
-  close: jest.fn(),
+  close: vi.fn(),
 };
 
 export { mockSdk };

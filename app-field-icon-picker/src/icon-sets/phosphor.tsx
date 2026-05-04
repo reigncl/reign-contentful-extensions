@@ -1,18 +1,28 @@
-import React, { ComponentType } from 'react';
+import React from 'react';
+import { css } from 'emotion';
 import { icons as phosphorIcons } from '@phosphor-icons/core';
-import * as PhosphorReact from '@phosphor-icons/react';
 
 import { IconEntry, IconRenderOptions, IconSetProvider } from './types';
 
-type PhosphorIconComponent = ComponentType<{
-  size?: number | string;
-  color?: string;
-  weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
-}>;
+/** All regular-weight SVGs as strings — avoids @phosphor-icons/react (entire icon tree) so the app bundle fits Contentful upload limits. */
+const svgModules = import.meta.glob<string>('../../node_modules/@phosphor-icons/core/assets/regular/*.svg', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
 
-type PhosphorReactExports = Record<string, PhosphorIconComponent | unknown>;
+const kebabFromModulePath = (path: string): string => {
+  const file = path.split('/').pop() ?? '';
+  return file.replace(/\.svg$/i, '');
+};
 
-const componentByName = PhosphorReact as unknown as PhosphorReactExports;
+const svgByKebabName: Map<string, string> = (() => {
+  const map = new Map<string, string>();
+  for (const [path, svg] of Object.entries(svgModules)) {
+    map.set(kebabFromModulePath(path), svg);
+  }
+  return map;
+})();
 
 const toLabel = (kebabName: string): string =>
   kebabName
@@ -28,17 +38,26 @@ interface PhosphorMeta {
   categories?: ReadonlyArray<string>;
 }
 
+const pascalToKebab: Map<string, string> = (() => {
+  const map = new Map<string, string>();
+  for (const rawMeta of phosphorIcons) {
+    const meta = rawMeta as unknown as PhosphorMeta;
+    if (svgByKebabName.has(meta.name)) {
+      map.set(meta.pascal_name, meta.name);
+    }
+  }
+  return map;
+})();
+
 const buildEntries = (): IconEntry[] => {
   const entries: IconEntry[] = [];
   for (const rawMeta of phosphorIcons) {
     const meta = rawMeta as unknown as PhosphorMeta;
-    const pascalName = meta.pascal_name;
-    if (!componentByName[pascalName]) {
-      continue;
-    }
+    if (!svgByKebabName.has(meta.name)) continue;
+
     const aliasLabel = meta.alias?.name ? toLabel(meta.alias.name) : undefined;
     entries.push({
-      name: pascalName,
+      name: meta.pascal_name,
       label: toLabel(meta.name),
       keywords: [
         meta.name,
@@ -56,6 +75,20 @@ const buildEntries = (): IconEntry[] => {
 
 let cachedEntries: IconEntry[] | null = null;
 
+const inlineSvgWrapClass = (size: number) =>
+  css({
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: `${size}px`,
+    height: `${size}px`,
+    lineHeight: 0,
+    '& svg': {
+      width: '100%',
+      height: '100%',
+    },
+  });
+
 export const phosphorProvider: IconSetProvider = {
   id: 'phosphor',
   label: 'Phosphor Icons',
@@ -66,8 +99,11 @@ export const phosphorProvider: IconSetProvider = {
     return cachedEntries;
   },
   render(name: string, opts?: IconRenderOptions): React.ReactNode {
-    const Component = componentByName[name] as PhosphorIconComponent | undefined;
-    if (!Component) return null;
-    return <Component size={opts?.size ?? 24} weight="regular" />;
+    const kebab = pascalToKebab.get(name);
+    if (!kebab) return null;
+    const svg = svgByKebabName.get(kebab);
+    if (!svg) return null;
+    const size = opts?.size ?? 24;
+    return <span className={inlineSvgWrapClass(size)} dangerouslySetInnerHTML={{ __html: svg }} aria-hidden />;
   },
 };

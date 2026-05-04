@@ -1,85 +1,48 @@
 # app-field-icon-picker
 
-Contentful field app that renders an icon picker on a JSON Object field. Ships with [Phosphor Icons](https://phosphoricons.com/) bundled at build time, but the icon-set layer is decoupled so other libraries can be added by registering a provider — no API calls, no rate limits, no runtime cache.
+Contentful field app: an icon picker for **JSON Object** fields. Bundled with [Phosphor Icons](https://phosphoricons.com/) at build time and pluggable for other icon sets.
 
-## How it looks
+## Field setup
 
-A single field with three pieces:
-
-- **Preview tile** (left, non-clickable) — renders the currently selected icon.
-- **Text input** — type to filter; shows the icon name once one is picked.
-- **Grid dropdown** — 4-column grid of icons + names, opens on focus or typing. Shows `No results found` when the filter has zero matches.
-
-## Stored value
-
-The field must be of type **JSON Object**. The value persisted is:
+The Contentful field this app is wired to **must be of type JSON Object**. The app stores the selected icon as the following JSON shape:
 
 ```json
 { "set": "phosphor", "name": "ArrowDown" }
 ```
 
-`set` is the icon-set provider id and `name` is the canonical icon id (PascalCase for Phosphor). Frontend consumers reading the field can either look the icon up in their own bundle or directly via `@phosphor-icons/react`:
+- `set` — icon-set provider id (e.g. `"phosphor"`).
+- `name` — canonical icon id within that set (PascalCase for Phosphor, e.g. `"ArrowDown"`).
+
+This app renders icons from **`@phosphor-icons/core` regular SVGs** (not `@phosphor-icons/react`) so the upload stays within Contentful’s bundle size limits.
+
+On your **website** you can still use React components, for example:
 
 ```tsx
-import * as PhosphorReact from '@phosphor-icons/react';
-
+import * as PhosphorReact from "@phosphor-icons/react";
 const Icon = (PhosphorReact as Record<string, any>)[value.name];
-return Icon ? <Icon size={20} /> : null;
 ```
 
-## Configuring the app
+## Configure
 
-1. Install the app on the space.
-2. On the **App config** screen, click **Add config** and pick:
-   - the **content type**,
-   - a **JSON Object** field on it,
-   - the **icon set** (Phosphor by default).
-3. Saving the config wires the app to the field automatically (the editor interface widget is updated to point to this app).
+On the **App config** screen click **Add config** and pick a content type, a JSON Object field, and the icon set. Saving wires the app to the field automatically.
 
-You can edit / delete each mapping later from the same screen.
+## Add another icon set
 
-## Adding a new icon set (decoupling contract)
-
-Each icon set implements the `IconSetProvider` interface in [`src/icon-sets/types.ts`](src/icon-sets/types.ts):
+Implement [`IconSetProvider`](src/icon-sets/types.ts) in a new file under [`src/icon-sets/`](src/icon-sets/) and register it in [`src/icon-sets/index.ts`](src/icon-sets/index.ts):
 
 ```ts
-export interface IconEntry {
-  name: string;        // canonical id stored in the field value
-  label: string;       // human readable label for filtering and display
-  keywords: string[];  // lowercase tags used by the search filter
-}
-
-export interface IconSetProvider {
-  id: string;                                       // value persisted as `set`
-  label: string;                                    // shown in the ConfigScreen Select
-  list(): IconEntry[];                              // sync (bundled at build time)
-  render(name: string, opts?: { size?: number }):   // returns a React node
-    React.ReactNode;
-}
+import { registerIconSet } from "./registry";
+import { mySetProvider } from "./my-set";
+registerIconSet(mySetProvider);
 ```
 
-To add a new set:
+The new set shows up in the ConfigScreen select; existing values stay valid because each one carries its own `set` id.
 
-1. Create `src/icon-sets/<my-set>.tsx` exporting a provider that conforms to `IconSetProvider`.
-2. Register it in `src/icon-sets/index.ts`:
+## Scripts
 
-   ```ts
-   import { registerIconSet } from './registry';
-   import { mySetProvider } from './my-set';
+Tooling is **Vite** + **Vitest** (no Create React App).
 
-   registerIconSet(mySetProvider);
-   ```
-
-3. Rebuild and redeploy. The new set will appear in the **Icon set** select on the ConfigScreen and existing values stay valid because every value carries its own `set` id.
-
-## Available scripts
-
-- `npm start` — dev mode.
-- `npm run build` — production build to `./build`.
-- `npm run upload` — interactive bundle upload.
-- `npm run upload-ci` — CI bundle upload (requires `CONTENTFUL_ORG_ID`, `CONTENTFUL_APP_DEF_ID`, `CONTENTFUL_ACCESS_TOKEN`).
-- `npm test` — run unit tests.
-
-## Updating bundled icons
-
-Icons ship inside the bundle via `@phosphor-icons/core` (metadata) and `@phosphor-icons/react` (components). To pick up new icons, bump those packages and redeploy — there is no runtime fetch or cache to invalidate.
+- `npm start` — dev server (port 3000).
+- `npm run build` — TypeScript check + production bundle to `./build` (for `upload`).
+- `npm run upload` / `upload-ci` — upload bundle to Contentful.
+- `npm test` — unit tests (`vitest run`). Use `npm run test:watch` during development.

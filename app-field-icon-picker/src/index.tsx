@@ -10,7 +10,7 @@ import './icon-sets';
 
 const root = document.getElementById('root');
 
-if (process.env.NODE_ENV === 'development' && window.self === window.top) {
+if (import.meta.env.DEV && window.self === window.top) {
   // You can remove this if block before deploying your app
   render(<LocalhostWarning />, root);
 } else {
