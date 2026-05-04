@@ -1,0 +1,44 @@
+{
+  "name": "app-field-icon-picker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@contentful/app-sdk": "4.13.0",
+    "@contentful/f36-components": "4.21.5",
+    "@contentful/f36-tokens": "4.0.1",
+    "@contentful/react-apps-toolkit": "1.2.8",
+    "@phosphor-icons/core": "2.1.1",
+    "contentful-management": "10.19.4",
+    "emotion": "10.0.27",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "create-app-definition": "contentful-app-scripts create-app-definition",
+    "upload": "contentful-app-scripts upload --bundle-dir ./build",
+    "upload-ci": "contentful-app-scripts upload --ci --bundle-dir ./build  --organization-id $CONTENTFUL_ORG_ID --definition-id $CONTENTFUL_APP_DEF_ID --token $CONTENTFUL_ACCESS_TOKEN"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+  },
+  "devDependencies": {
+    "@contentful/app-scripts": "1.1.36",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "12.1.5",
+    "@types/node": "18.19.64",
+    "@types/react": "18.0.9",
+    "@types/react-dom": "18.0.3",
+    "@vitejs/plugin-react": "4.3.4",
+    "happy-dom": "15.11.7",
+    "typescript": "5.7.2",
+    "vite": "6.0.7",
+    "vitest": "2.1.8"
+  },
+  "homepage": "."
+}
