@@ -18,6 +18,7 @@ const mockSdk: any = {
   },
   field: {
     id: 'test-field',
+    type: 'Object',
     getValue: vi.fn().mockReturnValue(undefined),
     setValue: vi.fn(),
     removeValue: vi.fn(),

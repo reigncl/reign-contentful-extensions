@@ -6,14 +6,24 @@ import tokens from '@contentful/f36-tokens';
 import { IconEntry, IconSetProvider, IconValue } from '../icon-sets';
 import IconGrid from './IconGrid';
 
-export interface IconPickerProps {
+type CommonIconPickerProps = {
   provider: IconSetProvider;
-  value: IconValue | null;
-  onChange: (value: IconValue) => void;
   onClear?: () => void;
   placeholder?: string;
   maxResults?: number;
-}
+};
+
+export type IconPickerProps =
+  | (CommonIconPickerProps & {
+      variant?: 'iconValue';
+      value: IconValue | null;
+      onChange: (value: IconValue) => void;
+    })
+  | (CommonIconPickerProps & {
+      variant: 'plainName';
+      value: string | null;
+      onChange: (value: string) => void;
+    });
 
 const wrapperClass = css({
   width: '100%',
@@ -66,13 +76,14 @@ const matches = (entry: IconEntry, normalizedQuery: string): boolean => {
   return false;
 };
 
-const IconPicker: React.FC<IconPickerProps> = ({
-  provider,
-  value,
-  onChange,
-  placeholder = 'Search icons',
-  maxResults = 200,
-}) => {
+const IconPicker: React.FC<IconPickerProps> = (props) => {
+  const {
+    provider,
+    placeholder = 'Search icons',
+    maxResults = 200,
+  } = props;
+  const plainName = props.variant === 'plainName';
+
   const allEntries = useMemo(() => provider.list(), [provider]);
   const entriesByName = useMemo(() => {
     const map = new Map<string, IconEntry>();
@@ -80,7 +91,14 @@ const IconPicker: React.FC<IconPickerProps> = ({
     return map;
   }, [allEntries]);
 
-  const selectedEntry = value && value.set === provider.id ? entriesByName.get(value.name) : undefined;
+  const selectedEntry = useMemo(() => {
+    if (plainName) {
+      const name = props.value;
+      return name ? entriesByName.get(name) : undefined;
+    }
+    const v = props.value;
+    return v && v.set === provider.id ? entriesByName.get(v.name) : undefined;
+  }, [plainName, props, provider.id, entriesByName]);
 
   const [open, setOpen] = useState(false);
   const [rawQuery, setRawQuery] = useState<string>('');
@@ -120,7 +138,11 @@ const IconPicker: React.FC<IconPickerProps> = ({
   }, [allEntries, debouncedQuery, maxResults]);
 
   const handleSelect = (name: string) => {
-    onChange({ set: provider.id, name });
+    if (plainName) {
+      props.onChange(name);
+    } else {
+      props.onChange({ set: provider.id, name });
+    }
     setOpen(false);
   };
 

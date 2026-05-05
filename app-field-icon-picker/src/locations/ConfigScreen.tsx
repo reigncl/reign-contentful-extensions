@@ -15,17 +15,10 @@ import { Control } from 'contentful-management';
 
 import { DialogTypes } from './Dialog';
 import { listIconSets } from '../icon-sets';
+import type { AppInstallationParameters, ConfigJsonStructureItem } from '../types/installConfig';
+import { defaultBuiltinWidgetId } from '../util/fieldConfig';
 
-export interface ConfigJsonStructureItem {
-  contentType: string;
-  field: string;
-  iconSet: string;
-  index?: number;
-}
-
-export interface AppInstallationParameters {
-  items?: Array<ConfigJsonStructureItem>;
-}
+export type { ConfigJsonStructureItem, AppInstallationParameters } from '../types/installConfig';
 
 const ConfigScreen = () => {
   const sdk = useSDK<AppExtensionSDK>();
@@ -81,11 +74,17 @@ const ConfigScreen = () => {
     return listIconSets().find((set) => set.id === id)?.label ?? id;
   };
 
+  const extraFieldsSummary = (item: ConfigJsonStructureItem): string => {
+    const ef = item.extraFields;
+    if (!ef?.length) return '—';
+    return ef.map((e) => e.id).join(', ');
+  };
+
   const TableWithItems = () => {
     if (!parameters.items || parameters.items.length === 0) {
       return (
         <Paragraph>
-          No mappings yet. Click <em>Add config</em> to wire this app to a JSON Object field.
+          No mappings yet. Click <em>Add config</em> to wire this app to a field.
         </Paragraph>
       );
     }
@@ -96,6 +95,7 @@ const ConfigScreen = () => {
             <Table.Cell>Content type</Table.Cell>
             <Table.Cell>Field</Table.Cell>
             <Table.Cell>Icon set</Table.Cell>
+            <Table.Cell>Extra fields</Table.Cell>
             <Table.Cell>Actions</Table.Cell>
           </Table.Row>
         </Table.Head>
@@ -105,6 +105,7 @@ const ConfigScreen = () => {
               <Table.Cell>{item?.contentType}</Table.Cell>
               <Table.Cell>{item?.field}</Table.Cell>
               <Table.Cell>{iconSetLabel(item?.iconSet)}</Table.Cell>
+              <Table.Cell>{extraFieldsSummary(item)}</Table.Cell>
               <Table.Cell>
                 <TextLink
                   as="button"
@@ -136,11 +137,13 @@ const ConfigScreen = () => {
     try {
       const result: ConfigJsonStructureItem = await sdk.dialogs.openCurrentApp({
         title: type === DialogTypes.ADD ? 'Add new configuration' : 'Edit configuration',
-        minHeight: 420,
+        minHeight: 520,
         parameters: {
           contentType: item?.contentType,
           field: item?.field,
           iconSet: item?.iconSet,
+          fieldType: item?.fieldType,
+          extraFields: item?.extraFields,
           index,
         } as unknown as SerializedJSONValue,
       });
@@ -155,7 +158,12 @@ const ConfigScreen = () => {
           previousVersion.contentType !== result.contentType ||
           previousVersion.field !== result.field
         ) {
-          await updateEditor(previousVersion.contentType, previousVersion.field, 'objectEditor');
+          await updateEditor(
+            previousVersion.contentType,
+            previousVersion.field,
+            defaultBuiltinWidgetId(previousVersion.fieldType),
+            'builtin'
+          );
           await updateEditor(result.contentType, result.field, sdk.ids.app, 'app');
         }
         currentItems[result.index] = result;
@@ -175,7 +183,12 @@ const ConfigScreen = () => {
         message: '',
       });
       if (deleteResponse) {
-        await updateEditor(item.contentType, item.field, 'objectEditor');
+        await updateEditor(
+          item.contentType,
+          item.field,
+          defaultBuiltinWidgetId(item.fieldType),
+          'builtin'
+        );
         const currentItems = parameters.items ?? [];
         currentItems.splice(index, 1);
         setParameters({ ...parameters, items: currentItems });
@@ -201,7 +214,8 @@ const ConfigScreen = () => {
           </TextLink>
         </Heading>
         <Paragraph>
-          Map this app to a JSON Object field to render the icon picker on that field.
+          Map this app to a <strong>Short text</strong>, <strong>Long text</strong>, or <strong>JSON Object</strong>{' '}
+          field. Saving wires the app to the field automatically.
         </Paragraph>
         <TableWithItems />
       </Box>
