@@ -1,52 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { FieldExtensionSDK } from "@contentful/app-sdk";
-import { /* useCMA, */ useSDK } from "@contentful/react-apps-toolkit";
-import MainEditor from "../components/MainEditor";
-import { EditorTypeValue, FieldState } from "../types";
-import {
-  AppInstallationParameters,
-  ConfigJsonStructureItem,
-} from "./ConfigScreen";
+import { FieldExtensionSDK } from '@contentful/app-sdk'
+import { useSDK } from '@contentful/react-apps-toolkit'
+import { useEffect, useMemo } from 'react'
+import SchemaEditor from '../components/SchemaEditor'
+import { InstallationParams, ObjectSchema } from '../types'
 
 const Field = () => {
-  const sdk = useSDK<FieldExtensionSDK>();
-  const [value, setValue] = useState<EditorTypeValue>();
-  const [stucture, setStructure] = useState<EditorTypeValue>();
+  const sdk = useSDK<FieldExtensionSDK>()
 
   useEffect(() => {
-    sdk.window.startAutoResizer();
-    return () => {
-      sdk.window.stopAutoResizer();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    sdk.window.startAutoResizer()
+    return () => sdk.window.stopAutoResizer()
+  }, [sdk.window])
 
-  useEffect(() => {
-    const structure = (
-      sdk.parameters.installation as AppInstallationParameters
-    ).items?.find(
-      (value: ConfigJsonStructureItem) =>
-        value.contentType === sdk.ids.contentType &&
-        value.field === sdk.ids.field
-    );
+  const schema = useMemo<ObjectSchema | undefined>(() => {
+    const params = sdk.parameters.installation as InstallationParams
+    return params.items?.find(
+      item => item.contentType === sdk.ids.contentType && item.field === sdk.ids.field
+    )?.json
+  }, [sdk.parameters.installation, sdk.ids.contentType, sdk.ids.field])
 
-    setStructure(structure?.json);
-    setValue(sdk.field.getValue() ?? {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialValue = useMemo(() => sdk.field.getValue() ?? {}, [])
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sdk]);
+  if (!schema) return null
 
   return (
-    <>
-      <MainEditor
-        structure={stucture as FieldState}
-        value={value as EditorTypeValue}
-        handleUpdate={(e: any) => {
-          sdk.field.setValue(e);
-        }}
-      />
-    </>
-  );
-};
+    <SchemaEditor
+      schema={schema}
+      initialValue={initialValue}
+      onChange={value => sdk.field.setValue(value)}
+    />
+  )
+}
 
-export default Field;
+export default Field
